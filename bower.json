@@ -1,9 +1,10 @@
 {
   "name": "ecmAngular",
-  "description": "",
-  "main": "",
+  "main" : "module.js",
+  "version":"1.0.0",
+  "description": "", 
   "license": "MIT",
-  "homepage": "",
+  "homepage": "", 
   "ignore": [
     "**/.*",
     "node_modules",
