@@ -889,7 +889,7 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-
+	
 		if(!isload) {
 
 			$templateCache.put('home.html', '');

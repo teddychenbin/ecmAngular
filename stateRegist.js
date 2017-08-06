@@ -1,4 +1,4 @@
-define(['require', './main'], function(require) {
+define(['require'], function(require) {
 
 	return function(stateProvider) {
 		//arg0 template
@@ -6,67 +6,99 @@ define(['require', './main'], function(require) {
 		stateProvider
 			.state('test', {
 				url: '/test',
-				templateUrl: '../../pages/test.html',
+				template: function() {
+					return '<div ng-include="' + "'test.html'" + '"></div>';
+				},
 				controller: 'testCtrl'
 			}).state('load', {
 				url: '/load',
-				templateUrl: '../../pages/load.html',
+				template: function() {
+					return '<div ng-include="' + "'load.html'" + '"></div>';
+				},
 				controller: 'loadCtrl'
 			}).state('error', {
 				url: '/error/:template',
-				templateUrl: '../../pages/error.html',
+				template: function() {
+					return '<div ng-include="' + "'error.html'" + '"></div>';
+				},
 				controller: 'errorCtrl'
 			}).state('home', {
-				url: '/home/:template', 
-				templateUrl: '../../pages/home.html',
+				url: '/home/:template',
+				template: function() {
+					return '<div ng-include="' + "'home.html'" + '"></div>';
+				},
 				controller: 'homeCtrl'
 			}).state('article', {
 				url: '/article/:template/:id',
-				templateUrl: '../../pages/article.html',
+				template: function() {
+					return '<div ng-include="' + "'article.html'" + '"></div>';
+				},
 				controller: 'articleCtrl'
 			}).state('mainitem', {
 				url: '/mainitem/:template/:path/:mainitemno/:id',
-				templateUrl: '../../pages/mainitem.html',
+				template: function() {
+					return '<div ng-include="' + "'mainitem.html'" + '"></div>';
+				},
 				controller: 'mainitemCtrl'
 			}).state('itemsearch', {
 				url: '/itemsearch/:template',
-				templateUrl: '../../pages/itemsearch.html',
+				template: function() {
+					return '<div ng-include="' + "'itemsearch.html'" + '"></div>';
+				},
 				controller: 'itemsearchCtrl'
 			}).state('login', {
 				url: '/login/:template',
-				templateUrl: '../../pages/login.html',
+				template: function() {
+					return '<div ng-include="' + "'login.html'" + '"></div>';
+				},
 				controller: 'loginCtrl'
 			}).state('register', {
 				url: '/register/:template',
-				templateUrl: '../../pages/register.html',
+				template: function() {
+					return '<div ng-include="' + "'register.html'" + '"></div>';
+				},
 				controller: 'registerCtrl'
 			}).state('member', {
 				url: '/member/:template',
-				templateUrl: '../../pages/member.html',
+				template: function() {
+					return '<div ng-include="' + "'member.html'" + '"></div>';
+				},
 				controller: 'memberCtrl'
 			}).state('order', {
 				url: '/order/:template',
-				templateUrl: '../../pages/order.html',
+				template: function() {
+					return '<div ng-include="' + "'order.html'" + '"></div>';
+				},
 				controller: 'orderCtrl'
 			}).state('orderpay', {
 				url: '/orderpay/:template',
-				templateUrl: '../../pages/orderpay.html',
+				template: function() {
+					return '<div ng-include="' + "'orderpay.html'" + '"></div>';
+				},
 				controller: 'orderpayCtrl'
 			}).state('shoppingcart', {
 				url: '/shoppingcart/:template',
-				templateUrl: '../../pages/shoppingcart.html',
+				template: function() {
+					return '<div ng-include="' + "'shoppingcart.html'" + '"></div>';
+				},
 				controller: 'shoppingcartCtrl'
 			}).state('mkgpgm', {
 				url: '/mkgpgm/:template/:id/:page',
-				templateUrl: '../../pages/mkgpgm.html',
+				template: function() {
+					return '<div ng-include="' + "'mkgpgm.html'" + '"></div>';
+				},
 				controller: 'mkgpgmCtrl'
 			}).state('mkgpgmarticle', {
 				url: '/mkgpgmarticle/:template/:path/:id',
-				templateUrl: '../../pages/mkgpgmarticle.html',
+				template: function() {
+					return '<div ng-include="' + "'mkgpgmarticle.html'" + '"></div>';
+				},
 				controller: 'mkgpgmarticleCtrl'
 			}).state('mkgdispgroup', {
 				url: '/mkgdispgroup/:template/:id/:page',
-				templateUrl: '../../pages/mkgdispgroup.html',
+				template: function() {
+					return '<div ng-include="' + "'mkgdispgroup.html'" + '"></div>';
+				},
 				controller: 'mkgdispgroupCtrl'
 			});
 
