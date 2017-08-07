@@ -373,11 +373,24 @@ define('factorys/identifyFactory',['require', './module'], function(require, mod
 
 		return {
 
-			get: function(identify) {
+			login: function(identify) {
 				var deferred = $q.defer();
 				$http({
-					url: apihost + '/config/config.json',
-					method: 'get'
+					url: apihost + '/security/login',
+					method: 'post'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			logout: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/logout',
+					method: 'post'
 				}).then(function(result) {
 					deferred.resolve(result.data);
 				}).catch(function(result) {
@@ -386,6 +399,7 @@ define('factorys/identifyFactory',['require', './module'], function(require, mod
 				});
 				return deferred.promise;
 			}
+
 		};
 
 	});
@@ -484,7 +498,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var angular = require('angular');
 
 	module.service('initctrlSvc', function($http, $q, $cacheFactory, pages, views, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, advertFactory) {
+		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, identifyFactory) {
 
 		this.initViews = function(templateCache, pageid) {
 			//loadpage
@@ -563,6 +577,36 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			rootScope.paths = paths;
 		};
 
+		this.initIdentify = function(rootScope) {
+
+			var input = $('#input_identify');
+			if(_.isEmpty(input.val())) {
+				rootScope.identify = null;
+			} else {
+				rootScope.identify = JSON.parse(input.val());
+			}
+		};
+
+		this.logout = function() {
+
+			identifyFactory.logout().then(function(data) {
+					console.info(data);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+
+		};
+
+		this.login = function(identify) {
+			identifyFactory.logint(identify).then(function(data) {
+					console.info(data);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache) {
 
 			if(sessionStorage.getItem('config') != null) {
@@ -571,6 +615,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
+				this.initIdentify(rootScope);
+				rootScope.login = this.login;
+				rootScope.logout = this.logout;
 				return true;
 			} else {
 
@@ -884,9 +931,7 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 	var _ = require('lodash');
 
 	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-
-		console.log($state.current.name);
-
+   
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache);
 	
@@ -895,10 +940,8 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 			$templateCache.put('home.html', '');
 			return;
 		}
-
-		$rootScope.path = [];
-		$rootScope.path.push(template);
-
+  
+		
 		setTimeout(function() {
 			$("img.lazy").lazyload();
 		}, 200);
@@ -1246,15 +1289,7 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			return;
 		}
 		
-		/*
-		 * 登录
-		 */
-		this.login = function(){
-			
-		};
-		
-		
-		 
+	 
 
 	});
 
@@ -1372,24 +1407,24 @@ define('filters/nodes',['require', './module'], function(require, module) {
 	});
 
 });
-define('filters/trueString',['require', './module'], function(require, module) {
+define('filters/ifvalue',['require', './module'], function(require, module) {
 	'use strict';
 
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.filter('trueString', function() {
+	module.filter('ifvalue', function() {
 
-		return function(input, compareString, trueString, falseString) {
+		return function(input, compareValue, trueValue, falseValue) {
 
-			return input === compareString ? trueString : falseString;
+			return input === compareValue ? trueValue : falseValue;
 
 		};
 
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './trueString'],
+define('filters/main',['./testFilter', './nodes', './ifvalue'],
 	function() {
 
 		'use strict';
