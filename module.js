@@ -196,7 +196,7 @@ define('factorys/advertFactory',['require', './module'], function(require, modul
 			get: function() {
 				var deferred = $q.defer();
 				$http({
-					url: jsonhost + '/advert/merge.json',
+					url: jsonhost + '/adv/merge.json',
 					method: 'get'
 				}).then(function(result) { 
 					deferred.resolve(result.data);
@@ -534,12 +534,14 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 			var page = JSON.parse(sessionStorage.getItem('page_' + pageid));
 
-			if(!_.isUndefined(page.title) && _.trim(page.title) !== "") {
-				rootScope.title = _.trim(page.title);
-				return;
-			} else if(!_.isUndefined(rootScope.config.title) && _.trim(rootScope.config.title) !== "") {
+			if(!_.isUndefined(rootScope.config.title) && _.trim(rootScope.config.title) !== "") {
 
 				rootScope.title = _.trim(rootScope.config.title);
+			}
+
+			if(!_.isUndefined(page.title) && _.trim(page.title) !== "") {
+				rootScope.title = _.trim(page.title) + ' -' + rootScope.title;
+
 			}
 
 		};
@@ -599,7 +601,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		};
 
 		this.login = function(identify) {
-			identifyFactory.logint(identify).then(function(data) {
+
+			identifyFactory.login(identify).then(function(data) {
 					console.info(data);
 				})
 				.catch(function(err) {
@@ -958,6 +961,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		mkgdispgroupFactory, mainitemFactory, pageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
+
 		var isload = initctrlSvc.controlLoad('mkgdispgroup' + template, $state, $location, $rootScope, $stateParams, $templateCache);
 
 		if(!isload) {
@@ -969,7 +973,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		$scope.fetch = function(pg) {
 			if(!_.isNumber(pg)) {
 				return;
-			} 
+			}
 			$state.go('mkgdispgroup', {
 				templage: $stateParams.template,
 				id: $stateParams.id,
@@ -980,6 +984,8 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		var page = _.parseInt($stateParams.page);
 
 		mkgdispgroupFactory.get($stateParams.id).then(function(data) {
+
+				$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
 				$scope.mkgdispgroup = {};
 				_.set($scope.mkgdispgroup, "id", data.id);
@@ -1053,6 +1059,9 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 		}
 
 		mkgpgmarticleFactory.get($stateParams.id).then(function(data) {
+
+				var title = '[' + data.name + ' ' + data.id + ']';
+
 				$scope.mkgpgmarticle = data;
 
 				var dispunitids = [];
@@ -1077,6 +1086,8 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 						_(mainitem.dispunits).forEach(function(dispunit) {
 
 							if(_.includes(dispunitids, dispunit.id)) {
+
+								title += ' [' + mainitem.name + ' ' + dispunit.id + ' ' + dispunit.prodspec1.name + ']';
 								dispunit.name = mainitem.name;
 								$scope.mkgpgmarticle.dispunits.push(dispunit);
 							}
@@ -1088,6 +1099,8 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 					setTimeout(function() {
 						$("img.lazy").lazyload();
 					}, 200);
+
+					$rootScope.title = title + ' -' + $rootScope.title;
 
 					console.info($scope.mkgpgmarticle.dispunits);
 
@@ -1121,7 +1134,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 		$scope.fetch = function(pg) {
 			if(!_.isNumber(pg)) {
 				return;
-			} 
+			}
 			$state.go('mkgpgm', {
 				templage: $stateParams.template,
 				id: $stateParams.id,
@@ -1132,6 +1145,8 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 		var page = _.parseInt($stateParams.page);
 
 		mkgpgmFactory.get($stateParams.id).then(function(data) {
+
+				$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
 				$scope.mkgpgm = {};
 				_.set($scope.mkgpgm, "id", data.id);
@@ -1197,14 +1212,21 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 				_($scope.mainitem.dispunits).forEach(function(el) {
 
 					if(el.id === $stateParams.id) {
-						$scope.dispunit = el; 
-					 
+						$scope.dispunit = el;
+
 					}
 
 				});
-				
+
 				console.info($scope.mainitem);
 				console.info($scope.dispunit);
+
+				var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
+
+				if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
+					title += ' ' + $scope.mainitem.brand.name;
+				}
+				$rootScope.title = title + ' -' + $rootScope.title;
 
 				setTimeout(function() {
 					$("img.lazy").lazyload();
@@ -1214,7 +1236,6 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			.catch(function(err) {
 				console.log(err);
 			});
-
 
 		/*
 		 * 选择颜色
@@ -1235,7 +1256,7 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 		$scope.addShoppingcart = function() {
 
 		};
-		
+
 		/*
 		 * 修改数量
 		 */
@@ -1249,17 +1270,14 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 		$scope.buy = function() {
 
 		};
-		
+
 		/*
 		 * 加入我的喜爱
 		 */
 		$scope.favor = function() {
 
 		};
-		
-		
-		
-		
+
 	});
 
 });
