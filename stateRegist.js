@@ -27,7 +27,7 @@ define(['require'], function(require) {
 				template: function() {
 					return '<div ng-include="' + "'info.html'" + '"></div>';
 				},
-				controller: 'errorCtrl'
+				controller: 'infoCtrl'
 			}).state('home', {
 				url: '/home/:template',
 				template: function() {

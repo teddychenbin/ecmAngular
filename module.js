@@ -562,14 +562,14 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		};
 
 		this.initTitle = function(pageid, rootScope) {
-
+			
 			var page = JSON.parse(sessionStorage.getItem('page_' + pageid));
 
 			if(!_.isUndefined(rootScope.config.title) && _.trim(rootScope.config.title) !== "") {
 
 				rootScope.title = _.trim(rootScope.config.title);
 			}
-
+			 
 			if(!_.isUndefined(page.title) && _.trim(page.title) !== "") {
 				rootScope.title = _.trim(page.title) + ' -' + rootScope.title;
 
