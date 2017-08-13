@@ -216,7 +216,7 @@ define('factorys/webpageFactory',['require', './module'], function(require, modu
 
 	var angular = require('angular');
 
-	module.factory('webpageFactory', function($http, $q, jsonhost) {
+	module.factory('webpageFactory', function($http, $q, webpagehost) {
 
 		return {
 
@@ -226,7 +226,7 @@ define('factorys/webpageFactory',['require', './module'], function(require, modu
 
 					var result = "";
 					$.ajax({
-						url: jsonhost + '/webpage/' + pageid + '.json',
+						url: webpagehost + '/webpage/' + pageid + '.json',
 						cache: false,
 						async: false,
 						type: "get",
@@ -241,7 +241,7 @@ define('factorys/webpageFactory',['require', './module'], function(require, modu
 
 					var deferred = $q.defer();
 					$http({
-						url: jsonhost + '/webpage/' + pageid + '.json',
+						url: webpagehost + '/webpage/' + pageid + '.json',
 						method: 'get'
 					}).then(function(result) {
 						deferred.resolve(result.data);
@@ -366,19 +366,21 @@ define('factorys/articlecontentFactory',['require', './module'], function(requir
 	});
 
 });
-define('factorys/identifyFactory',['require', './module'], function(require, module) {
+define('factorys/memberidentifyFactory',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.factory('identifyFactory', function($http, $q, apihost) {
+	module.factory('memberidentifyFactory', function($http, $q, apihost) {
 
 		return {
 
 			login: function(user) {
 				var deferred = $q.defer();
 				$http({
-					url: apihost + '/membermall/security/login',
-					method: 'post',
-					params: user
+					url: apihost + '/security/memberidentify/login',
+					method: 'post', 
+					params: {
+						data: JSON.stringify(user)
+					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
 				}).catch(function(result) {
@@ -390,8 +392,8 @@ define('factorys/identifyFactory',['require', './module'], function(require, mod
 			logout: function() {
 				var deferred = $q.defer();
 				$http({
-					url: apihost + '/membermall/security/logout',
-					method: 'post'
+					url: apihost + '/security/memberidentify/logout',
+					method: 'post', 
 				}).then(function(result) {
 					deferred.resolve(result.data);
 				}).catch(function(result) {
@@ -406,11 +408,39 @@ define('factorys/identifyFactory',['require', './module'], function(require, mod
 	});
 
 });
+define('factorys/memberaccountFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('memberaccountFactory', function($http, $q, apihost) {
+
+		return {
+
+			regist: function(user) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/memberaccount/regist',
+					method: 'post',
+					params: {
+						data: JSON.stringify(user)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+		};
+
+	});
+
+});
 define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 
 		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
-		'./identifyFactory'
+		'./memberidentifyFactory', './memberaccountFactory'
 	],
 	function() {
 
@@ -499,7 +529,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var angular = require('angular');
 
 	module.service('initctrlSvc', function($http, $q, $cacheFactory, pages, views, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, identifyFactory) {
+		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, memberidentifyFactory) {
 
 		this.initViews = function(templateCache, pageid) {
 			//loadpage
@@ -881,7 +911,7 @@ define('controllers/testCtrl',['require', './module'], function(require, module)
 });
 define('controllers/articleCtrl',['require', './module'], function(require, module) {
 	'use strict';
-
+ 
 	module.controller('articleCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc, articlecontentFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
@@ -893,7 +923,7 @@ define('controllers/articleCtrl',['require', './module'], function(require, modu
 			$templateCache.put('article.html', '');
 			return;
 		}
-
+ 
 		var content = articlecontentFactory.get($stateParams.id, false);
 		$templateCache.put('content.html', content);
 
@@ -903,9 +933,23 @@ define('controllers/articleCtrl',['require', './module'], function(require, modu
 define('controllers/errorCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('errorCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+	var _ = require('lodash');
+
+	module.controller('errorCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
+   
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('error' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+	
+		if(!isload) {
+
+			$templateCache.put('error.html', '');
+			return;
+		}
+   
+		
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
 
 	});
 
@@ -977,34 +1021,32 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 				var fetch = pageSvc.fetch($scope, data.lines, page);
 
 				var promises = [];
-
+				var proddispunitids = [];
 				for(var i = fetch.first; i < fetch.max; i++) {
 					if(i < data.lines.length) {
 						var mainitemno = data.lines[i].mainitemno;
+						proddispunitids.push(data.lines[i].proddispunitid);
 						promises.push(mainitemFactory.get(mainitemno));
 					}
 				}
 
 				$q.all(promises).then(function(values) {
 
-						_(values).forEach(function(mainitem) {
-
-							var existMajor = false;
-							_(mainitem.dispunits).forEach(function(dispunit) {
-
-								dispunit.name = mainitem.name;
-								dispunit.mainitemno = mainitem.id;
-								if(dispunit.ismajorcolor === "True") {
-									$scope.mkgdispgroup.lines.push(dispunit);
-									existMajor = true;
+						for(var i = 0; i < values.length; i++) {
+							var mainitem = values[i];
+							var proddispunitid = proddispunitids[i];
+							
+							for(var j = 0; j < mainitem.dispunits.length; j++) {
+								mainitem.dispunits[j].mainitem = mainitem;
+								if(mainitem.dispunits[j].id === proddispunitid) {
+									$scope.mkgdispgroup.lines.push(mainitem.dispunits[j]);
 								}
-							});
-
-							if(!existMajor && mainitem.dispunits.length > 0) {
-								$scope.mkgdispgroup.lines.push(mainitem.dispunits[0]);
 							}
-
-						});
+						
+							 
+						}
+						
+						console.info($scope.mkgdispgroup);
 
 						setTimeout(function() {
 							$("img.lazy").lazyload();
@@ -1034,11 +1076,24 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('mkgpgmarticle' + template, $state, $location, $rootScope, $stateParams, $templateCache);
 
-		if(!isload) {
+		if (!isload) {
 
 			$templateCache.put('mkgpgmarticle.html', '');
 			return;
 		}
+
+		$scope.appendSuit = function(mainitem) {
+			var promises = [];
+			_(mainitem.suits).forEach(function(el) {
+
+				promises.push(mainitemFactory.get(el.mainitemno));
+			});
+
+			$q.all(promises).then(function(suitmainitems) {
+				mainitem.suits = [];
+				mainitem.suits = suitmainitems;
+			});
+		};
 
 		mkgpgmarticleFactory.get($stateParams.id).then(function(data) {
 
@@ -1057,20 +1112,25 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 
 				var promises = [];
 
-				for(var i = 0; i < dispunitids.length; i++) {
+				for (var i = 0; i < dispunitids.length; i++) {
 					promises.push(mainitemFactory.get(mainitemnos[i]));
 				}
 
 				$q.all(promises).then(function(values) {
 
-					_(values).forEach(function(mainitem) {
 
+					_(values).forEach(function(mainitem) {
+						
+						$scope.appendSuit(mainitem);
+						
 						_(mainitem.dispunits).forEach(function(dispunit) {
 
-							if(_.includes(dispunitids, dispunit.id)) {
+							if (_.includes(dispunitids, dispunit.id)) {
 
 								title += ' [' + mainitem.name + ' ' + dispunit.id + ' ' + dispunit.prodspec1.name + ']';
 								dispunit.name = mainitem.name;
+								dispunit.mainitemno = mainitem.id;
+								dispunit.mainitem = mainitem;
 								$scope.mkgpgmarticle.dispunits.push(dispunit);
 							}
 
@@ -1127,7 +1187,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 		var page = _.parseInt($stateParams.page);
 
 		mkgpgmFactory.get($stateParams.id).then(function(data) {
-
+		 
 				$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
 				$scope.mkgpgm = {};
@@ -1174,18 +1234,31 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 	var _ = require('lodash');
 
-	module.controller('mainitemCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
+	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
 		mainitemFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
 		var isload = initctrlSvc.controlLoad('mainitem' + template, $state, $location, $rootScope, $stateParams, $templateCache);
 
-		if(!isload) {
+		if (!isload) {
 
 			$templateCache.put('mainitem.html', '');
 			return;
 		}
+
+		$scope.appendSuit = function(mainitem) {
+			var promises = [];
+			_(mainitem.suits).forEach(function(el) {
+
+				promises.push(mainitemFactory.get(el.mainitemno));
+			});
+
+			$q.all(promises).then(function(suitmainitems) {
+				mainitem.suits = [];
+				mainitem.suits = suitmainitems;
+			});
+		};
 
 		mainitemFactory.get($stateParams.mainitemno).then(function(data) {
 
@@ -1193,19 +1266,21 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 				_($scope.mainitem.dispunits).forEach(function(el) {
 
-					if(el.id === $stateParams.id) {
+					if (el.id === $stateParams.id) {
 						$scope.dispunit = el;
 
 					}
 
 				});
 
+				$scope.appendSuit($scope.mainitem);
+
 				console.info($scope.mainitem);
 				console.info($scope.dispunit);
 
 				var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
 
-				if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
+				if (!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
 					title += ' ' + $scope.mainitem.brand.name;
 				}
 				$rootScope.title = title + ' -' + $rootScope.title;
@@ -1279,7 +1354,7 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 	var _ = require('lodash');
 
 	module.controller('loginCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, identifyFactory) {
+		initctrlSvc, memberidentifyFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('login' + template, $state, $location, $rootScope, $stateParams, $templateCache);
@@ -1290,28 +1365,15 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			return;
 		}
 
-		$scope.user = {
-			telno: null,
-			email: null,
+		$scope.user = {			
 			id: null,
-			pwd: null
+			password: null
 		};
-
-		//		this.logout = function() {
-		//
-		//			identifyFactory.logout().then(function(data) {
-		//					console.info(data);
-		//				})
-		//				.catch(function(err) {
-		//					console.log(err);
-		//				});
-		//
-		//		};
 
 		$scope.login = function() {
 		 
 			
-			identifyFactory.login(this.user).then(function(data) {
+			memberidentifyFactory.login(this.user).then(function(data) {
 					console.info(data);
 				})
 				.catch(function(err) {
@@ -1352,12 +1414,28 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 	});
 
 });
-define('controllers/registerCtrl',['require', './module'], function(require, module) {
+define('controllers/registCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('registerCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+	var _ = require('lodash');
+
+	module.controller('registCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, memberidentifyFactory) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('regist' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+
+		if(!isload) {
+
+			$templateCache.put('regist.html', '');
+			return;
+		}
+
+		$scope.user = {
+			id: null,
+			password: null,
+			authtype: null,
+		};
 
 	});
 
@@ -1389,9 +1467,34 @@ define('controllers/loadCtrl',['require', './module'], function(require, module)
 	});
 
 });
+define('controllers/infoCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('infoCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
+   
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('info' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+	
+		if(!isload) {
+
+			$templateCache.put('info.html', '');
+			return;
+		}
+  
+  		$scope.message = $stateParams.message;
+		
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
 define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl', 
 './mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl', 
-'./registerCtrl', './shoppingcartCtrl', './loadCtrl'],
+'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl'],
 	function() {
 
 		'use strict';

@@ -22,6 +22,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'error.html'" + '"></div>';
 				},
 				controller: 'errorCtrl'
+			}).state('info', {
+				url: '/info/:template/:message',
+				template: function() {
+					return '<div ng-include="' + "'info.html'" + '"></div>';
+				},
+				controller: 'errorCtrl'
 			}).state('home', {
 				url: '/home/:template',
 				template: function() {
@@ -52,12 +58,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'login.html'" + '"></div>';
 				},
 				controller: 'loginCtrl'
-			}).state('register', {
-				url: '/register/:template',
+			}).state('regist', {
+				url: '/regist/:template',
 				template: function() {
-					return '<div ng-include="' + "'register.html'" + '"></div>';
+					return '<div ng-include="' + "'regist.html'" + '"></div>';
 				},
-				controller: 'registerCtrl'
+				controller: 'registCtrl'
 			}).state('member', {
 				url: '/member/:template',
 				template: function() {
