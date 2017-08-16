@@ -1,7 +1,7 @@
-define('factorys/module',['require'], function(require) {
+﻿define('factorys/module',['require'], function(require) {
     'use strict';
     var ng = require('angular'); 
-    return ng.module('app.factorys', []);
+    return ng.module('app.factorys', []); 
 });
 
 define('factorys/testFactory',['require', './module'], function(require, module) {
