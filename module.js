@@ -1112,7 +1112,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 				_.forEach(data.lines, function(mainitem) {
 					mainitemnos.push(mainitem.id);
 				});
-				console.info(mainitemnos)
+		 
 				$scope.mkgpgmarticle.lines = [];
 
 				var promises = [];
@@ -1462,11 +1462,9 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 			email: null,
 			phone: null,
 			authtype: null,
-			client: null
+			client: (new Date()).toISOString()
 		};
-
-		$scope.user.client = (new Date).toISOString();
-
+ 
 		$scope.regist = function(authtype) {
 
 			$scope.user.authtype = authtype;
