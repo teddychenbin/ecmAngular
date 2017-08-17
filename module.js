@@ -1039,11 +1039,10 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 				var fetch = pageSvc.fetch($scope, data.lines, page);
 
 				var promises = [];
-				var proddispunitids = [];
+
 				for(var i = fetch.first; i < fetch.max; i++) {
 					if(i < data.lines.length) {
 						var mainitemno = data.lines[i].mainitemno;
-						proddispunitids.push(data.lines[i].proddispunitid);
 						promises.push(mainitemFactory.get(mainitemno, $rootScope.bust));
 					}
 				}
@@ -1052,18 +1051,9 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 						for(var i = 0; i < values.length; i++) {
 							var mainitem = values[i];
-							var proddispunitid = proddispunitids[i];
-							
-							for(var j = 0; j < mainitem.dispunits.length; j++) {
-								mainitem.dispunits[j].mainitem = mainitem;
-								if(mainitem.dispunits[j].id === proddispunitid) {
-									$scope.mkgdispgroup.lines.push(mainitem.dispunits[j]);
-								}
-							}
-						
-							 
+							$scope.mkgdispgroup.lines.push(mainitem);
 						}
-						
+
 						console.info($scope.mkgdispgroup);
 
 						setTimeout(function() {
@@ -1094,7 +1084,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('mkgpgmarticle' + template, $state, $location, $rootScope, $stateParams, $templateCache);
 
-		if (!isload) {
+		if(!isload) {
 
 			$templateCache.put('mkgpgmarticle.html', '');
 			return;
@@ -1118,41 +1108,28 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 				var title = '[' + data.name + ' ' + data.id + ']';
 
 				$scope.mkgpgmarticle = data;
-
-				var dispunitids = [];
 				var mainitemnos = [];
-				_.forEach(data.dispunits, function(dispunit) {
-					dispunitids.push(dispunit.id);
-					mainitemnos.push(dispunit.mainitemno);
+				_.forEach(data.lines, function(mainitem) {
+					mainitemnos.push(mainitem.id);
 				});
-
-				$scope.mkgpgmarticle.dispunits = [];
+				console.info(mainitemnos)
+				$scope.mkgpgmarticle.lines = [];
 
 				var promises = [];
 
-				for (var i = 0; i < dispunitids.length; i++) {
+				for(var i = 0; i < mainitemnos.length; i++) {
 					promises.push(mainitemFactory.get(mainitemnos[i], $rootScope.bust));
 				}
 
 				$q.all(promises).then(function(values) {
 
-
 					_(values).forEach(function(mainitem) {
-						
+
 						$scope.appendSuit(mainitem);
+
+						title += ' [' + mainitem.name + ' ' + mainitem.dispunits[0].id + ' ' + mainitem.dispunits[0].prodspec1.name + ']';
 						
-						_(mainitem.dispunits).forEach(function(dispunit) {
-
-							if (_.includes(dispunitids, dispunit.id)) {
-
-								title += ' [' + mainitem.name + ' ' + dispunit.id + ' ' + dispunit.prodspec1.name + ']';
-								dispunit.name = mainitem.name;
-								dispunit.mainitemno = mainitem.id;
-								dispunit.mainitem = mainitem;
-								$scope.mkgpgmarticle.dispunits.push(dispunit);
-							}
-
-						});
+						$scope.mkgpgmarticle.lines.push(mainitem);
 
 					});
 
@@ -1162,7 +1139,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 
 					$rootScope.title = title + ' -' + $rootScope.title;
 
-					console.info($scope.mkgpgmarticle.dispunits);
+					console.info($scope.mkgpgmarticle.lines);
 
 				});
 
@@ -1370,9 +1347,10 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 	'use strict';
 
 	var _ = require('lodash');
+	var md5 = require('md5');
 
 	module.controller('loginCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, memberidentifyFactory) {
+		initctrlSvc, dialogSvc, memberidentifyFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('login' + template, $state, $location, $rootScope, $stateParams, $templateCache);
@@ -1387,25 +1365,56 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			id: null,
 			password: null
 		};
+ 
 
-		/*
-		 * authtype: id , email ,phone
-		 */
 		$scope.login = function() {
  
-			 
-		};
+ 
+			var mask = JSON.parse(JSON.stringify(this.user));
+			mask.password = md5(mask.password);
 
+			memberidentifyFactory.login(mask).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+					 					
+ 					$state.go($rootScope.previousState,$rootScope.previousParams);
+					         			
+				} else {
+					
+					$.registCallback(data.message);
+
+				}
+
+			}, function(err) { 
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
+			});
+
+		};
 	});
 
 });
 define('controllers/memberCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('memberCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+	var _ = require('lodash');
+	
 
+	module.controller('memberCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+
+		if(!isload) {
+
+			$templateCache.put('member.html', '');
+			return;
+		}
+ 
+
+	 
 	});
 
 });
@@ -1452,8 +1461,11 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 			password: null,
 			email: null,
 			phone: null,
-			authtype: null
+			authtype: null,
+			client: null
 		};
+
+		$scope.user.client = (new Date).toISOString();
 
 		$scope.regist = function(authtype) {
 
@@ -1461,17 +1473,24 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 
 			var mask = JSON.parse(JSON.stringify(this.user));
 			mask.password = md5(mask.password);
- 			 		 
+
 			memberaccountFactory.regist(mask).then(function(data) {
 
-				if(data.toLower() === 'true') {
-
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+					$state.go("info", {
+						template: 'registsuccess',
+						message: $scope.user.id
+					});
 				} else {
-					dialogSvc.error('失敗1');
+					
+					$.registCallback(data.message);
+
 				}
 
-			}, function(err) {
-				dialogSvc.error('失敗2');
+			}, function(err) { 
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
 			});
 
 		};
@@ -1586,8 +1605,7 @@ define('filters/nodeattr',['require', './module'], function(require, module) {
 
 		return function(sitemap, id, property) {
 			
-			console.info(id);
-			console.info(property);
+		 
 			
 			var el = _.find(sitemap, function(value) {
 				return value.id === id;
