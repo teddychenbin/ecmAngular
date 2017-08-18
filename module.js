@@ -516,8 +516,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function($http, $q, $cacheFactory, pages, views, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, memberidentifyFactory) {
+	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, pages, views, webpageFactory,
+		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, memberidentifyFactory, dialogSvc) {
 
 		this.initViews = function(templateCache, pageid) {
 			//loadpage
@@ -600,23 +600,23 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		this.initIdentify = function(rootScope) {
 
-			var input = $('#hidden_identify');
-			if(_.isEmpty(input.val())) {
+			var el = $('#hidden_identify');
+			if(_.isEmpty(el.text())) {
 				rootScope.identify = null;
-			} else {
-				rootScope.identify = JSON.parse(input.val());
+			} else {				
+				rootScope.identify = JSON.parse(el.text());
 			}
 		};
 
 		this.logout = function() {
 
-			memberidentifyFactory.login(mask).then(function(data) {
+			memberidentifyFactory.logout().then(function(data) {
 
 				$window.location = 'index.html';
 				$window.location.reload();
 
 			}, function(err) {
-				dialogSvc.error("net error!"); 
+				dialogSvc.error("net error!");
 			});
 
 		};
