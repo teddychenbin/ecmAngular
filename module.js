@@ -464,20 +464,7 @@ define('directives/testDirective',['require', './module'], function(require, mod
 	});
 
 });
-define('directives/login',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.directive("login", function(ver, identifySvc) {
-		return {
-			restrict: "A",
-			replace: true,
-			template: "<h1>自定义指令!</h1>"
-
-		};
-	});
-
-});
-define('directives/main',['./testDirective', './login'],
+define('directives/main',['./testDirective'],
 	function() {
 
 		'use strict';
@@ -613,12 +600,25 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		this.initIdentify = function(rootScope) {
 
-			var input = $('#input_identify');
+			var input = $('#hidden_identify');
 			if(_.isEmpty(input.val())) {
 				rootScope.identify = null;
 			} else {
 				rootScope.identify = JSON.parse(input.val());
 			}
+		};
+
+		this.logout = function() {
+
+			memberidentifyFactory.login(mask).then(function(data) {
+
+				$window.location = 'index.html';
+				$window.location.reload();
+
+			}, function(err) {
+				dialogSvc.error("net error!"); 
+			});
+
 		};
 
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache) {
@@ -630,7 +630,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
 				this.initIdentify(rootScope);
-				rootScope.login = this.login;
+
 				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
 
@@ -712,31 +712,6 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
-	});
-
-});
-define('services/identifySvc',['require', './module'], function(require, module) {
-	'use strict';
-
-	var _ = require('lodash');
-	var angular = require('angular');
-
-	module.service('identifySvc', function() {
-
-		this.get = function() {
-			return null;
-		};
-
-		this.login = function(identify) {
-			
-		};
-
-		this.logout = function() {
-
-		};
-		
-		
-		
 	});
 
 });
@@ -897,7 +872,7 @@ define('services/dialogSvc',['require', './module'], function(require, module) {
 	});
 
 });
-define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './identifySvc', './pageSvc', './shoppingcartSvc', './dialogSvc'],
+define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc'],
 	function() {
 
 		'use strict';
@@ -1365,27 +1340,30 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			id: null,
 			password: null
 		};
- 
 
 		$scope.login = function() {
- 
- 
+
 			var mask = JSON.parse(JSON.stringify(this.user));
 			mask.password = md5(mask.password);
 
 			memberidentifyFactory.login(mask).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
-					 					
- 					$state.go($rootScope.previousState,$rootScope.previousParams);
-					         			
+
+					if($rootScope.previousState.name === 'login' || $rootScope.previousState.name === '' ) {
+						$window.location = 'index.html';
+					} else {  
+						$state.go($rootScope.previousState, $rootScope.previousParams); 				 
+					}
+					$window.location.reload();
+
 				} else {
-					
+
 					$.registCallback(data.message);
 
 				}
 
-			}, function(err) { 
+			}, function(err) {
 				dialogSvc.error("net error!");
 				$.registCallback('');
 
