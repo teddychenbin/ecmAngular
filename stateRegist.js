@@ -118,6 +118,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'actionauth.html'" + '"></div>';
 				},
 				controller: 'actionauthCtrl'
+			}).state('bindingemail', {
+				url: '/bindingemail/:template',
+				template: function() {
+					return '<div ng-include="' + "'bindingemail.html'" + '"></div>';
+				},
+				controller: 'bindingemailCtrl'
 			});
 
 	};

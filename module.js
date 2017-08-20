@@ -436,12 +436,40 @@ define('factorys/memberaccountFactory',['require', './module'], function(require
 	});
 
 });
+define('factorys/memberaccountbindingFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('memberaccountbindingFactory', function($http, $q, apihost) {
+
+		return {
+
+			saveOrUpdate: function(accountbinding) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberaccountbinding/saveorupdate',
+					method: 'post',
+					params: {
+						data: JSON.stringify(accountbinding)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+		};
+
+	});
+
+});
 define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 
 		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
-		'./memberidentifyFactory', './memberaccountFactory'
-		
+		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory'
+
 	],
 	function() {
 
@@ -1400,7 +1428,7 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 				template: '',
 				actiontype: 'changepassword'
 			});
-		}
+		};
 
 		setTimeout(function() {
 			$("img.lazy").lazyload();
@@ -1583,6 +1611,11 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 			$templateCache.put('changepassword.html', '');
 			return;
 		}
+		
+		if($rootScope.identify === null) {
+			$state.go('login');
+			return;
+		}
   
   		$scope.message = $stateParams.message;
 		
@@ -1593,9 +1626,69 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 	});
 
 });
+define('controllers/bindingemailCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('bindingemailCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc, memberaccountbindingFactory) {
+			
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+	
+		if(!isload) {
+
+			$templateCache.put('bindingemail.html', '');
+			return;
+		}
+  
+  
+		if($rootScope.identify === null) {
+			$state.go('login');
+			return;
+		}
+		
+  		$scope.accountbinding = {
+			id: $rootScope.identify.email,   
+			authtype: 'email',
+			client: (new Date()).toISOString()
+		};
+		 
+		$scope.send = function() {
+  
+			memberaccountbindingFactory.saveOrUpdate().then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+					$state.go("info", {
+						template: 'gotoemail',
+						message: $rootScope.identify.email
+					});
+				} else {
+					
+					$.registCallback(data.message);
+
+				}
+
+			}, function(err) { 
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
+			});
+
+		};
+		
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
 define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
 		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl',
-		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl'
+		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
+		'./bindingemailCtrl'
 	],
 	function() {
 
