@@ -106,6 +106,18 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'mkgdispgroup.html'" + '"></div>';
 				},
 				controller: 'mkgdispgroupCtrl'
+			}).state('changepassword', {
+				url: '/changepassword/:template/:actionauthpk',
+				template: function() {
+					return '<div ng-include="' + "'changepassword.html'" + '"></div>';
+				},
+				controller: 'changepasswordCtrl'
+			}).state('actionauth', {
+				url: '/actionauth/:template/:actiontype',
+				template: function() {
+					return '<div ng-include="' + "'actionauth.html'" + '"></div>';
+				},
+				controller: 'actionauthCtrl'
 			});
 
 	};

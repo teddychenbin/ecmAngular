@@ -1377,7 +1377,6 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 	'use strict';
 
 	var _ = require('lodash');
-	
 
 	module.controller('memberCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
 		initctrlSvc, dialogSvc) {
@@ -1390,9 +1389,23 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 			$templateCache.put('member.html', '');
 			return;
 		}
- 
 
-	 
+		if($rootScope.identify === null) {
+			$state.go('login');
+			return;
+		}
+
+		$scope.changepassword = function() {
+			$state.go('actionauth', {
+				template: '',
+				actiontype: 'changepassword'
+			});
+		}
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
 	});
 
 });
@@ -1525,9 +1538,65 @@ define('controllers/infoCtrl',['require', './module'], function(require, module)
 	});
 
 });
-define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl', 
-'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl', 
-'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl'],
+define('controllers/actionauthCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('actionauthCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+
+		if(!isload) {
+
+			$templateCache.put('actionauth.html', '');
+			return;
+		}
+
+		if($rootScope.identify === null) {
+			$state.go('login');
+			return;
+		}
+
+		$scope.actiontype = $stateParams.actiontype;
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/changepasswordCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('changepasswordCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
+   
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+	
+		if(!isload) {
+
+			$templateCache.put('changepassword.html', '');
+			return;
+		}
+  
+  		$scope.message = $stateParams.message;
+		
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
+		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl',
+		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl'
+	],
 	function() {
 
 		'use strict';
