@@ -377,7 +377,7 @@ define('factorys/memberidentifyFactory',['require', './module'], function(requir
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/security/memberidentify/login',
-					method: 'post', 
+					method: 'post',
 					params: {
 						data: JSON.stringify(user)
 					}
@@ -393,7 +393,7 @@ define('factorys/memberidentifyFactory',['require', './module'], function(requir
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/security/memberidentify/logout',
-					method: 'post', 
+					method: 'post',
 				}).then(function(result) {
 					deferred.resolve(result.data);
 				}).catch(function(result) {
@@ -401,6 +401,44 @@ define('factorys/memberidentifyFactory',['require', './module'], function(requir
 					deferred.reject(result);
 				});
 				return deferred.promise;
+			},
+			getIdentify: function(isAsync) {
+
+				if(!isAsync) {
+					
+					var result = "";
+
+					$.ajax({
+						url: apihost + '/security/memberidentify/getidentify',
+						cache: false,
+						async: false,
+						type: "get",
+						dataType: 'html',
+						success: function(data) {
+							result = data;
+						},
+						error: function(XMLHTTPRequest, textStatus, errorThrown) {
+							console.info(XMLHTTPRequest.status);
+						}
+					});
+
+					return result;
+					
+				} else {
+
+					var deferred = $q.defer();
+					$http({
+						url: apihost + '/security/memberidentify/getidentify',
+						method: 'get'
+					}).then(function(result) {
+						deferred.resolve(result.data);
+					}).catch(function(result) {
+						console.error(result);
+						deferred.reject(result);
+					});
+					return deferred.promise;
+				}
+
 			}
 
 		};
@@ -655,30 +693,32 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			rootScope.paths = paths;
 		};
 
-		this.initIdentify = function(rootScope) {
+		this.initIdentify = function(rootScope, state, requireLogin) {
 
-			var el = $('#hidden_identify');
-			if(_.isEmpty(el.text())) {
+			var data = memberidentifyFactory.getIdentify(false)
+			if(data === "") {
 				rootScope.identify = null;
-			} else {				
-				rootScope.identify = JSON.parse(el.text());
+				if(requireLogin) {
+					state.go('login');
+				}
+
+			} else {
+				rootScope.identify = JSON.parse(data);
 			}
+
 		};
 
 		this.logout = function() {
 
 			memberidentifyFactory.logout().then(function(data) {
-
 				$window.location = 'index.html';
-				$window.location.reload();
-
 			}, function(err) {
 				dialogSvc.error("net error!");
 			});
 
 		};
 
-		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache) {
+		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, requireLogin) {
 
 			if(sessionStorage.getItem('config') != null) {
 
@@ -686,7 +726,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
-				this.initIdentify(rootScope);
+				this.initIdentify(rootScope, state, requireLogin);
 
 				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
@@ -1398,6 +1438,12 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			password: null
 		};
 
+		if($rootScope.identify != null) {
+
+			$state.go($rootScope.loginReturnState, $rootScope.loginReturnParams);
+
+		}
+
 		$scope.login = function() {
 
 			var mask = JSON.parse(JSON.stringify(this.user));
@@ -1406,14 +1452,7 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			memberidentifyFactory.login(mask).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
-
-					if($rootScope.previousState.name === 'login' || $rootScope.previousState.name === '' ) {
-						$window.location = 'index.html';
-					} else {  
-						$state.go($rootScope.previousState, $rootScope.previousParams); 				 
-					}
 					$window.location.reload();
-
 				} else {
 
 					$.registCallback(data.message);
@@ -1439,16 +1478,11 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
 
 		if(!isload) {
 
 			$templateCache.put('member.html', '');
-			return;
-		}
-
-		if($rootScope.identify === null) {
-			$state.go('login');
 			return;
 		}
 
@@ -1603,16 +1637,11 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 	module.controller('actionauthCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
 
 		if(!isload) {
 
 			$templateCache.put('actionauth.html', '');
-			return;
-		}
-
-		if($rootScope.identify === null) {
-			$state.go('login');
 			return;
 		}
 
@@ -1631,23 +1660,18 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 	var _ = require('lodash');
 
 	module.controller('changepasswordCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-   
+
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-	
+		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
 		if(!isload) {
 
 			$templateCache.put('changepassword.html', '');
 			return;
 		}
-		
-		if($rootScope.identify === null) {
-			$state.go('login');
-			return;
-		}
-  
-  		$scope.message = $stateParams.message;
-		
+
+		$scope.message = $stateParams.message;
+
 		setTimeout(function() {
 			$("img.lazy").lazyload();
 		}, 200);
@@ -1662,30 +1686,24 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 
 	module.controller('bindingemailCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
 		initctrlSvc, dialogSvc, memberaccountbindingFactory) {
-			
+
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-	
+		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
 		if(!isload) {
 
 			$templateCache.put('bindingemail.html', '');
 			return;
 		}
-  
-  
-		if($rootScope.identify === null) {
-			$state.go('login');
-			return;
-		}
-		
-  		$scope.accountbinding = {
-			id: $rootScope.identify.email,   
+
+		$scope.accountbinding = {
+			id: $rootScope.identify.email,
 			authtype: 'email',
 			client: (new Date()).toISOString()
 		};
-		 
+
 		$scope.send = function() {
-  
+
 			memberaccountbindingFactory.saveOrUpdate().then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
@@ -1694,19 +1712,19 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 						message: $rootScope.identify.email
 					});
 				} else {
-					
+
 					$.registCallback(data.message);
 
 				}
 
-			}, function(err) { 
+			}, function(err) {
 				dialogSvc.error("net error!");
 				$.registCallback('');
 
 			});
 
 		};
-		
+
 		setTimeout(function() {
 			$("img.lazy").lazyload();
 		}, 200);
