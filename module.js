@@ -2066,9 +2066,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 		$scope.save = function(md) {
 
 			$scope.user.name = md.name;
-
-			console.info($scope.user);
-
+ 
 			if($scope.submittime != null) {
 				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
 				if(sec < 3) {
@@ -2077,32 +2075,32 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 			}
 			$scope.submittime = new Date();
 
-			//			memberinfoFactory.add($scope.user).then(function(data) {
-			//
-			//				if(JSON.stringify(data).toLowerCase() === 'true') {
-			//
-			//					memberidentifyFactory.logout().then(function(da) {
-			//
-			//						$state.go("info", {
-			//							template: 'membermodifysuccess',
-			//							message: ''
-			//						});
-			//
-			//					}, function(err) {
-			//
-			//					});
-			//
-			//				} else {
-			//
-			//					$.registCallback(data.message);
-			//
-			//				}
-			//
-			//			}, function(err) {
-			//				dialogSvc.error("net error!");
-			//				$.registCallback('');
-			//
-			//			});
+			memberinfoFactory.saveorupdate($scope.user).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					memberidentifyFactory.logout().then(function(da) {
+
+						$state.go("info", {
+							template: 'membermodifysuccess',
+							message: ''
+						});
+
+					}, function(err) {
+
+					});
+
+				} else {
+
+					$.registCallback(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
+			});
 
 		};
 
