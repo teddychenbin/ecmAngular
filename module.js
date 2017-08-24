@@ -468,7 +468,41 @@ define('factorys/memberaccountFactory',['require', './module'], function(require
 					deferred.reject(result);
 				});
 				return deferred.promise;
+			},
+			actionauth: function(actionauth) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/memberaccount/actionauth',
+					method: 'post',
+					params: {
+						data: JSON.stringify(actionauth)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			changepassword: function(actionauthpk, pwd) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/memberaccount/changepassword',
+					method: 'post',
+					params: {
+						actionauthpk: actionauthpk,
+						password: pwd
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
 			}
+
 		};
 
 	});
@@ -481,13 +515,41 @@ define('factorys/memberaccountbindingFactory',['require', './module'], function(
 
 		return {
 
-			saveOrUpdate: function(accountbinding) {
+			add: function(accountbinding) {
 				var deferred = $q.defer();
 				$http({
-					url: apihost + '/entity/bmb/memberaccountbinding/saveorupdate',
+					url: apihost + '/entity/bmb/memberaccountbinding/add',
 					method: 'post',
 					params: {
 						data: JSON.stringify(accountbinding)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+		};
+
+	});
+
+});
+define('factorys/memberinfoFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('memberinfoFactory', function($http, $q, apihost) {
+
+		return {
+
+			saveorupdate: function(user) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberinfo/saveorupdate',
+					method: 'post',
+					params: {
+						data: JSON.stringify(user)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -506,7 +568,7 @@ define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 
 		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
-		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory'
+		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory'
 
 	],
 	function() {
@@ -1437,22 +1499,37 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			id: null,
 			password: null
 		};
-
+ 		
 		if($rootScope.identify != null) {
 
 			$window.location = 'index.html';
 			return;
 		}
+		 
+		$scope.submittime = null;
 
-		$scope.login = function() {
-
-			var mask = JSON.parse(JSON.stringify(this.user));
-			mask.password = md5(mask.password);
-
-			memberidentifyFactory.login(mask).then(function(data) {
+		$scope.login = function(md) {
+			
+			$scope.user.id = md.id;
+			$scope.user.password = md5(md.password);
+			 
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+		  
+			memberidentifyFactory.login($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
-					$state.go($rootScope.loginReturnState, $rootScope.loginReturnParams);
+					if(!_.isUndefined($rootScope.loginReturnState) && $rootScope.loginReturnState != null) {
+						$state.go($rootScope.loginReturnState, $rootScope.loginReturnParams);
+					} else {
+						$window.location = 'index.html';
+					}
+
 				} else {
 
 					$.registCallback(data.message);
@@ -1486,12 +1563,7 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 			return;
 		}
 
-		$scope.changepassword = function() {
-			$state.go('actionauth', {
-				template: '',
-				actiontype: 'changepassword'
-			});
-		};
+	
 
 		setTimeout(function() {
 			$("img.lazy").lazyload();
@@ -1546,15 +1618,27 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 			authtype: null,
 			client: (new Date()).toISOString()
 		};
+
+		$scope.submittime = null;
+
+		$scope.regist = function(md) {
+
+			$scope.user.id = md.id;
+			$scope.user.password = md5(md.password);
+			$scope.user.email = md.email;
+			$scope.user.phone = md.phone;
+			$scope.user.authtype = md.authtype;
+
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
  
-		$scope.regist = function(authtype) {
 
-			$scope.user.authtype = authtype;
-
-			var mask = JSON.parse(JSON.stringify(this.user));
-			mask.password = md5(mask.password);
-
-			memberaccountFactory.regist(mask).then(function(data) {
+			memberaccountFactory.regist($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 					$state.go("info", {
@@ -1562,12 +1646,12 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 						message: $scope.user.id
 					});
 				} else {
-					
+
 					$.registCallback(data.message);
 
 				}
 
-			}, function(err) { 
+			}, function(err) {
 				dialogSvc.error("net error!");
 				$.registCallback('');
 
@@ -1634,10 +1718,11 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 
 	var _ = require('lodash');
 
-	module.controller('actionauthCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
+	module.controller('actionauthCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc, memberaccountFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
 
 		if(!isload) {
 
@@ -1645,72 +1730,44 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 			return;
 		}
 
-		$scope.actiontype = $stateParams.actiontype;
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
-
-	});
-
-});
-define('controllers/changepasswordCtrl',['require', './module'], function(require, module) {
-	'use strict';
-
-	var _ = require('lodash');
-
-	module.controller('changepasswordCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-
-		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
-
-		if(!isload) {
-
-			$templateCache.put('changepassword.html', '');
-			return;
-		}
-
-		$scope.message = $stateParams.message;
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
-
-	});
-
-});
-define('controllers/bindingemailCtrl',['require', './module'], function(require, module) {
-	'use strict';
-
-	var _ = require('lodash');
-
-	module.controller('bindingemailCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberaccountbindingFactory) {
-
-		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
-
-		if(!isload) {
-
-			$templateCache.put('bindingemail.html', '');
-			return;
-		}
-
-		$scope.accountbinding = {
-			id: $rootScope.identify.email,
-			authtype: 'email',
-			client: (new Date()).toISOString()
+		$scope.actionauth = {
+			actiontype: $stateParams.actiontype,
+			authtype: $stateParams.authtype,
+			authfrom: null,
+			authcode: null
 		};
 
-		$scope.send = function() {
+		if($scope.actionauth.authtype === 'email') {
+			if($rootScope.identify != null) {
+				$scope.actionauth.authfrom = $rootScope.identify.email;
+			}
+		}
 
-			memberaccountbindingFactory.saveOrUpdate($scope.accountbinding).then(function(data) {
+		$scope.submittime = null;
+
+		$scope.send = function(md) {
+
+			$scope.actionauth.authfrom = md.authfrom; 
+			
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			memberaccountFactory.actionauth($scope.actionauth).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
-					$state.go("info", {
-						template: 'gotoemail',
-						message: $rootScope.identify.email
-					});
+					if($scope.actionauth.authtype === 'email') {
+						
+						$state.go("info", {
+							template: 'gotoemail',
+							message: ''
+						});
+					}
+
 				} else {
 
 					$.registCallback(data.message);
@@ -1732,10 +1789,361 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 	});
 
 });
+define('controllers/changepasswordCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var md5 = require('md5');
+
+	module.controller('changepasswordCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc, memberaccountFactory, memberidentifyFactory) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+
+		if(!isload) {
+
+			$templateCache.put('changepassword.html', '');
+			return;
+		}
+
+		$scope.md = {
+			actionauthpk : $stateParams.actionauthpk,
+			password : null
+		};
+
+		$scope.submittime = null;
+
+		$scope.changepassword = function(md) {
+			
+			$scope.md.password = md.password;
+			
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			memberaccountFactory.changepassword($scope.md.actionauthpk, md5($scope.md.password)).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					memberidentifyFactory.logout().then(function(da) {
+
+						$state.go("info", {
+							template: 'changepasswordsuccess',
+							message: ''
+						});
+
+					}, function(err) {
+
+					});
+
+				} else {
+
+					$.registCallback(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
+			});
+
+		};
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/bindingemailCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('bindingemailCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc, memberaccountbindingFactory, memberidentifyFactory) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('bindingemail.html', '');
+			return;
+		}
+
+		$scope.accountbinding = {
+			id: $rootScope.identify.email,
+			authtype: 'email',
+			client: (new Date()).toISOString()
+		};
+
+		$scope.submittime = null;
+
+		$scope.send = function(md) {
+			
+			$scope.accountbinding.id = md.id;
+			
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			memberaccountbindingFactory.add($scope.accountbinding).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					memberidentifyFactory.logout().then(function(da) {
+
+						$state.go("info", {
+							template: 'gotoemail',
+							message: $rootScope.identify.email
+						});
+
+					}, function(err) {
+
+					});
+
+				} else {
+					 
+					$.registCallback(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
+			});
+
+		};
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/memberaddresslistCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberaddresslistCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('memberaddresslist.html', '');
+			return;
+		}
+
+		
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/memberaddressmodifyCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberaddressmodifyCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('memberaddressmodify.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/memberbrowseCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberbrowseCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberbrowse' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('memberbrowse.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/memberfollowCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberfollowCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberfollow' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('memberfollow.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/membermodifyCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('membermodifyCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc, memberinfoFactory, memberidentifyFactory) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('membermodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('membermodify.html', '');
+			return;
+		}
+
+		$scope.user = {
+			name: null,
+			birthday: "2017-08-24 02:30:21",
+			gendertype: null
+		};
+
+		$scope.submittime = null;
+
+		$scope.save = function(md) {
+
+			$scope.user.name = md.name;
+
+			console.info($scope.user);
+
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			//			memberinfoFactory.add($scope.user).then(function(data) {
+			//
+			//				if(JSON.stringify(data).toLowerCase() === 'true') {
+			//
+			//					memberidentifyFactory.logout().then(function(da) {
+			//
+			//						$state.go("info", {
+			//							template: 'membermodifysuccess',
+			//							message: ''
+			//						});
+			//
+			//					}, function(err) {
+			//
+			//					});
+			//
+			//				} else {
+			//
+			//					$.registCallback(data.message);
+			//
+			//				}
+			//
+			//			}, function(err) {
+			//				dialogSvc.error("net error!");
+			//				$.registCallback('');
+			//
+			//			});
+
+		};
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
+define('controllers/memberorderlistCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberorderlistCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberorderlist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('memberorderlist.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
+
+	});
+
+});
 define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
 		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl',
 		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
-		'./bindingemailCtrl'
+		'./bindingemailCtrl', './memberaddresslistCtrl', './memberaddressmodifyCtrl', './memberbrowseCtrl',
+		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl'
 	],
 	function() {
 
@@ -1824,7 +2232,57 @@ define('filters/ifvalue',['require', './module'], function(require, module) {
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue'],
+define('filters/range',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('range', function() {
+
+		return function(input, start, length) {
+
+			var result = [];
+			for (var i = start; i < length; i++) {
+				result.push(input[i]);
+			}
+
+			return result;
+
+		};
+
+	});
+
+});
+define('filters/privatestring',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('privatestring', function() {
+
+		return function(input, char, length) {
+			if(input === null || _.isUndefined(input)) {
+				return '';
+			}
+			var result = "";
+			result += input.substring(0, length);
+			result += char;
+			result += char;
+			result += char;
+			result += char;
+
+			input = input.substring(length, input.length);
+			result += input.substring(input.length - length, input.length);
+			return result;
+
+		};
+
+	});
+
+});
+define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring'],
 	function() {
 
 		'use strict';
