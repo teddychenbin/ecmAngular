@@ -2094,7 +2094,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 				if(sec < 3) {
 					return;
 				}
-			}
+			} 
 			$scope.submittime = new Date();
 
 			memberinfoFactory.saveorupdate($scope.user).then(function(data) {
