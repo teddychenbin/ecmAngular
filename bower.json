@@ -25,7 +25,7 @@
     "lodash": "^4.17.4",
     "js-md5": "md5#^0.6.0",
     "jqwidgets": "^5.0.0",
-    "bootstrap-switch": "^3.3.4",
-    "jquery": "^3.2.1"
+    "jquery": "^3.2.1", 
+    "angular-bootstrap-switch": "^0.5.2"
   }
 }

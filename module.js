@@ -769,7 +769,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			}
 
 		};
-
+		
+	 
 		this.logout = function() {
 
 			memberidentifyFactory.logout().then(function(data) {
@@ -783,13 +784,13 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, requireLogin) {
 
 			if(sessionStorage.getItem('config') != null) {
-
+				 
 				this.initViews(templateCache, pageid);
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
 				this.initIdentify(rootScope, state, requireLogin);
-
+				
 				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
 
@@ -2066,6 +2067,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 		$scope.save = function(md) {
 
 			$scope.user.name = md.name;
+			$scope.user.gendertype = md.gendertype;
  
 			if($scope.submittime != null) {
 				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
