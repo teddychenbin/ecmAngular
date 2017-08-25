@@ -113,7 +113,7 @@ define(['require'], function(require) {
 				},
 				controller: 'changepasswordCtrl'
 			}).state('actionauth', {
-				url: '/actionauth/:template/:actiontype',
+				url: '/actionauth/:template/:actiontype/:authtype',
 				template: function() {
 					return '<div ng-include="' + "'actionauth.html'" + '"></div>';
 				},
@@ -124,6 +124,42 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'bindingemail.html'" + '"></div>';
 				},
 				controller: 'bindingemailCtrl'
+			}).state('memberaddresslist', {
+				url: '/memberaddresslist/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberaddresslist.html'" + '"></div>';
+				},
+				controller: 'memberaddresslistCtrl'
+			}).state('memberaddressmodify', {
+				url: '/memberaddressmodify/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberaddressmodify.html'" + '"></div>';
+				},
+				controller: 'memberaddressmodifyCtrl'
+			}).state('memberbrowse', {
+				url: '/memberbrowse/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberbrowse.html'" + '"></div>';
+				},
+				controller: 'memberbrowseCtrl'
+			}).state('memberfollow', {
+				url: '/memberfollow/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberfollow.html'" + '"></div>';
+				},
+				controller: 'memberfollowCtrl'
+			}).state('membermodify', {
+				url: '/membermodify/:template',
+				template: function() {
+					return '<div ng-include="' + "'membermodify.html'" + '"></div>';
+				},
+				controller: 'membermodifyCtrl'
+			}).state('memberorderlist', {
+				url: '/memberorderlist/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberorderlist.html'" + '"></div>';
+				},
+				controller: 'memberorderlistCtrl'
 			});
 
 	};
