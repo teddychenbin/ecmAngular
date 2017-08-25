@@ -542,7 +542,22 @@ define('factorys/memberinfoFactory',['require', './module'], function(require, m
 	module.factory('memberinfoFactory', function($http, $q, apihost) {
 
 		return {
+			get: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberinfo/get',
+					method: 'get',
+					params: {
 
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
 			saveorupdate: function(user) {
 				var deferred = $q.defer();
 				$http({
@@ -559,6 +574,7 @@ define('factorys/memberinfoFactory',['require', './module'], function(require, m
 				});
 				return deferred.promise;
 			}
+
 		};
 
 	});
@@ -2056,11 +2072,15 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 			return;
 		}
 
-		$scope.user = {
-			name: null,
-			birthday: "2017-08-24 02:30:21",
-			gendertype: null
-		};
+		memberinfoFactory.get().then(function(data) {
+
+			$scope.user = data;
+			console.info($scope.user);
+		}, function(err) {
+			dialogSvc.error("net error!");
+			$.registCallback('');
+
+		});
 
 		$scope.submittime = null;
 
@@ -2068,7 +2088,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 
 			$scope.user.name = md.name;
 			$scope.user.gendertype = md.gendertype;
- 
+
 			if($scope.submittime != null) {
 				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
 				if(sec < 3) {
