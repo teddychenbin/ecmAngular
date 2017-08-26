@@ -690,7 +690,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var angular = require('angular');
 
 	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, pages, views, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, memberidentifyFactory, dialogSvc) {
+		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, memberidentifyFactory, dialogSvc, dateformat) {
 
 		this.initViews = function(templateCache, pageid) {
 			//loadpage
@@ -781,12 +781,17 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				}
 
 			} else {
+
 				rootScope.identify = JSON.parse(data);
+				if(!_.isUndefined(rootScope.identify.birthday)) {
+				 
+					rootScope.identify.birthday = new Date(rootScope.identify.birthday) 
+				}
+
 			}
 
 		};
-		
-	 
+
 		this.logout = function() {
 
 			memberidentifyFactory.logout().then(function(data) {
@@ -800,13 +805,13 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, requireLogin) {
 
 			if(sessionStorage.getItem('config') != null) {
-				 
+
 				this.initViews(templateCache, pageid);
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
 				this.initIdentify(rootScope, state, requireLogin);
-				
+
 				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
 
@@ -2088,6 +2093,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 
 			$scope.user.name = md.name;
 			$scope.user.gendertype = md.gendertype;
+			$scope.user.birthday = md.birthday.replace('年','-').replace('月','-').replace('日','') + ' 00:00:00';
 
 			if($scope.submittime != null) {
 				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
