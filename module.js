@@ -580,11 +580,87 @@ define('factorys/memberinfoFactory',['require', './module'], function(require, m
 	});
 
 });
+define('factorys/countryFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('countryFactory', function($http, $q, jsonhost) {
+
+		return {
+
+			get: function(bust) {
+				var deferred = $q.defer();
+				$http({
+					url: jsonhost + '/country/country.json?bust' + bust,
+					method: 'get'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+		};
+
+	});
+
+});
+define('factorys/govadmdivFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('govadmdivFactory', function($http, $q, jsonhost) {
+
+		return {
+
+			get: function(id, isAsync, bust) {
+				if(!isAsync) {
+
+					var result = "";
+
+					$.ajax({
+						url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
+						cache: false,
+						async: false,
+						type: "get",
+						dataType: 'html',
+						success: function(data) {
+							result = data;
+						},
+						error: function(XMLHTTPRequest, textStatus, errorThrown) {
+							console.info(XMLHTTPRequest.status);
+						}
+					});
+
+					return result;
+
+				} else {
+
+					var deferred = $q.defer();
+					$http({
+						url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
+						method: 'get'
+					}).then(function(result) {
+						deferred.resolve(result.data);
+					}).catch(function(result) {
+						console.error(result);
+						deferred.reject(result);
+					});
+					return deferred.promise;
+
+				}
+
+			}
+		};
+
+	});
+
+});
 define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 
 		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
-		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory'
+		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory',
+		'./countryFactory', './govadmdivFactory'
 
 	],
 	function() {
@@ -690,7 +766,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var angular = require('angular');
 
 	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, pages, views, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, advertFactory, memberidentifyFactory, dialogSvc, dateformat) {
+		webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory,
+		advertFactory, memberidentifyFactory, dialogSvc, dateformat) {
 
 		this.initViews = function(templateCache, pageid) {
 			//loadpage
@@ -784,8 +861,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				rootScope.identify = JSON.parse(data);
 				if(!_.isUndefined(rootScope.identify.birthday)) {
-				 
-					rootScope.identify.birthday = new Date(rootScope.identify.birthday) 
+
+					rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
 				}
 
 			}
@@ -810,6 +887,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
+				
 				this.initIdentify(rootScope, state, requireLogin);
 
 				rootScope.logout = this.logout;
@@ -1963,10 +2041,10 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 	var _ = require('lodash');
 
 	module.controller('memberaddresslistCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
 
 		if(!isload) {
 
@@ -1988,10 +2066,10 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 	var _ = require('lodash');
 
 	module.controller('memberaddressmodifyCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
 
 		if(!isload) {
 
@@ -1999,7 +2077,96 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			return;
 		}
 
-		
+		$scope.address = {
+			country: null,
+			state: null,
+			city: null,
+			district: null,
+			county: null,
+			addr1: null,
+			addr2: null,
+			addr3: null,
+			zipcode: null,
+			ismajor: true
+		};
+
+		$scope.currGovadmdiv = [];
+
+		countryFactory.get($rootScope.bust).then(function(data) {
+			$scope.govadmdiv = data;
+			$scope.currGovadmdiv = data;
+		}, function(err) {
+			console.error(err);
+		});
+
+		$scope.selectGovadmdiv = function(arg) {
+
+			$scope.currGovadmdiv = [];
+			var isCountry = _.isUndefined(arg.lines);
+			if(isCountry) {
+
+				govadmdivFactory.get(arg.id, true, $rootScope.bust).then(function(data) {
+					arg.lines = data.lines;
+					if(arg.lines.length > 0) {
+						$scope.currGovadmdiv = arg.lines;
+					}
+				}, function(err) {
+					console.error(err);
+				});
+
+			} else {
+				if(arg.lines.length > 0) {
+					$scope.currGovadmdiv = arg.lines;
+				}
+			}
+			
+		}; 
+
+		$scope.clear = function() {
+			$scope.address.country = null;
+			$scope.address.state = null;
+			$scope.address.city = null;
+			$scope.address.county = null; 
+			$scope.currGovadmdiv = $scope.govadmdiv;
+		};
+
+		  
+		$scope.selectCountry = function(arg) {
+
+			$scope.selectGovadmdiv(arg);
+			$scope.address.country = {
+				pk: arg.pk,
+				id: arg.id,
+				name: arg.name
+			};
+		};
+		$scope.selectState = function(arg) {
+
+			$scope.selectGovadmdiv(arg);
+			$scope.address.state = {
+				pk: arg.pk,
+				id: arg.id,
+				name: arg.name
+			};
+		};
+		$scope.selectCity = function(arg) {
+
+			$scope.selectGovadmdiv(arg);
+			$scope.address.city = {
+				pk: arg.pk,
+				id: arg.id,
+				name: arg.name
+			};
+		};
+		$scope.selectCounty = function(arg) {
+
+			$scope.selectGovadmdiv(arg);
+			$scope.address.county = {
+				pk: arg.pk,
+				id: arg.id,
+				name: arg.name
+			};
+		};
 
 		setTimeout(function() {
 			$("img.lazy").lazyload();
@@ -2308,7 +2475,37 @@ define('filters/privatestring',['require', './module'], function(require, module
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring'],
+define('filters/nvl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('nvl', function() {
+
+		return function(input, value) { 
+		
+			
+			if(_.isUndefined(input)) { 
+				return value;
+			}
+
+			if(input == null) {
+				return value;
+			}
+
+			if(_.isEmpty(input)) {
+				return value;
+			}
+
+			return input;
+
+		};
+
+	});
+
+});
+define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring', './nvl'],
 	function() {
 
 		'use strict';
@@ -2328,9 +2525,8 @@ define('app/module',['require', './main'], function(require) {
 
 	var app = ng.module('app', ['app.factorys', 'app.directives', 'app.services',
 		'app.controllers', 'app.filters',
-		'ui.router'
+		'ui.router', 'jqwidgets'
 	]);
-	
- 
+
 	return app;
 });

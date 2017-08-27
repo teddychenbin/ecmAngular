@@ -131,7 +131,7 @@ define(['require'], function(require) {
 				},
 				controller: 'memberaddresslistCtrl'
 			}).state('memberaddressmodify', {
-				url: '/memberaddressmodify/:template',
+				url: '/memberaddressmodify/:template/:pk',
 				template: function() {
 					return '<div ng-include="' + "'memberaddressmodify.html'" + '"></div>';
 				},
