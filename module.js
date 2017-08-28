@@ -655,12 +655,73 @@ define('factorys/govadmdivFactory',['require', './module'], function(require, mo
 	});
 
 });
+define('factorys/member2addrFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('member2addrFactory', function($http, $q, apihost) {
+
+		return {
+			get: function(pk) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/member2addr/get',
+					method: 'get',
+					params: {
+						data: pk
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			delete: function(pk) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/member2addr/delete',
+					method: 'get',
+					params: {
+						data: pk
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+
+			saveorupdate: function(addr) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/member2addr/saveorupdate',
+					method: 'post',
+					params: {
+						data: JSON.stringify(addr)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
 define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 
 		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
 		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory',
-		'./countryFactory', './govadmdivFactory'
+		'./countryFactory', './govadmdivFactory', './member2addrFactory'
 
 	],
 	function() {
@@ -2066,7 +2127,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 	var _ = require('lodash');
 
 	module.controller('memberaddressmodifyCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory) {
+		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory, member2addrFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
@@ -2078,6 +2139,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 		}
 
 		$scope.address = {
+			addrtype: null,
 			country: null,
 			state: null,
 			city: null,
@@ -2087,7 +2149,9 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			addr2: null,
 			addr3: null,
 			zipcode: null,
-			ismajor: true
+			phoneno: null,
+			contacts: null,
+			mobphoneno: null
 		};
 
 		$scope.currGovadmdiv = [];
@@ -2099,16 +2163,32 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			console.error(err);
 		});
 
-		$scope.selectGovadmdiv = function(arg) {
+		if($stateParams.pk !== '') {
+
+			member2addrFactory.get($stateParams.pk).then(function(data) {
+				$scope.address = data;
+				console.info($scope.address);
+			}, function(err) {
+				dialogSvc.error("net error!");
+				$.registCallback('');
+			});
+		}
+
+		$scope.selectGovadmdiv = function(arg, after) {
 
 			$scope.currGovadmdiv = [];
 			var isCountry = _.isUndefined(arg.lines);
 			if(isCountry) {
 
 				govadmdivFactory.get(arg.id, true, $rootScope.bust).then(function(data) {
-					arg.lines = data.lines;
+					arg.lines = data;
 					if(arg.lines.length > 0) {
 						$scope.currGovadmdiv = arg.lines;
+
+						if(!_.isUndefined(after)) {
+							after();
+						}
+
 					}
 				}, function(err) {
 					console.error(err);
@@ -2117,46 +2197,76 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			} else {
 				if(arg.lines.length > 0) {
 					$scope.currGovadmdiv = arg.lines;
+					if(!_.isUndefined(after)) {
+						after();
+					}
+
 				}
 			}
-			
-		}; 
 
+		};
 		$scope.clear = function() {
 			$scope.address.country = null;
 			$scope.address.state = null;
 			$scope.address.city = null;
-			$scope.address.county = null; 
+			$scope.address.district = null;
 			$scope.currGovadmdiv = $scope.govadmdiv;
 		};
-
-		  
 		$scope.selectCountry = function(arg) {
 
-			$scope.selectGovadmdiv(arg);
+			$scope.selectGovadmdiv(arg, function() {
+				if($scope.currGovadmdiv.length === 1) {
+					$scope.selectState($scope.currGovadmdiv[0]);
+				}
+			});
 			$scope.address.country = {
 				pk: arg.pk,
 				id: arg.id,
 				name: arg.name
 			};
+
 		};
 		$scope.selectState = function(arg) {
 
-			$scope.selectGovadmdiv(arg);
+			$scope.selectGovadmdiv(arg, function() {
+				if($scope.currGovadmdiv.length === 1) {
+					$scope.selectCity($scope.currGovadmdiv[0]);
+				}
+			});
 			$scope.address.state = {
 				pk: arg.pk,
 				id: arg.id,
 				name: arg.name
 			};
+
 		};
 		$scope.selectCity = function(arg) {
 
-			$scope.selectGovadmdiv(arg);
+			$scope.selectGovadmdiv(arg, function() {
+				if($scope.currGovadmdiv.length === 1) {
+					$scope.selectDistrict($scope.currGovadmdiv[0]);
+				}
+			});
 			$scope.address.city = {
 				pk: arg.pk,
 				id: arg.id,
 				name: arg.name
 			};
+
+		};
+		$scope.selectDistrict = function(arg) {
+
+			$scope.selectGovadmdiv(arg, function() {
+				if($scope.currGovadmdiv.length === 1) {
+					$scope.selectCounty($scope.currGovadmdiv[0]);
+				}
+			});
+			$scope.address.district = {
+				pk: arg.pk,
+				id: arg.id,
+				name: arg.name
+			};
+
 		};
 		$scope.selectCounty = function(arg) {
 
@@ -2166,6 +2276,52 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 				id: arg.id,
 				name: arg.name
 			};
+
+		};
+
+		$scope.submittime = null;
+
+		$scope.save = function(md) {
+
+			$scope.address.addrtype = {
+				pk: md.addrtype.pk
+			};
+			$scope.address.mobphoneno = md.mobphoneno;
+			$scope.address.contacts = md.contacts;
+			$scope.address.phoneno = md.phoneno;
+			$scope.address.zipcode = md.zipcode;
+			$scope.address.addr1 = md.addr1;
+			$scope.address.addr2 = md.addr2;
+			$scope.address.addr3 = md.addr3;
+
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 3) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			member2addrFactory.saveorupdate($scope.addr).then(function(data) {
+
+				if(_.isUndefined(data.errorcode)) {
+
+					$state.go("memberaddresslist", {
+						template: ''
+					});
+
+				} else {
+
+					$.registCallback(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error("net error!");
+				$.registCallback('');
+
+			});
+
 		};
 
 		setTimeout(function() {
