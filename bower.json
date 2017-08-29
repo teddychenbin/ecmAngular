@@ -26,7 +26,7 @@
     "js-md5": "md5#^0.6.0",
     "jqwidgets": "^5.0.0",
     "jquery": "^3.2.1",
-    "bootstrap-datepicker": "^1.7.1"
+    "bootstrap-datepicker": "^1.7.1",
+    "awesome-bootstrap-checkbox": "^0.3.7"
   }
 }
- 

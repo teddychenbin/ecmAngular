@@ -661,13 +661,26 @@ define('factorys/member2addrFactory',['require', './module'], function(require, 
 	module.factory('member2addrFactory', function($http, $q, apihost) {
 
 		return {
-			get: function(pk) {
+			select: function(pk) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/query/bmb/member2addr/select',
+					method: 'get'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			get: function(pkvalue) {
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/entity/bmb/member2addr/get',
 					method: 'get',
 					params: {
-						data: pk
+						pk: pkvalue
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -677,13 +690,13 @@ define('factorys/member2addrFactory',['require', './module'], function(require, 
 				});
 				return deferred.promise;
 			},
-			delete: function(pk) {
+			delete: function(pkvalue) {
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/entity/bmb/member2addr/delete',
-					method: 'get',
+					method: 'post',
 					params: {
-						data: pk
+						pk: pkvalue
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -1188,11 +1201,36 @@ define('services/dialogSvc',['require', './module'], function(require, module) {
 		this.error = function(message){
 			window.alert(message);
 		};
+		
+		this.confirm = function(message){
+			return window.confirm(message);
+		};
 
 	});
 
 });
-define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc'],
+define('services/languageSvc',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.service('languageSvc', function(lanuage) {
+
+		this.confirm_delete = function(message){
+			
+			if(lanuage === 'zh-TW'){
+				return '確定要刪除 ' + message + '嗎？';
+			}
+			
+			return '';
+		};
+		
+		
+	});
+
+});
+define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc', './languageSvc'],
 	function() {
 
 		'use strict';
@@ -2102,10 +2140,10 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 	var _ = require('lodash');
 
 	module.controller('memberaddresslistCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory) {
+		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory, member2addrFactory, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
 
 		if(!isload) {
 
@@ -2113,7 +2151,44 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 			return;
 		}
 
-		
+		$scope.addresslist = [];
+
+		member2addrFactory.select().then(function(data) {
+
+			for(var i = 0; i < data.length; i++) {
+
+				if(!data[i].ismajor) {
+					$scope.addresslist.push(data[i]);
+				}
+
+			}
+
+		}, function(err) {
+			console.error(err);
+		});
+
+		$scope.delete = function(md) {
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(md.addr1))) {
+				member2addrFactory.delete(md.pk).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+
+						location.reload();
+
+					} else {
+
+						$.registCallback(data.message);
+
+					}
+
+				}, function(err) {
+					console.error(err);
+				});
+
+			}
+		};
+
 		setTimeout(function() {
 			$("img.lazy").lazyload();
 		}, 200);
@@ -2130,7 +2205,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory, member2addrFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
 
 		if(!isload) {
 
@@ -2148,6 +2223,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			addr1: null,
 			addr2: null,
 			addr3: null,
+			name: null,
 			zipcode: null,
 			phoneno: null,
 			contacts: null,
@@ -2163,15 +2239,38 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			console.error(err);
 		});
 
-		if($stateParams.pk !== '') {
+		$scope.load = function(pk) {
 
-			member2addrFactory.get($stateParams.pk).then(function(data) {
+			member2addrFactory.get(pk).then(function(data) {
 				$scope.address = data;
+				$scope.currGovadmdiv = [];
 				console.info($scope.address);
 			}, function(err) {
 				dialogSvc.error("net error!");
 				$.registCallback('');
 			});
+		};
+
+		if($stateParams.ismajor) {
+			//主地址查询
+
+			member2addrFactory.select().then(function(data) {
+				for(var i = 0; i < data.length; i++) {
+					if(data[i].ismajor) {
+						$scope.load(data[i].pk);
+					}
+				}
+			}, function(err) {
+				console.error(err);
+			});
+
+		} else {
+
+			if($stateParams.pk !== '') {
+
+				$scope.load($stateParams.pk);
+			}
+
 		}
 
 		$scope.selectGovadmdiv = function(arg, after) {
@@ -2283,9 +2382,20 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		$scope.save = function(md) {
 
-			$scope.address.addrtype = {
-				pk: md.addrtype.pk
-			};
+			if($stateParams.ismajor) {
+				$scope.address.ismajor = true;
+				$scope.address.addrtype = {
+					pk: '10009G'
+				};
+			} else {
+
+				$scope.address.ismajor = false;
+				$scope.address.addrtype = {
+					pk: '10009A'
+				};
+			}
+
+			$scope.address.name = md.name;
 			$scope.address.mobphoneno = md.mobphoneno;
 			$scope.address.contacts = md.contacts;
 			$scope.address.phoneno = md.phoneno;
@@ -2302,7 +2412,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			}
 			$scope.submittime = new Date();
 
-			member2addrFactory.saveorupdate($scope.addr).then(function(data) {
+			member2addrFactory.saveorupdate($scope.address).then(function(data) {
 
 				if(_.isUndefined(data.errorcode)) {
 
@@ -2681,8 +2791,8 @@ define('app/module',['require', './main'], function(require) {
 
 	var app = ng.module('app', ['app.factorys', 'app.directives', 'app.services',
 		'app.controllers', 'app.filters',
-		'ui.router', 'jqwidgets'
+		'ui.router', 'mgcrea.ngStrap'
 	]);
-
+//'jqwidgets', 
 	return app;
 });
