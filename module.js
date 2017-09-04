@@ -661,13 +661,26 @@ define('factorys/member2addrFactory',['require', './module'], function(require, 
 	module.factory('member2addrFactory', function($http, $q, apihost) {
 
 		return {
-			get: function(pk) {
+			select: function(pk) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/query/bmb/member2addr/select',
+					method: 'get'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			get: function(pkvalue) {
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/entity/bmb/member2addr/get',
 					method: 'get',
 					params: {
-						data: pk
+						pk: pkvalue
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -677,13 +690,13 @@ define('factorys/member2addrFactory',['require', './module'], function(require, 
 				});
 				return deferred.promise;
 			},
-			delete: function(pk) {
+			delete: function(pkvalue) {
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/entity/bmb/member2addr/delete',
-					method: 'get',
+					method: 'post',
 					params: {
-						data: pk
+						pk: pkvalue
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -774,6 +787,9 @@ define('directives/loadscript',['require', './module'], function(require, module
 	});
 
 });
+/*
+ * 发现在绑定集合ng-repeat 的时候 用指令封装会影响绑定稳定，列表数据有时不显示
+ */
 define('directives/main',['./testDirective', './loadscript'],
 	function() {
 
@@ -826,9 +842,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, pages, views, webpageFactory,
+	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, pages, views, webpagehost, webpageFactory,
 		webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory,
-		advertFactory, memberidentifyFactory, dialogSvc, dateformat) {
+		advertFactory, memberidentifyFactory, dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
 		this.initViews = function(templateCache, pageid) {
 			//loadpage
@@ -901,7 +917,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				}
 
 				route += el;
-				console.info(route);
+				console.info('path ' + route);
 				paths.push(route);
 
 			});
@@ -909,22 +925,51 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			rootScope.paths = paths;
 		};
 
+		//设置自定义变量和前端交互默认给20个
+		this.customVar = function(rootScope) {
+
+			rootScope.customVar0 = null; 
+			 
+			rootScope.setCustomVar0 = function(value){
+				rootScope.customVar0 = value;
+			}
+
+		};
+
 		this.initIdentify = function(rootScope, state, requireLogin) {
 
-			var data = memberidentifyFactory.getIdentify(false);
-			if(data === "") {
-				rootScope.identify = null;
-				if(requireLogin) {
-					state.go('login');
-				}
+			/*
+			 * requireLogin === true 强验证模式必须同步等待
+			 * requireLogin === false 抓取会员信息用异步就可以，加快非会员页面的速度
+			 */
+			rootScope.identify = null;
 
+			if(requireLogin) {
+				var data = memberidentifyFactory.getIdentify(false);
+				if(data === "") {
+					rootScope.identify = null;
+					if(requireLogin) {
+						state.go('login');
+					}
+
+				} else {
+
+					rootScope.identify = JSON.parse(data);
+					if(!_.isUndefined(rootScope.identify.birthday)) {
+						rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
+					}
+
+				}
 			} else {
+				memberidentifyFactory.getIdentify(true).then(function(data) {
+					rootScope.identify = data;
+					if(!_.isUndefined(rootScope.identify.birthday)) {
+						rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
+					}
 
-				rootScope.identify = JSON.parse(data);
-				if(!_.isUndefined(rootScope.identify.birthday)) {
+				}, function(err) {
 
-					rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
-				}
+				});
 
 			}
 
@@ -940,6 +985,33 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
+		this.initAside = function(rootScope) {
+
+			rootScope.hideAside = function() {
+				rootScope.aside.$promise.then(function() {
+					rootScope.aside.hide();
+				});
+			};
+
+			rootScope.showAsidemenu = function(md) {
+//				var contentHtml = $window.getAsideMenu(md);
+
+				rootScope.aside = $aside({
+					scope: rootScope,
+					title: md.title,
+					animation: "am-slide-left",
+					placement: (_.isUndefined(md.placement) ? 'left' : md.animation),
+					templateUrl: webpagehost + '/webpage/asidemenu.content.json'
+				});
+
+				rootScope.aside.$promise.then(function() {
+					rootScope.aside.show();
+				});
+
+			};
+
+		};
+
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, requireLogin) {
 
 			if(sessionStorage.getItem('config') != null) {
@@ -948,8 +1020,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
-				
+				this.initAside(rootScope);
 				this.initIdentify(rootScope, state, requireLogin);
+				this.customVar(rootScope);
 
 				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
@@ -1183,16 +1256,65 @@ define('services/dialogSvc',['require', './module'], function(require, module) {
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('dialogSvc', function() {
+	module.service('dialogSvc', function($rootScope, $modal, $aside, $alert, languageSvc) {
 
-		this.error = function(message){
-			window.alert(message);
+		this.error = function(message) {
+
+			$modal({
+				title: languageSvc.error(),
+				content: message,
+				show: true
+			});
+
+		};
+
+		this.confirm = function(message) {
+			return window.confirm(message);
 		};
 
 	});
 
 });
-define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc'],
+define('services/languageSvc',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+
+	module.service('languageSvc', function(lanuage) {
+
+		this.warning = function(message) {
+
+			if(lanuage === 'zh-TW') {
+				return '提示 ';
+			}
+
+			return '';
+		};
+
+		this.error = function(message) {
+
+			if(lanuage === 'zh-TW') {
+				return '錯誤';
+			}
+
+			return '';
+		};
+
+		this.confirm_delete = function(message) {
+
+			if(lanuage === 'zh-TW') {
+				return '確定要刪除 ' + message + '嗎？';
+			}
+
+			return '';
+		};
+
+	});
+
+});
+define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc', './languageSvc'],
 	function() {
 
 		'use strict';
@@ -1274,15 +1396,17 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 
 	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
    
+  
 		var template = initctrlSvc.getTemplate($stateParams);
+	 
 		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-	
+ 
 		if(!isload) {
 
 			$templateCache.put('home.html', '');
 			return;
 		}
-  
+ 
 		
 		setTimeout(function() {
 			$("img.lazy").lazyload();
@@ -1297,7 +1421,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 	var _ = require('lodash');
 
 	module.controller('mkgdispgroupCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mkgdispgroupFactory, mainitemFactory, pageSvc) {
+		mkgdispgroupFactory, mainitemFactory, pageSvc, webpagehost, $modal, $aside, $alert, $select) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
@@ -1320,50 +1444,98 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 			});
 		};
 
-		var page = _.parseInt($stateParams.page);
+		$scope.showMkgdispgroupasidefilter = function(md) {
+			//			var contentHtml = $window.getAsideFilter(md);
 
-		mkgdispgroupFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
-
-				$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
-
-				$scope.mkgdispgroup = {};
-				_.set($scope.mkgdispgroup, "id", data.id);
-				_.set($scope.mkgdispgroup, "name", data.name);
-				_.set($scope.mkgdispgroup, "lines", []);
-
-				var fetch = pageSvc.fetch($scope, data.lines, page);
-
-				var promises = [];
-
-				for(var i = fetch.first; i < fetch.max; i++) {
-					if(i < data.lines.length) {
-						var mainitemno = data.lines[i].mainitemno;
-						promises.push(mainitemFactory.get(mainitemno, $rootScope.bust));
-					}
-				}
-
-				$q.all(promises).then(function(values) {
-
-						for(var i = 0; i < values.length; i++) {
-							var mainitem = values[i];
-							$scope.mkgdispgroup.lines.push(mainitem);
-						}
-
-						console.info($scope.mkgdispgroup);
-
-						setTimeout(function() {
-							$("img.lazy").lazyload();
-						}, 200);
-
-					})
-					.catch(function(err) {
-						console.log(err);
-					});
-
-			})
-			.catch(function(err) {
-				console.log(err);
+			$scope.aside = $aside({
+				scope: $scope,
+				title: md.title,
+				animation: "am-slide-left",
+				placement: (_.isUndefined(md.placement) ? 'left' : md.animation),
+				templateUrl: webpagehost + '/webpage/mkgdispgroupasidefilter.content.json'
 			});
+
+			$scope.aside.$promise.then(function() {
+				$scope.aside.show();
+			});
+
+		};
+
+		$scope.load = function(page) {
+
+			mkgdispgroupFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
+
+					$scope.data = data;
+
+					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
+
+					$scope.mkgdispgroup = {};
+					_.set($scope.mkgdispgroup, "id", data.id);
+					_.set($scope.mkgdispgroup, "name", data.name);
+					_.set($scope.mkgdispgroup, "lines", []);
+
+					$scope.loadMainitem(data, page);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.loadMainitem = function(data, page) {
+
+			var promises = [];
+
+			var fetch = pageSvc.fetch($scope, data.lines, page);
+
+			for(var i = fetch.first; i < fetch.max; i++) {
+				if(i < data.lines.length) {
+					var mainitemno = data.lines[i].mainitemno;
+					promises.push(mainitemFactory.get(mainitemno, $rootScope.bust));
+				}
+			}
+
+			$q.all(promises).then(function(values) {
+
+					for(var i = 0; i < values.length; i++) {
+						var mainitem = values[i];
+						$scope.mkgdispgroup.lines.push(mainitem);
+					}
+
+					console.info($scope.mkgdispgroup);
+
+					setTimeout(function() {
+						$("img.lazy").lazyload();
+					}, 200);
+
+					if(!_.isUndefined($window.afterLoad)) {
+
+						$window.afterLoad();
+					}
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.submittime = null;
+
+		$scope.loadMore = function() {
+			console.info('loadMore ')
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 1) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			if($scope.page < $scope.pagecount) {
+				$scope.loadMainitem($scope.data, $scope.page + 1);
+			}
+		};
+
+		$scope.load(_.parseInt($stateParams.page));
 
 	});
 
@@ -1474,47 +1646,79 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 			});
 		};
 
-		var page = _.parseInt($stateParams.page);
+		$scope.load = function(page) {
 
-		mkgpgmFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
-		 
-				$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
+			mkgpgmFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
 
-				$scope.mkgpgm = {};
-				_.set($scope.mkgpgm, "id", data.id);
-				_.set($scope.mkgpgm, "name", data.name);
-				_.set($scope.mkgpgm, "lines", []);
+					$scope.data = data;
 
-				var fetch = pageSvc.fetch($scope, data.lines, page);
+					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
-				var promises = [];
+					$scope.mkgpgm = {};
+					_.set($scope.mkgpgm, "id", data.id);
+					_.set($scope.mkgpgm, "name", data.name);
+					_.set($scope.mkgpgm, "lines", []);
 
-				for(var i = fetch.first; i < fetch.max; i++) {
-					if(i < data.lines.length) {
-						var articleid = data.lines[i].articleid;
-						promises.push(mkgpgmarticleFactory.get(articleid, $rootScope.bust));
-					}
+					$scope.loadMkgpgm(data, page);
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+
+		};
+
+		$scope.loadMkgpgm = function(data, page) {
+
+			var promises = [];
+
+			var fetch = pageSvc.fetch($scope, data.lines, page);
+
+			for(var i = fetch.first; i < fetch.max; i++) {
+				if(i < data.lines.length) {
+					var articleid = data.lines[i].articleid;
+					promises.push(mkgpgmarticleFactory.get(articleid, $rootScope.bust));
 				}
+			}
 
-				$q.all(promises).then(function(values) {
+			$q.all(promises).then(function(values) {
 
-						_(values).forEach(function(mkgpgmarticle) {
-							$scope.mkgpgm.lines.push(mkgpgmarticle);
-						});
-
-						setTimeout(function() {
-							$("img.lazy").lazyload();
-						}, 200);
-
-					})
-					.catch(function(err) {
-						console.log(err);
+					_(values).forEach(function(mkgpgmarticle) {
+						$scope.mkgpgm.lines.push(mkgpgmarticle);
 					});
 
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
+					setTimeout(function() {
+						$("img.lazy").lazyload();
+					}, 200);
+
+					if(!_.isUndefined($window.afterLoad)) {
+
+						$window.afterLoad();
+					}
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.submittime = null;
+
+		$scope.loadMore = function() {
+
+			if($scope.submittime != null) {
+				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
+				if(sec < 1) {
+					return;
+				}
+			}
+			$scope.submittime = new Date();
+
+			if($scope.page < $scope.pagecount) {
+				$scope.loadMkgpgm($scope.data, $scope.page + 1);
+			}
+		};
+
+		$scope.load(_.parseInt($stateParams.page));
 
 	});
 
@@ -2102,10 +2306,10 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 	var _ = require('lodash');
 
 	module.controller('memberaddresslistCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory) {
+		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory, member2addrFactory, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
 
 		if(!isload) {
 
@@ -2113,7 +2317,44 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 			return;
 		}
 
-		
+		$scope.addresslist = [];
+
+		member2addrFactory.select().then(function(data) {
+
+			for(var i = 0; i < data.length; i++) {
+
+				if(!data[i].ismajor) {
+					$scope.addresslist.push(data[i]);
+				}
+
+			}
+
+		}, function(err) {
+			console.error(err);
+		});
+
+		$scope.delete = function(md) {
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(md.addr1))) {
+				member2addrFactory.delete(md.pk).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+
+						location.reload();
+
+					} else {
+
+						$.registCallback(data.message);
+
+					}
+
+				}, function(err) {
+					console.error(err);
+				});
+
+			}
+		};
+
 		setTimeout(function() {
 			$("img.lazy").lazyload();
 		}, 200);
@@ -2130,7 +2371,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory, member2addrFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
 
 		if(!isload) {
 
@@ -2148,6 +2389,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			addr1: null,
 			addr2: null,
 			addr3: null,
+			name: null,
 			zipcode: null,
 			phoneno: null,
 			contacts: null,
@@ -2163,15 +2405,38 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			console.error(err);
 		});
 
-		if($stateParams.pk !== '') {
+		$scope.load = function(pk) {
 
-			member2addrFactory.get($stateParams.pk).then(function(data) {
+			member2addrFactory.get(pk).then(function(data) {
 				$scope.address = data;
+				$scope.currGovadmdiv = [];
 				console.info($scope.address);
 			}, function(err) {
 				dialogSvc.error("net error!");
 				$.registCallback('');
 			});
+		};
+
+		if($stateParams.ismajor) {
+			//主地址查询
+
+			member2addrFactory.select().then(function(data) {
+				for(var i = 0; i < data.length; i++) {
+					if(data[i].ismajor) {
+						$scope.load(data[i].pk);
+					}
+				}
+			}, function(err) {
+				console.error(err);
+			});
+
+		} else {
+
+			if($stateParams.pk !== '') {
+
+				$scope.load($stateParams.pk);
+			}
+
 		}
 
 		$scope.selectGovadmdiv = function(arg, after) {
@@ -2283,9 +2548,20 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		$scope.save = function(md) {
 
-			$scope.address.addrtype = {
-				pk: md.addrtype.pk
-			};
+			if($stateParams.ismajor) {
+				$scope.address.ismajor = true;
+				$scope.address.addrtype = {
+					pk: '10009G'
+				};
+			} else {
+
+				$scope.address.ismajor = false;
+				$scope.address.addrtype = {
+					pk: '10009A'
+				};
+			}
+
+			$scope.address.name = md.name;
 			$scope.address.mobphoneno = md.mobphoneno;
 			$scope.address.contacts = md.contacts;
 			$scope.address.phoneno = md.phoneno;
@@ -2302,7 +2578,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			}
 			$scope.submittime = new Date();
 
-			member2addrFactory.saveorupdate($scope.addr).then(function(data) {
+			member2addrFactory.saveorupdate($scope.address).then(function(data) {
 
 				if(_.isUndefined(data.errorcode)) {
 
@@ -2681,8 +2957,12 @@ define('app/module',['require', './main'], function(require) {
 
 	var app = ng.module('app', ['app.factorys', 'app.directives', 'app.services',
 		'app.controllers', 'app.filters',
-		'ui.router', 'jqwidgets'
+		'ui.router', 
+		'ngAnimate',
+		'mgcrea.ngStrap'
 	]);
 
+
+	//'jqwidgets', 
 	return app;
 });
