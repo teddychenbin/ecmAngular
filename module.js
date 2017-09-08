@@ -842,13 +842,44 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, pages, views, webpagehost, webpageFactory,
+	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, mockidentify, pages, views, webpagehost, webpageFactory,
 		webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory,
 		advertFactory, memberidentifyFactory, dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
-		this.initViews = function(templateCache, pageid) {
-			//loadpage
+		this.cachePage = function(rootScope, name, value) {
+
+			var isPageContent = _.startsWith(name, 'page_') && _.endsWith(name, '_content');
+
+			var jsonStr = isPageContent ? value : JSON.stringify(value);
+
+			if(isPageContent) {
+
+				_.set(rootScope, name, jsonStr);
+				sessionStorage.setItem(name, _.get(rootScope, name));
+			} else {
+
+				_.set(rootScope, name, JSON.parse(jsonStr));
+				sessionStorage.setItem(name, JSON.stringify(_.get(rootScope, name)));
+			}
+
+		};
+
+		this.initViews = function(rootScope, templateCache, pageid) {
+
 			var pageContent = sessionStorage.getItem('page_' + pageid + '_content');
+			if(pageContent === null) {
+				//没有预加载，同步加载
+
+				var pageValue = webpageFactory.get(pageid, false, rootScope.bust);
+				this.cachePage(rootScope, 'page_' + pageid, pageValue);
+
+				var pageContentValue = webpagecontentFactory.get(pageid, false, rootScope.bust);
+				this.cachePage(rootScope, 'page_' + pageid + '_content', pageContentValue);
+
+				pageContent = sessionStorage.getItem('page_' + pageid + '_content');
+
+			}
+
 			var isSubPage = _.includes(pageid, '_');
 			if(isSubPage) {
 				templateCache.put(pageid.split('_')[0] + '.html', pageContent);
@@ -872,7 +903,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				_.set(rootScope, name, JSON.parse(sessionStorage.getItem(name)));
 			});
 
-			_.set(rootScope, 'stateParams', stateParams);
+			_.set(rootScope, 'stateParams', JSON.parse(JSON.stringify(stateParams)));
 
 		};
 
@@ -928,16 +959,20 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		//设置自定义变量和前端交互默认给20个
 		this.customVar = function(rootScope) {
 
-			rootScope.customVar0 = null; 
-			 
-			rootScope.setCustomVar0 = function(value){
+			rootScope.customVar0 = null;
+
+			rootScope.setCustomVar0 = function(value) {
 				rootScope.customVar0 = value;
-			}
+			};
 
 		};
 
 		this.initIdentify = function(rootScope, state, requireLogin) {
 
+			if(mockidentify !== null) {
+				rootScope.identify = mockidentify;
+				return;
+			}
 			/*
 			 * requireLogin === true 强验证模式必须同步等待
 			 * requireLogin === false 抓取会员信息用异步就可以，加快非会员页面的速度
@@ -949,7 +984,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				if(data === "") {
 					rootScope.identify = null;
 					if(requireLogin) {
-						state.go('login');
+						state.go('login', {
+							template: ''
+						});
 					}
 
 				} else {
@@ -962,9 +999,11 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				}
 			} else {
 				memberidentifyFactory.getIdentify(true).then(function(data) {
-					rootScope.identify = data;
-					if(!_.isUndefined(rootScope.identify.birthday)) {
-						rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
+					if(data !== "") {
+						rootScope.identify = data;
+						if(!_.isUndefined(rootScope.identify.birthday)) {
+							rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
+						}
 					}
 
 				}, function(err) {
@@ -994,19 +1033,115 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			};
 
 			rootScope.showAsidemenu = function(md) {
-//				var contentHtml = $window.getAsideMenu(md);
+				//				var contentHtml = $window.getAsideMenu(md);
 
 				rootScope.aside = $aside({
 					scope: rootScope,
 					title: md.title,
 					animation: "am-slide-left",
 					placement: (_.isUndefined(md.placement) ? 'left' : md.animation),
-					templateUrl: webpagehost + '/webpage/asidemenu.content.json'
+					templateUrl: webpagehost + '/webpage/asidemenu.content.json?bust' + rootScope.bust
 				});
 
 				rootScope.aside.$promise.then(function() {
 					rootScope.aside.show();
 				});
+
+			};
+			
+			if(!_.isUndefined(rootScope.aside)){
+				
+				rootScope.aside.$promise.then(function() {
+					rootScope.aside.hide();
+				});
+			}
+
+		};
+
+		//		this.initShoppingcart = function(rootScope) {
+		//
+		//			rootScope.saveShoppingcart = function(data) { 
+		//			};
+		//
+		//			rootScope.getShoppingcart = function() { 
+		//				
+		//			};
+		//
+		//		};
+
+		//		this.initMemberFollow = function(rootScope) {
+		//
+		//			rootScope.appendFollow = function(data) {
+		//			
+		//			};
+		//
+		//			rootScope.removeFollow = function(pk) {
+		//
+		//			};
+		//		};
+
+		this.initMemberBrowse = function(rootScope) {
+
+			rootScope.appendBrowse = function(data, url) {
+
+				if(rootScope.identify === null) {
+					rootScope.appendLocalBrowse(data, url);
+				} else {
+					rootScope.appendSvcBrowse(data, url);
+				}
+
+			};
+
+			/*
+			 *  本地瀏覽記錄
+			 */
+			rootScope.appendLocalBrowse = function(data, url) {
+
+				var memberbrowses = localStorage.getItem('memberbrowses');
+				if(memberbrowses === null) {
+					memberbrowses = [];
+				} else {
+					memberbrowses = JSON.parse(localStorage.getItem('memberbrowses'));
+				}
+
+				for(var i = 0; i < memberbrowses.length; i++) {
+					if(memberbrowses[i].url === url) {
+						memberbrowses.splice(i, 1);
+						break;
+					}
+				}
+
+				data.url = url;
+				memberbrowses.splice(0, 0, data);
+
+				localStorage.setItem('memberbrowses', JSON.stringify(memberbrowses));
+
+			};
+			/*
+			 * 獲取本地瀏覽記錄
+			 */
+			rootScope.getLocalBrowses = function() {
+				var memberbrowses = localStorage.getItem('memberbrowses');
+				if(memberbrowses === null) {
+					memberbrowses = [];
+				} else {
+					memberbrowses = JSON.parse(localStorage.getItem('memberbrowses'));
+				}
+
+				return memberbrowses;
+			};
+
+			/*
+			 * 服務端瀏覽記錄
+			 */
+			rootScope.appendSvcBrowse = function(data, url) {
+
+			};
+
+			/*
+			 * 刪除服務器端瀏覽記錄
+			 */
+			rootScope.removeBrowse = function(mainitempk) {
 
 			};
 
@@ -1016,16 +1151,22 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 			if(sessionStorage.getItem('config') != null) {
 
-				this.initViews(templateCache, pageid);
+				rootScope.logout = this.logout;
+				rootScope.bust = sessionStorage.getItem("bust");
+
+				this.initViews(rootScope, templateCache, pageid);
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
 				this.initAside(rootScope);
 				this.initIdentify(rootScope, state, requireLogin);
 				this.customVar(rootScope);
+				//				this.initShoppnigcart(rootScope);
+				//				this.initMemberFollow(rootScope);
 
-				rootScope.logout = this.logout;
-				rootScope.bust = sessionStorage.getItem("bust");
+				this.initMemberBrowse(rootScope);
+
+				rootScope.localbrowses = rootScope.getLocalBrowses();
 
 				return true;
 			} else {
@@ -1070,6 +1211,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 			});
 
+			var cachePage = this.cachePage;
+
 			$q.all(promises).then(function(values) {
 
 				for(var i = 0; i < values.length; ++i) {
@@ -1077,20 +1220,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 					var value = values[i];
 					var name = objectNames[i];
 
-					var isPageContent = _.startsWith(name, 'page_') && _.endsWith(name, '_content');
-
-					var jsonStr = isPageContent ? value : JSON.stringify(value);
-
-					if(isPageContent) {
-
-						_.set(rootScope, name, jsonStr);
-						sessionStorage.setItem(name, _.get(rootScope, name));
-					} else {
-
-						_.set(rootScope, name, JSON.parse(jsonStr));
-						sessionStorage.setItem(name, JSON.stringify(_.get(rootScope, name)));
-					}
-
+					cachePage(rootScope, name, value);
 				}
 
 				var redirect = sessionStorage.getItem('redirect');
@@ -1446,13 +1576,13 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 		$scope.showMkgdispgroupasidefilter = function(md) {
 			//			var contentHtml = $window.getAsideFilter(md);
-
+			
 			$scope.aside = $aside({
 				scope: $scope,
 				title: md.title,
 				animation: "am-slide-left",
 				placement: (_.isUndefined(md.placement) ? 'left' : md.animation),
-				templateUrl: webpagehost + '/webpage/mkgdispgroupasidefilter.content.json'
+				templateUrl: webpagehost + '/webpage/mkgdispgroupasidefilter.content.json?bust' + $rootScope.bust
 			});
 
 			$scope.aside.$promise.then(function() {
@@ -1521,7 +1651,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		$scope.submittime = null;
 
 		$scope.loadMore = function() {
-			console.info('loadMore ')
+		 
 			if($scope.submittime != null) {
 				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
 				if(sec < 1) {
@@ -1728,8 +1858,13 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 	var _ = require('lodash');
 
+/*
+ * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
+ */
+
 	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
 		mainitemFactory) {
+
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
@@ -1740,6 +1875,8 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			$templateCache.put('mainitem.html', '');
 			return;
 		}
+		
+ 
 
 		$scope.appendSuit = function(mainitem) {
 			var promises = [];
@@ -1749,6 +1886,7 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			});
 
 			$q.all(promises).then(function(suitmainitems) {
+					
 				mainitem.suits = [];
 				mainitem.suits = suitmainitems;
 			});
@@ -1757,12 +1895,23 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 		mainitemFactory.get($stateParams.mainitemno, $rootScope.bust).then(function(data) {
 
 				$scope.mainitem = data;
-
+				
+				if($stateParams.prodspec1 === ''){
+						
+					$rootScope.stateParams.prodspec1 = $scope.mainitem.dispunits[0].prodspec1.id;
+				}
+					
 				_($scope.mainitem.dispunits).forEach(function(el) {
 
-					if(el.id === $stateParams.id) {
+				
+					if(el.prodspec1.id === $stateParams.prodspec1) {
+						
 						$scope.dispunit = el;
-
+						
+						if($stateParams.prodspec2 === ''){
+					 		 
+							$rootScope.stateParams.prodspec2 = el.items[0].prodspec2.id;
+						}
 					}
 
 				});
@@ -1771,6 +1920,8 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 				console.info($scope.mainitem);
 				console.info($scope.dispunit);
+
+				$rootScope.appendBrowse($scope.mainitem, $location.absUrl());
 
 				var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
 
@@ -1835,9 +1986,25 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 define('controllers/itemsearchCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('itemsearchCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+	var _ = require('lodash');
+
+	module.controller('itemsearchCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('itemsearch' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+
+		if(!isload) {
+
+			$templateCache.put('itemsearch.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
 
 	});
 
@@ -1940,9 +2107,25 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 define('controllers/orderCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('orderCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+	var _ = require('lodash');
+
+	module.controller('orderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('order' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('order.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
 
 	});
 
@@ -1950,9 +2133,25 @@ define('controllers/orderCtrl',['require', './module'], function(require, module
 define('controllers/orderpayCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('orderpayCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+	var _ = require('lodash');
+
+	module.controller('orderpayCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('orderpay' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('orderpay.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
 
 	});
 
@@ -2029,9 +2228,25 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 define('controllers/shoppingcartCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('shoppingcartCtrl', function($scope, $rootScope, $templateCache) {
-	 
-	 
+var _ = require('lodash');
+
+	module.controller('shoppingcartCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('shoppingcart' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+
+		if(!isload) {
+
+			$templateCache.put('shoppingcart.html', '');
+			return;
+		}
+
+		
+
+		setTimeout(function() {
+			$("img.lazy").lazyload();
+		}, 200);
 
 	});
 
@@ -2417,7 +2632,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			});
 		};
 
-		if($stateParams.ismajor) {
+		if($stateParams.ismajor === 'true') {
 			//主地址查询
 
 			member2addrFactory.select().then(function(data) {
@@ -2548,7 +2763,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		$scope.save = function(md) {
 
-			if($stateParams.ismajor) {
+			if($stateParams.ismajor === 'true') {
 				$scope.address.ismajor = true;
 				$scope.address.addrtype = {
 					pk: '10009G'
@@ -2581,10 +2796,18 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			member2addrFactory.saveorupdate($scope.address).then(function(data) {
 
 				if(_.isUndefined(data.errorcode)) {
-
-					$state.go("memberaddresslist", {
-						template: ''
-					});
+					
+					if($stateParams.ismajor === 'true'){
+						
+						$state.go("member", {
+							template: ''
+						});
+					}else{
+						
+						$state.go("memberaddresslist", {
+							template: ''
+						});
+					}
 
 				} else {
 
@@ -2868,10 +3091,11 @@ define('filters/range',['require', './module'], function(require, module) {
 		return function(input, start, length) {
 
 			var result = [];
-			for (var i = start; i < length; i++) {
+			for (var i = start; i < start+length && i< input.length; i++) {
 				result.push(input[i]);
 			}
-
+			
+			
 			return result;
 
 		};
@@ -2937,7 +3161,31 @@ define('filters/nvl',['require', './module'], function(require, module) {
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring', './nvl'],
+define('filters/cutindex',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('cutindex', function() {
+
+		return function(input, len) {
+
+			var result = [];
+			var count = input.length;
+			if(count === 0) return 0;
+			while(count > 0) {
+				count = count - len;
+				result.push(result.length * len);
+			} 
+			return result;
+
+		};
+
+	});
+
+});
+define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring', './nvl', './cutindex'],
 	function() {
 
 		'use strict';
@@ -2959,7 +3207,8 @@ define('app/module',['require', './main'], function(require) {
 		'app.controllers', 'app.filters',
 		'ui.router', 
 		'ngAnimate',
-		'mgcrea.ngStrap'
+		'mgcrea.ngStrap',
+		'monospaced.qrcode'
 	]);
 
 
