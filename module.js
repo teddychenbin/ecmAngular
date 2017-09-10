@@ -934,12 +934,12 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			} else if(state.current.name === 'mainitem' || state.current.name === 'mkgpgmarticle') {
 
 				pathString = stateParams.path;
-			} else {
+			} else if(state.current.name === 'home') {
 
 				pathString = template;
 			}
 
-			var paths = [];
+			var paths = []; 
 			var arr = _.words(pathString, /[^_ ]+/g);
 			var route = '';
 			_(arr).forEach(function(el) {
@@ -949,20 +949,38 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				route += el;
 				console.info('path ' + route);
-				paths.push(route);
+				paths.push(route); 
 
 			});
 
-			rootScope.paths = paths;
+			rootScope.paths = paths; 
+			
+			
 		};
 
-		//设置自定义变量和前端交互默认给20个
-		this.customVar = function(rootScope) {
+		//设置自定义变量
+		//		this.customVar = function(rootScope) {
+		//
+		//			rootScope.customVar0 = null;
+		//
+		//			rootScope.setCustomVar0 = function(value) {
+		//				rootScope.customVar0 = value;
+		//			};
+		//
+		//		};
 
-			rootScope.customVar0 = null;
+		//设置自定义session变量
+		this.sessionVar = function(rootScope) {
 
-			rootScope.setCustomVar0 = function(value) {
-				rootScope.customVar0 = value;
+			if(sessionStorage.getItem('sessionVar') !== null) {
+				rootScope.sessionVar = JSON.parse(sessionStorage.getItem('sessionVar'));
+			} else {
+				rootScope.sessionVar = null;
+			}
+
+			rootScope.setSessionVar = function(value) {
+				rootScope.sessionVar = value;
+				sessionStorage.setItem('sessionVar', JSON.stringify(value));
 			};
 
 		};
@@ -1048,9 +1066,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				});
 
 			};
-			
-			if(!_.isUndefined(rootScope.aside)){
-				
+
+			if(!_.isUndefined(rootScope.aside)) {
+
 				rootScope.aside.$promise.then(function() {
 					rootScope.aside.hide();
 				});
@@ -1160,7 +1178,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initPath(rootScope, stateParams, state);
 				this.initAside(rootScope);
 				this.initIdentify(rootScope, state, requireLogin);
-				this.customVar(rootScope);
+				this.sessionVar(rootScope);
 				//				this.initShoppnigcart(rootScope);
 				//				this.initMemberFollow(rootScope);
 
@@ -3173,11 +3191,14 @@ define('filters/cutindex',['require', './module'], function(require, module) {
 
 			var result = [];
 			var count = input.length;
-			if(count === 0) return 0;
+			if(count === 0) {
+
+				return 0;
+			}
 			while(count > 0) {
 				count = count - len;
 				result.push(result.length * len);
-			} 
+			}
 			return result;
 
 		};
