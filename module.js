@@ -729,12 +729,259 @@ define('factorys/member2addrFactory',['require', './module'], function(require, 
 	});
 
 });
+define('factorys/memberfollowFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('memberfollowFactory', function($http, $q, apihost) {
+
+		return {
+			select: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/query/bmb/memberfollow/select',
+					method: 'get',
+					params: {
+
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			selectbyobjectpk: function(objectpkvalue) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/query/bmb/memberfollow/selectbyobjectpk',
+					method: 'get',
+					params: {
+						objectpk: objectpkvalue
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			saveorupdate: function(data) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberfollow/saveorupdate',
+					method: 'post',
+					params: {
+						data: JSON.stringify(data)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			delete: function(pkvalue) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberfollow/delete',
+					method: 'post',
+					params: {
+						pk: pkvalue
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			deletelist: function(pks) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberfollow/deletelist',
+					method: 'post',
+					params: {
+						deleltepks: JSON.stringify(pks)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
+define('factorys/memberbrowseFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('memberbrowseFactory', function($http, $q, apihost) {
+
+		return {
+			select: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/query/bmb/memberbrowse/select',
+					method: 'get',
+					params: {
+
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			 
+			saveorupdate: function(data) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberbrowse/saveorupdate',
+					method: 'post',
+					params: {
+						data: JSON.stringify(data)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			delete: function(pkvalue) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberbrowse/delete',
+					method: 'post',
+					params: {
+						pk: pkvalue
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			deletelist: function(pks) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/bmb/memberbrowse/deletelist',
+					method: 'post',
+					params: {
+						deleltepks: JSON.stringify(pks)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
+define('factorys/shoppingcartFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('shoppingcartFactory', function($http, $q, apihost) {
+
+		return {
+
+			get: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/shoppingcart/get',
+					method: 'get',
+					params: {
+
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			update: function(md) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/shoppingcart/update',
+					method: 'post',
+					params: {
+						data: JSON.stringify(md)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			addline: function(md) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/shoppingcart/addline',
+					method: 'post',
+					params: {
+						data: JSON.stringify(md)
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			clear: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/shoppingcart/clear',
+					method: 'post',
+					params: {
+						
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+			
+		};
+
+	});
+
+});
 define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 
 		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
 		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory',
-		'./countryFactory', './govadmdivFactory', './member2addrFactory'
+		'./countryFactory', './govadmdivFactory', './member2addrFactory', './memberfollowFactory', './memberbrowseFactory',
+		'./shoppingcartFactory'
 
 	],
 	function() {
@@ -844,7 +1091,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, mockidentify, pages, views, webpagehost, webpageFactory,
 		webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory,
-		advertFactory, memberidentifyFactory, dialogSvc, dateformat, $modal, $aside, $alert, $select) {
+		advertFactory, memberidentifyFactory, memberbrowseFactory, memberfollowFactory, dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
 		this.cachePage = function(rootScope, name, value) {
 
@@ -939,7 +1186,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				pathString = template;
 			}
 
-			var paths = []; 
+			var paths = [];
 			var arr = _.words(pathString, /[^_ ]+/g);
 			var route = '';
 			_(arr).forEach(function(el) {
@@ -949,25 +1196,13 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				route += el;
 				console.info('path ' + route);
-				paths.push(route); 
+				paths.push(route);
 
 			});
 
-			rootScope.paths = paths; 
-			
-			
-		};
+			rootScope.paths = paths;
 
-		//设置自定义变量
-		//		this.customVar = function(rootScope) {
-		//
-		//			rootScope.customVar0 = null;
-		//
-		//			rootScope.setCustomVar0 = function(value) {
-		//				rootScope.customVar0 = value;
-		//			};
-		//
-		//		};
+		};
 
 		//设置自定义session变量
 		this.sessionVar = function(rootScope) {
@@ -1087,39 +1322,25 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		//
 		//		};
 
-		//		this.initMemberFollow = function(rootScope) {
-		//
-		//			rootScope.appendFollow = function(data) {
-		//			
-		//			};
-		//
-		//			rootScope.removeFollow = function(pk) {
-		//
-		//			};
-		//		};
+		this.initMemberBrowse = function(rootScope, location) {
 
-		this.initMemberBrowse = function(rootScope) {
-
-			rootScope.appendBrowse = function(data, url) {
+			rootScope.appendBrowse = function(data) {
 
 				if(rootScope.identify === null) {
-					rootScope.appendLocalBrowse(data, url);
+					rootScope.appendLocalBrowse(data, location.absUrl());
 				} else {
-					rootScope.appendSvcBrowse(data, url);
+					rootScope.appendSvcBrowse(data, location.absUrl());
 				}
 
 			};
 
-			/*
-			 *  本地瀏覽記錄
-			 */
-			rootScope.appendLocalBrowse = function(data, url) {
+			rootScope.appendStorageBrowse = function(storagekey, data, url) {
 
-				var memberbrowses = localStorage.getItem('memberbrowses');
+				var memberbrowses = localStorage.getItem(storagekey);
 				if(memberbrowses === null) {
 					memberbrowses = [];
 				} else {
-					memberbrowses = JSON.parse(localStorage.getItem('memberbrowses'));
+					memberbrowses = JSON.parse(localStorage.getItem(storagekey));
 				}
 
 				for(var i = 0; i < memberbrowses.length; i++) {
@@ -1132,35 +1353,55 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				data.url = url;
 				memberbrowses.splice(0, 0, data);
 
-				localStorage.setItem('memberbrowses', JSON.stringify(memberbrowses));
+				localStorage.setItem(storagekey, JSON.stringify(memberbrowses));
 
 			};
+
+			/*
+			 *  加入本地瀏覽記錄
+			 */
+			rootScope.appendLocalBrowse = function(data, url) {
+				rootScope.appendStorageBrowse('localbrowses', data, url);
+			};
+			/*
+			 * 加入服務端瀏覽記錄
+			 */
+			rootScope.appendSvcBrowse = function(data, _url) {
+
+				memberbrowseFactory.saveorupdate({
+					objectpk: data.pk,
+					objectid: data.id,
+					url: _url,
+					browsetype: 'mainitem'
+
+				}).then(function(data) {
+
+				}, function(err) {});
+
+			};
+
 			/*
 			 * 獲取本地瀏覽記錄
 			 */
 			rootScope.getLocalBrowses = function() {
-				var memberbrowses = localStorage.getItem('memberbrowses');
-				if(memberbrowses === null) {
-					memberbrowses = [];
+				var result = localStorage.getItem('localbrowses');
+				if(result === null) {
+					result = [];
 				} else {
-					memberbrowses = JSON.parse(localStorage.getItem('memberbrowses'));
+					result = JSON.parse(localStorage.getItem('localbrowses'));
 				}
-
-				return memberbrowses;
+				return result;
 			};
 
-			/*
-			 * 服務端瀏覽記錄
-			 */
-			rootScope.appendSvcBrowse = function(data, url) {
+		};
 
-			};
+		this.initImageLazyLoad = function(rootScope) {
 
-			/*
-			 * 刪除服務器端瀏覽記錄
-			 */
-			rootScope.removeBrowse = function(mainitempk) {
+			rootScope.loadImg = function() {
 
+				setTimeout(function() {
+					$("img.lazy").lazyload();
+				}, 500);
 			};
 
 		};
@@ -1179,11 +1420,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				this.initAside(rootScope);
 				this.initIdentify(rootScope, state, requireLogin);
 				this.sessionVar(rootScope);
-				//				this.initShoppnigcart(rootScope);
-				//				this.initMemberFollow(rootScope);
-
-				this.initMemberBrowse(rootScope);
-
+				//				this.initShoppnigcart(rootScope); 
+				this.initMemberBrowse(rootScope, location);
+				this.initImageLazyLoad(rootScope);
 				rootScope.localbrowses = rootScope.getLocalBrowses();
 
 				return true;
@@ -1329,67 +1568,71 @@ define('services/pageSvc',['require', './module'], function(require, module) {
 });
 define('services/shoppingcartSvc',['require', './module'], function(require, module) {
 	'use strict';
-
 	var _ = require('lodash');
 	var angular = require('angular');
 
 	/*
 	 * 购物车服务
 	 */
-	module.service('shoppingcartSvc', function() {
-
-		this.items = [];
+	module.service('shoppingcartSvc', function($http, $q, $cacheFactory,
+		$window, $modal, $aside, $alert, $select, dialogSvc, dateformat,
+		shoppingcartFactory) {
 
 		/*
 		 * 清空购物车
 		 */
-		this.clear = function() {
+		this.clear = function(rootScope) {
+
+			shoppingcartFactory.clean().then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+				} else {
+					dialogSvc.error(data.message);
+				}
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
 
 		};
 
 		/*
-		 * 获取所有货号
+		 * 获取购物车
 		 */
-		this.getItems = function(index) {
+		this.get = function(rootScope) {
 
-		};
-		/*
-		 * 获取货号
-		 */
-		this.getItem = function(index) {
+			shoppingcartFactory.get().then(function(data) {
 
-		};
-		/*
-		 * 添加货号
-		 */
-		this.addItem = function(item) {
-			this.items.push(item);
-		};
-		/*
-		 * 移除货号
-		 */
-		this.removeItem = function(index) {
+			}, function(err) {
+				dialogSvc.error(err);
+			});
 
 		};
 
 		/*
-		 * 修改数量
+		 * 添加产品
 		 */
-		this.changeQty = function(index, value) {
-			this.items[index].qty = value;
+		this.addline = function(rootScope, md) {
+
+			shoppingcartFactory.addline(md).then(function(data) {
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+
 		};
 
 		/*
-		 * 数量合计
+		 * 更新购物车
 		 */
-		this.getTotalQty = function() {
-			
-		};
+		this.update = function(rootScope, md) {
 
-		/*
-		 * 金额合计
-		 */
-		this.getTotalAmt = function() {
+			shoppingcartFactory.update(update).then(function(data) {
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
 
 		};
 		
@@ -1408,11 +1651,21 @@ define('services/dialogSvc',['require', './module'], function(require, module) {
 
 		this.error = function(message) {
 
-			$modal({
+			var alert = $alert({
 				title: languageSvc.error(),
 				content: message,
+				placement: 'top',
+				animation: 'am-fade-and-slide-top',
+				type: 'danger',
+				duration: 3,
 				show: true
 			});
+
+			//			$modal({
+			//				title: languageSvc.error(),
+			//				content: message,
+			//				show: true
+			//			});
 
 		};
 
@@ -1453,7 +1706,7 @@ define('services/languageSvc',['require', './module'], function(require, module)
 		this.confirm_delete = function(message) {
 
 			if(lanuage === 'zh-TW') {
-				return '確定要刪除 ' + message + '嗎？';
+				return '確定要刪除' + message + '嗎？';
 			}
 
 			return '';
@@ -1530,9 +1783,7 @@ define('controllers/errorCtrl',['require', './module'], function(require, module
 		}
    
 		
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -1556,9 +1807,7 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 		}
  
 		
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -1651,9 +1900,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 					console.info($scope.mkgdispgroup);
 
-					setTimeout(function() {
-						$("img.lazy").lazyload();
-					}, 200);
+					$rootScope.loadImg();
 
 					if(!_.isUndefined($window.afterLoad)) {
 
@@ -1748,9 +1995,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 
 					});
 
-					setTimeout(function() {
-						$("img.lazy").lazyload();
-					}, 200);
+					$rootScope.loadImg();
 
 					$rootScope.title = title + ' -' + $rootScope.title;
 
@@ -1835,9 +2080,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 						$scope.mkgpgm.lines.push(mkgpgmarticle);
 					});
 
-					setTimeout(function() {
-						$("img.lazy").lazyload();
-					}, 200);
+					$rootScope.loadImg();
 
 					if(!_.isUndefined($window.afterLoad)) {
 
@@ -1876,13 +2119,12 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 	var _ = require('lodash');
 
-/*
- * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
- */
+	/*
+	 * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
+	 */
 
 	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mainitemFactory) {
-
+		mainitemFactory, memberfollowFactory, shoppingcartFactory, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
@@ -1893,8 +2135,6 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			$templateCache.put('mainitem.html', '');
 			return;
 		}
-		
- 
 
 		$scope.appendSuit = function(mainitem) {
 			var promises = [];
@@ -1904,30 +2144,97 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			});
 
 			$q.all(promises).then(function(suitmainitems) {
-					
+
 				mainitem.suits = [];
 				mainitem.suits = suitmainitems;
 			});
 		};
 
+		$scope.follow = null;
+
+		$scope.memberfollow = function(mainitem) {
+
+			memberfollowFactory.selectbyobjectpk(mainitem.pk).then(function(data) {
+					if(data.length > 0) {
+						$scope.follow = data[0];
+					}
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+
+		};
+
+		$scope.addShoppingcart = function(qty){
+			
+			shoppingcartFactory.get().then(function(data) {
+				
+				  
+				
+				
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+			
+		};
+
+		$scope.appendFollow = function(md) {
+
+			if($rootScope.identify === null) {
+				$state.go('login', {
+					template: ''
+				});
+				return;
+			}
+
+			memberfollowFactory.saveorupdate({
+				objectpk: md.pk,
+				objectid: md.id,
+				url: $location.absUrl(),
+				followtype: 'mainitem'
+
+			}).then(function(data) {
+				$scope.memberfollow($scope.mainitem);
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.deleteFollow = function(md) {
+
+			memberfollowFactory.delete(md.pk).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+					$scope.follow = null;
+				} else {
+					dialogSvc.error(data.message);
+				}
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
 		mainitemFactory.get($stateParams.mainitemno, $rootScope.bust).then(function(data) {
 
 				$scope.mainitem = data;
-				
-				if($stateParams.prodspec1 === ''){
-						
+
+				if($stateParams.prodspec1 === '') {
+
 					$rootScope.stateParams.prodspec1 = $scope.mainitem.dispunits[0].prodspec1.id;
 				}
-					
+
 				_($scope.mainitem.dispunits).forEach(function(el) {
 
-				
 					if(el.prodspec1.id === $stateParams.prodspec1) {
-						
+
 						$scope.dispunit = el;
-						
-						if($stateParams.prodspec2 === ''){
-					 		 
+
+						if($stateParams.prodspec2 === '') {
+
 							$rootScope.stateParams.prodspec2 = el.items[0].prodspec2.id;
 						}
 					}
@@ -1939,8 +2246,6 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 				console.info($scope.mainitem);
 				console.info($scope.dispunit);
 
-				$rootScope.appendBrowse($scope.mainitem, $location.absUrl());
-
 				var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
 
 				if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
@@ -1948,9 +2253,16 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 				}
 				$rootScope.title = title + ' -' + $rootScope.title;
 
+				$rootScope.loadImg();
+
 				setTimeout(function() {
-					$("img.lazy").lazyload();
-				}, 200);
+					if($rootScope.identify !== null) {
+
+						$scope.memberfollow($scope.mainitem);
+					}
+					$rootScope.appendBrowse($scope.mainitem);
+
+				}, 1000);
 
 			})
 			.catch(function(err) {
@@ -2020,9 +2332,7 @@ define('controllers/itemsearchCtrl',['require', './module'], function(require, m
 
 		
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2049,20 +2359,20 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			id: null,
 			password: null
 		};
- 		
+
 		if($rootScope.identify != null) {
 
 			$window.location = 'index.html';
 			return;
 		}
-		 
+
 		$scope.submittime = null;
 
 		$scope.login = function(md) {
-			
+
 			$scope.user.id = md.id;
 			$scope.user.password = md5(md.password);
-			 
+
 			if($scope.submittime != null) {
 				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
 				if(sec < 3) {
@@ -2070,12 +2380,14 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 				}
 			}
 			$scope.submittime = new Date();
-		  
+
 			memberidentifyFactory.login($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 					if(!_.isUndefined($rootScope.loginReturnState) && $rootScope.loginReturnState != null) {
-						$state.go($rootScope.loginReturnState, $rootScope.loginReturnParams);
+
+						$state.go($rootScope.loginReturnState.name, $rootScope.loginReturnParams);
+
 					} else {
 						$window.location = 'index.html';
 					}
@@ -2113,11 +2425,7 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 			return;
 		}
 
-	
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2141,9 +2449,7 @@ define('controllers/orderCtrl',['require', './module'], function(require, module
 
 		
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2167,9 +2473,7 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 
 		
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2262,9 +2566,7 @@ var _ = require('lodash');
 
 		
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2304,9 +2606,7 @@ define('controllers/infoCtrl',['require', './module'], function(require, module)
   
   		$scope.message = $stateParams.message;
 		
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2380,9 +2680,7 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2453,9 +2751,7 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2526,9 +2822,7 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2577,20 +2871,18 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 
 					} else {
 
-						$.registCallback(data.message);
+						dialogSvc.error(data.message);
 
 					}
 
 				}, function(err) {
-					console.error(err);
+					dialogSvc.error(err);
 				});
 
 			}
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2841,9 +3133,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2853,8 +3143,8 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 
 	var _ = require('lodash');
 
-	module.controller('memberbrowseCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+	module.controller('memberbrowseCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		memberbrowseFactory, mainitemFactory, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('memberbrowse' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
@@ -2865,11 +3155,93 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 			return;
 		}
 
-		
+		$scope.browses = [];
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$scope.loadMainitem = function(data) {
+
+			var promises = [];
+			console.info(data);
+			for(var i = 0; i < data.length; i++) {
+				var mainitemno = data[i].objectid;
+				promises.push(mainitemFactory.get(mainitemno, $rootScope.bust));
+			}
+
+			$q.all(promises).then(function(values) {
+
+					for(var i = 0; i < values.length; i++) {
+						values[i].url = data[i].url;
+						values[i].pk = data[i].pk;
+						$scope.browses.push(values[i]);
+
+					}
+
+					$rootScope.loadImg();
+
+					if(!_.isUndefined($window.afterLoad)) {
+
+						$window.afterLoad();
+					}
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		memberbrowseFactory.select().then(function(data) {
+				$scope.loadMainitem(data);
+			})
+			.catch(function(err) {
+				console.log(err);
+			});
+
+		$scope.delete = function(md) {
+
+			memberbrowseFactory.delete(md.pk).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					location.reload();
+
+				} else {
+
+					dialogSvc.error(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+		};
+
+		$scope.deletelist = function() {
+
+			var pks = [];
+			_.forEach($scope.browses, function(value) {
+				pks.push({
+					pk: value.pk
+				});
+			});
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(""))) {
+				memberbrowseFactory.deletelist(pks).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+
+						location.reload();
+
+					} else {
+
+						dialogSvc.error(data.message);
+
+					}
+
+				}, function(err) {
+					dialogSvc.error(err);
+				});
+			}
+
+		};
 
 	});
 
@@ -2879,8 +3251,8 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 
 	var _ = require('lodash');
 
-	module.controller('memberfollowCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+	module.controller('memberfollowCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		memberfollowFactory, mainitemFactory, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('memberfollow' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
@@ -2891,11 +3263,93 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 			return;
 		}
 
-		
+		$scope.follows = [];
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$scope.loadMainitem = function(data) {
+
+			var promises = [];
+			console.info(data);
+			for(var i = 0; i < data.length; i++) {
+				var mainitemno = data[i].objectid;
+				promises.push(mainitemFactory.get(mainitemno, $rootScope.bust));
+			}
+
+			$q.all(promises).then(function(values) {
+
+					for(var i = 0; i < values.length; i++) {
+						values[i].url = data[i].url;
+						values[i].pk = data[i].pk;
+						$scope.follows.push(values[i]);
+
+					}
+
+					$rootScope.loadImg();
+
+					if(!_.isUndefined($window.afterLoad)) {
+
+						$window.afterLoad();
+					}
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		memberfollowFactory.select().then(function(data) {
+				$scope.loadMainitem(data);
+			})
+			.catch(function(err) {
+				console.log(err);
+			});
+
+		$scope.delete = function(md) {
+
+			memberfollowFactory.delete(md.pk).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					location.reload();
+
+				} else {
+
+					dialogSvc.error(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+		};
+
+		$scope.deletelist = function() {
+
+			var pks = [];
+			_.forEach($scope.follows, function(value) {
+				pks.push({
+					pk: value.pk
+				});
+			});
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(""))) {
+				memberfollowFactory.deletelist(pks).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+
+						location.reload();
+
+					} else {
+
+						dialogSvc.error(data.message);
+
+					}
+
+				}, function(err) {
+					dialogSvc.error(err);
+				});
+			}
+
+		};
 
 	});
 
@@ -2972,9 +3426,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2998,9 +3450,103 @@ define('controllers/memberorderlistCtrl',['require', './module'], function(requi
 
 		
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/membermessageCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('membermessageCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('membermessage' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('membermessage.html', '');
+			return;
+		}
+
+		
+
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/memberorderCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberorderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('memberorder.html', '');
+			return;
+		}
+
+		
+
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/orderconfirmsuccessCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('orderconfirmsuccessCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('orderconfirmsuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('orderconfirmsuccess.html', '');
+			return;
+		}
+
+		
+
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/orderpaysuccessCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('orderpaysuccessCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('orderpaysuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+
+		if(!isload) {
+
+			$templateCache.put('orderpaysuccess.html', '');
+			return;
+		}
+
+		
+
+		$rootScope.loadImg();
 
 	});
 
@@ -3009,7 +3555,8 @@ define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './home
 		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl',
 		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
 		'./bindingemailCtrl', './memberaddresslistCtrl', './memberaddressmodifyCtrl', './memberbrowseCtrl',
-		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl'
+		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl', './membermessageCtrl', './memberorderCtrl', 
+		'./orderconfirmsuccessCtrl', './orderpaysuccessCtrl'
 	],
 	function() {
 
@@ -3188,8 +3735,11 @@ define('filters/cutindex',['require', './module'], function(require, module) {
 	module.filter('cutindex', function() {
 
 		return function(input, len) {
-
+			
 			var result = [];
+			if(_.isUndefined(input)){
+				return result; 
+			}
 			var count = input.length;
 			if(count === 0) {
 

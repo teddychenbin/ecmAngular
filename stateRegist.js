@@ -160,6 +160,30 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'memberorderlist.html'" + '"></div>';
 				},
 				controller: 'memberorderlistCtrl'
+			}).state('membermessage', {
+				url: '/membermessage/:template',
+				template: function() {
+					return '<div ng-include="' + "'membermessage.html'" + '"></div>';
+				},
+				controller: 'membermessageCtrl'
+			}).state('memberorder', {
+				url: '/memberorder/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberorder.html'" + '"></div>';
+				},
+				controller: 'memberorderCtrl'
+			}).state('orderconfirmsuccess', {
+				url: '/orderconfirmsuccess/:template',
+				template: function() {
+					return '<div ng-include="' + "'orderconfirmsuccess.html'" + '"></div>';
+				},
+				controller: 'orderconfirmsuccessCtrl'
+			}).state('orderpaysuccess', {
+				url: '/orderpaysuccess/:template',
+				template: function() {
+					return '<div ng-include="' + "'orderpaysuccess.html'" + '"></div>';
+				},
+				controller: 'orderpaysuccessCtrl'
 			});
 
 	};
