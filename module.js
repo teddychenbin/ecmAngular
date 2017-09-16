@@ -379,7 +379,7 @@ define('factorys/memberidentifyFactory',['require', './module'], function(requir
 					url: apihost + '/security/memberidentify/login',
 					method: 'post',
 					params: {
-						data: JSON.stringify(user)
+						data: angular.toJson(user)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -459,7 +459,7 @@ define('factorys/memberaccountFactory',['require', './module'], function(require
 					url: apihost + '/security/memberaccount/regist',
 					method: 'post',
 					params: {
-						data: JSON.stringify(user)
+						data: angular.toJson(user)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -475,7 +475,7 @@ define('factorys/memberaccountFactory',['require', './module'], function(require
 					url: apihost + '/security/memberaccount/actionauth',
 					method: 'post',
 					params: {
-						data: JSON.stringify(actionauth)
+						data: angular.toJson(actionauth)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -521,7 +521,7 @@ define('factorys/memberaccountbindingFactory',['require', './module'], function(
 					url: apihost + '/entity/bmb/memberaccountbinding/add',
 					method: 'post',
 					params: {
-						data: JSON.stringify(accountbinding)
+						data: angular.toJson(accountbinding)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -564,7 +564,7 @@ define('factorys/memberinfoFactory',['require', './module'], function(require, m
 					url: apihost + '/entity/bmb/memberinfo/saveorupdate',
 					method: 'post',
 					params: {
-						data: JSON.stringify(user)
+						data: angular.toJson(user)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -713,7 +713,7 @@ define('factorys/member2addrFactory',['require', './module'], function(require, 
 					url: apihost + '/entity/bmb/member2addr/saveorupdate',
 					method: 'post',
 					params: {
-						data: JSON.stringify(addr)
+						data: angular.toJson(addr)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -773,7 +773,7 @@ define('factorys/memberfollowFactory',['require', './module'], function(require,
 					url: apihost + '/entity/bmb/memberfollow/saveorupdate',
 					method: 'post',
 					params: {
-						data: JSON.stringify(data)
+						data: angular.toJson(data)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -805,7 +805,7 @@ define('factorys/memberfollowFactory',['require', './module'], function(require,
 					url: apihost + '/entity/bmb/memberfollow/deletelist',
 					method: 'post',
 					params: {
-						deleltepks: JSON.stringify(pks)
+						deleltepks: angular.toJson(pks)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -850,7 +850,7 @@ define('factorys/memberbrowseFactory',['require', './module'], function(require,
 					url: apihost + '/entity/bmb/memberbrowse/saveorupdate',
 					method: 'post',
 					params: {
-						data: JSON.stringify(data)
+						data: angular.toJson(data)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -882,7 +882,7 @@ define('factorys/memberbrowseFactory',['require', './module'], function(require,
 					url: apihost + '/entity/bmb/memberbrowse/deletelist',
 					method: 'post',
 					params: {
-						deleltepks: JSON.stringify(pks)
+						deleltepks: angular.toJson(pks)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -921,29 +921,37 @@ define('factorys/shoppingcartFactory',['require', './module'], function(require,
 				});
 				return deferred.promise;
 			},
-			update: function(md) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/security/shoppingcart/update',
-					method: 'post',
-					params: {
-						data: JSON.stringify(md)
+			/*
+			 * 必须同步否则会和get并发
+			 */
+			initfromshoppingcartkey: function(value) {
+
+				var result = "";
+				$.ajax({
+					url: apihost + '/security/shoppingcart/initfromshoppingcartkey',
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'json',
+					data: {
+						pk: value
+					},
+					success: function(data) {
+						result = data;
 					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
 				});
-				return deferred.promise;
+
+				return angular.fromJson(result);
+
 			},
-			addline: function(md) {
+			saveorupdate: function(md) {
 				var deferred = $q.defer();
 				$http({
-					url: apihost + '/security/shoppingcart/addline',
+					url: apihost + '/security/shoppingcart/saveorupdate',
 					method: 'post',
 					params: {
-						data: JSON.stringify(md)
+
+						data: angular.toJson(md)
 					}
 				}).then(function(result) {
 					deferred.resolve(result.data);
@@ -957,10 +965,7 @@ define('factorys/shoppingcartFactory',['require', './module'], function(require,
 				var deferred = $q.defer();
 				$http({
 					url: apihost + '/security/shoppingcart/clear',
-					method: 'post',
-					params: {
-						
-					}
+					method: 'get'
 				}).then(function(result) {
 					deferred.resolve(result.data);
 				}).catch(function(result) {
@@ -969,7 +974,65 @@ define('factorys/shoppingcartFactory',['require', './module'], function(require,
 				});
 				return deferred.promise;
 			}
-			
+
+		};
+
+	});
+
+});
+define('factorys/salesorderFactory',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.factory('salesorderFactory', function($http, $q, apihost) {
+
+		return {
+
+			get: function(value) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/eso/salesorder/get',
+					method: 'get',
+					params: {
+						pk: value
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			approve: function(value) {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/eso/salesorder/approve',
+					method: 'get',
+					params: {
+						pk: value
+					}
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			convertfromshoppingcart: function() {
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/entity/eso/salesorder/convertfromshoppingcart',
+					method: 'get'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+
 		};
 
 	});
@@ -981,7 +1044,7 @@ define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
 		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
 		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory',
 		'./countryFactory', './govadmdivFactory', './member2addrFactory', './memberfollowFactory', './memberbrowseFactory',
-		'./shoppingcartFactory'
+		'./shoppingcartFactory', './salesorderFactory'
 
 	],
 	function() {
@@ -1089,9 +1152,11 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, mockidentify, pages, views, webpagehost, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory,
-		advertFactory, memberidentifyFactory, memberbrowseFactory, memberfollowFactory, dialogSvc, dateformat, $modal, $aside, $alert, $select) {
+	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, mockidentify,
+		pages, views, webpagehost, currency,
+		webpageFactory, webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory, mainitemFactory,
+		advertFactory, memberidentifyFactory, memberbrowseFactory, memberfollowFactory, shoppingcartFactory,
+		dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
 		this.cachePage = function(rootScope, name, value) {
 
@@ -1220,23 +1285,34 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
-		this.initIdentify = function(rootScope, state, requireLogin) {
+		this.initIdentify = function(rootScope, state, loginConfig) {
+
+			rootScope.loginValid = function() {
+				var data = memberidentifyFactory.getIdentify(false);
+				if(data === "") {
+					state.go('login', {
+						template: ''
+					});
+					return false;
+				}
+				return true;
+			};
 
 			if(mockidentify !== null) {
 				rootScope.identify = mockidentify;
 				return;
 			}
 			/*
-			 * requireLogin === true 强验证模式必须同步等待
-			 * requireLogin === false 抓取会员信息用异步就可以，加快非会员页面的速度
+			 * loginConfig.auth === true 强验证模式必须同步等待
+			 * loginConfig.auth === false 抓取会员信息用异步就可以，加快非会员页面的速度
 			 */
 			rootScope.identify = null;
 
-			if(requireLogin) {
+			if(!loginConfig.isAsync) {
 				var data = memberidentifyFactory.getIdentify(false);
 				if(data === "") {
 					rootScope.identify = null;
-					if(requireLogin) {
+					if(loginConfig.auth) {
 						state.go('login', {
 							template: ''
 						});
@@ -1251,12 +1327,14 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				}
 			} else {
+
 				memberidentifyFactory.getIdentify(true).then(function(data) {
 					if(data !== "") {
 						rootScope.identify = data;
 						if(!_.isUndefined(rootScope.identify.birthday)) {
 							rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
 						}
+
 					}
 
 				}, function(err) {
@@ -1310,17 +1388,6 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			}
 
 		};
-
-		//		this.initShoppingcart = function(rootScope) {
-		//
-		//			rootScope.saveShoppingcart = function(data) { 
-		//			};
-		//
-		//			rootScope.getShoppingcart = function() { 
-		//				
-		//			};
-		//
-		//		};
 
 		this.initMemberBrowse = function(rootScope, location) {
 
@@ -1406,23 +1473,151 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
-		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, requireLogin) {
+		this.initSubmittime = function(rootScope) {
+
+			rootScope.submittime = null;
+
+			rootScope.submittimeValid = function() {
+
+				if(rootScope.submittime != null) {
+					var sec = parseInt((new Date()) - rootScope.submittime) / 1000;
+					if(sec < 3) {
+						return false;
+					}
+				}
+
+				rootScope.submittime = new Date();
+				return true;
+
+			};
+		};
+
+		this.localShoppingcart = function(rootScope) {
+
+			/*
+			 * 登陆状态不保存
+			 */
+			rootScope.setShoppingcartKey = function(key) {
+
+				localStorage.setItem('shoppingcartkey', key);
+
+				memberidentifyFactory.getIdentify(true).then(function(data) {
+					if(data !== "") {
+						localStorage.setItem('shoppingcartkey', null);
+					}
+
+				}, function(err) {
+
+				});
+			};
+
+			/*
+			 * 系统执行一次本地购物车同步服务购物车
+			 */
+			if(sessionStorage.getItem('isinitfromshoppingcartkey') === null) {
+				if(localStorage.getItem('shoppingcartkey') != null) {
+					console.info(localStorage.getItem('shoppingcartkey'));
+					shoppingcartFactory.initfromshoppingcartkey(localStorage.getItem('shoppingcartkey'));
+				}
+				sessionStorage.setItem('isinitfromshoppingcartkey', true);
+			}
+
+		};
+
+		this.fastShoppingcart = function(rootScope) {
+
+			rootScope.loadFastShoppingcart = function() {
+				
+			 
+				shoppingcartFactory.get().then(function(data) {
+
+					rootScope.setShoppingcartKey(data.pk);
+
+					rootScope.fastshoppingcartmainitems = [];
+					rootScope.loadMainitems(data.lines, 'fastshoppingcartmainitems');
+					rootScope.fastshoppingcart = data;
+
+				}, function(err) {
+
+				});
+
+			};
+
+			rootScope.loadFastShoppingcart();
+
+		};
+
+		this.initMainitems = function(rootScope) {
+
+			rootScope.loadMainitems = function(lines, targetName) {
+
+				if(_.isUndefined(lines) || lines === null) {
+					return;
+				}
+
+				var promises = [];
+
+				for(var i = 0; i < lines.length; i++) {
+					var mainitemno = lines[i].mainitem.id;
+					promises.push(mainitemFactory.get(mainitemno, rootScope.bust));
+				}
+
+				$q.all(promises).then(function(values) {
+
+						var target = values;
+
+						for(var i = 0; i < values.length; i++) {
+
+							for(var j = 0; j < values[i].dispunits.length; j++) {
+								var el = values[i].dispunits[j];
+
+								if(el.prodspec1.id === lines[i].prodspec1.id) {
+									target[i].dispunit = el;
+
+								}
+
+							}
+
+						}
+
+						_.set(rootScope, targetName, values);
+
+						if(!_.isUndefined($window.afterLoadMainitems)) {
+
+							$window.afterLoadMainitems();
+						}
+
+					})
+					.catch(function(err) {
+						console.log(err);
+					});
+			};
+
+		};
+
+		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, loginConfig) {
 
 			if(sessionStorage.getItem('config') != null) {
 
 				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
+				rootScope.currency = currency;
 
 				this.initViews(rootScope, templateCache, pageid);
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
 				this.initAside(rootScope);
-				this.initIdentify(rootScope, state, requireLogin);
+				this.initIdentify(rootScope, state, loginConfig);
 				this.sessionVar(rootScope);
 				//				this.initShoppnigcart(rootScope); 
 				this.initMemberBrowse(rootScope, location);
 				this.initImageLazyLoad(rootScope);
+				this.initSubmittime(rootScope);
+				this.localShoppingcart(rootScope);
+				this.initMainitems(rootScope);
+				this.fastShoppingcart(rootScope);
+
 				rootScope.localbrowses = rootScope.getLocalBrowses();
 
 				return true;
@@ -1566,81 +1761,6 @@ define('services/pageSvc',['require', './module'], function(require, module) {
 	});
 
 });
-define('services/shoppingcartSvc',['require', './module'], function(require, module) {
-	'use strict';
-	var _ = require('lodash');
-	var angular = require('angular');
-
-	/*
-	 * 购物车服务
-	 */
-	module.service('shoppingcartSvc', function($http, $q, $cacheFactory,
-		$window, $modal, $aside, $alert, $select, dialogSvc, dateformat,
-		shoppingcartFactory) {
-
-		/*
-		 * 清空购物车
-		 */
-		this.clear = function(rootScope) {
-
-			shoppingcartFactory.clean().then(function(data) {
-
-				if(JSON.stringify(data).toLowerCase() === 'true') {
-
-				} else {
-					dialogSvc.error(data.message);
-				}
-
-			}, function(err) {
-				dialogSvc.error(err);
-			});
-
-		};
-
-		/*
-		 * 获取购物车
-		 */
-		this.get = function(rootScope) {
-
-			shoppingcartFactory.get().then(function(data) {
-
-			}, function(err) {
-				dialogSvc.error(err);
-			});
-
-		};
-
-		/*
-		 * 添加产品
-		 */
-		this.addline = function(rootScope, md) {
-
-			shoppingcartFactory.addline(md).then(function(data) {
-
-			}, function(err) {
-				dialogSvc.error(err);
-			});
-
-		};
-
-		/*
-		 * 更新购物车
-		 */
-		this.update = function(rootScope, md) {
-
-			shoppingcartFactory.update(update).then(function(data) {
-
-			}, function(err) {
-				dialogSvc.error(err);
-			});
-
-		};
-		
-		
-
-	});
-
-});
 define('services/dialogSvc',['require', './module'], function(require, module) {
 	'use strict';
 
@@ -1682,8 +1802,9 @@ define('services/languageSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-
 	module.service('languageSvc', function(lanuage) {
+
+	 
 
 		this.warning = function(message) {
 
@@ -1715,7 +1836,166 @@ define('services/languageSvc',['require', './module'], function(require, module)
 	});
 
 });
-define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc', './languageSvc'],
+define('services/mainitemSvc',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.service('mainitemSvc', function($q, mainitemFactory, memberfollowFactory, dialogSvc) {
+
+		this.init = function(scope, rootScope, location, stateParams) {
+
+			scope.follow = null;
+			scope.itemqty = 1;
+			scope.mainitem = null;
+
+			scope.appendSuit = function(mainitem) {
+				var promises = [];
+				_(mainitem.suits).forEach(function(el) {
+
+					promises.push(mainitemFactory.get(el.mainitemno, rootScope.bust));
+				});
+
+				$q.all(promises).then(function(suitmainitems) {
+
+					mainitem.suits = [];
+					mainitem.suits = suitmainitems;
+				});
+			};
+
+			scope.memberfollow = function(mainitem) {
+
+				memberfollowFactory.selectbyobjectpk(mainitem.pk).then(function(data) {
+						if(data.length > 0) {
+							scope.follow = data[0];
+						}
+					})
+					.catch(function(err) {
+						console.log(err);
+					});
+
+			};
+
+			scope.appendFollow = function(md) {
+
+				if(!rootScope.loginValid()) {
+					return;
+				}
+
+				memberfollowFactory.saveorupdate({
+					objectpk: md.pk,
+					objectid: md.id,
+					url: location.absUrl(),
+					followtype: 'mainitem'
+
+				}).then(function(data) {
+					scope.memberfollow(scope.mainitem);
+				}, function(err) {
+					dialogSvc.error(err);
+				});
+
+			};
+
+			scope.deleteFollow = function(md) {
+
+				memberfollowFactory.delete(md.pk).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+						scope.follow = null;
+					} else {
+						dialogSvc.error(data.message);
+					}
+
+				}, function(err) {
+
+					dialogSvc.error(err);
+				});
+
+			};
+
+			scope.plusItemQty = function() {
+				if(scope.itemqty < 999) {
+					scope.itemqty = scope.itemqty + 1;
+				}
+
+			};
+
+			scope.minuItemQty = function() {
+				if(scope.itemqty > 2) {
+					scope.itemqty = scope.itemqty - 1;
+				}
+
+			};
+			
+			
+			/*
+			 * loadSuccessHandle
+			 */
+			scope.load = function() {
+
+				mainitemFactory.get(stateParams.mainitemno, rootScope.bust).then(function(data) {
+
+						scope.mainitem = data;
+
+						scope.prodspec1 = scope.mainitem.dispunits[0].prodspec1;
+						_(scope.mainitem.dispunits).forEach(function(el) {
+							if(stateParams.prodspec1 === el.prodspec1.id) {
+								scope.prodspec1 = el.prodspec1;
+							}
+						});
+
+						_(scope.mainitem.dispunits).forEach(function(el) {
+
+							if(el.prodspec1.id === scope.prodspec1.id) {
+
+								scope.dispunit = el;
+								scope.prodspec2 = el.items[0].prodspec2;
+								scope.item = el.items[0];
+
+								_(el.items).forEach(function(item) {
+									if(stateParams.prodspec2 === item.prodspec2.id) {
+										scope.prodspec2 = item.prodspec2;
+										scope.item = item;
+									}
+								});
+
+							}
+
+						});
+
+						scope.appendSuit(scope.mainitem);
+
+						console.info('mainitem');
+						console.info(scope.mainitem);
+						console.info('dispunit');
+						console.info(scope.dispunit);
+						console.info('item');
+						console.info(scope.item);
+						
+				 
+ 
+						
+						if(!_.isUndefined(scope.loadSuccessHandle)){
+							scope.loadSuccessHandle();
+						}
+
+
+					
+
+					})
+					.catch(function(err) {
+						console.log(err);
+					});
+
+			};
+
+		};
+
+	});
+
+});
+define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './dialogSvc', './languageSvc', './mainitemSvc'],
 	function() {
 
 		'use strict';
@@ -1752,7 +2032,10 @@ define('controllers/articleCtrl',['require', './module'], function(require, modu
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		var isload = initctrlSvc.controlLoad('article' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('article' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -1774,7 +2057,10 @@ define('controllers/errorCtrl',['require', './module'], function(require, module
 	module.controller('errorCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
    
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('error' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('error' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 	
 		if(!isload) {
 
@@ -1794,19 +2080,20 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 	var _ = require('lodash');
 
 	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-   
-  
+
 		var template = initctrlSvc.getTemplate($stateParams);
-	 
-		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache);
- 
+
+		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
 		if(!isload) {
 
 			$templateCache.put('home.html', '');
 			return;
 		}
- 
-		
+
 		$rootScope.loadImg();
 
 	});
@@ -1822,7 +2109,10 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		var isload = initctrlSvc.controlLoad('mkgdispgroup' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mkgdispgroup' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -1843,7 +2133,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 		$scope.showMkgdispgroupasidefilter = function(md) {
 			//			var contentHtml = $window.getAsideFilter(md);
-			
+
 			$scope.aside = $aside({
 				scope: $scope,
 				title: md.title,
@@ -1913,17 +2203,11 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 				});
 		};
 
-		$scope.submittime = null;
-
 		$scope.loadMore = function() {
-		 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 1) {
-					return;
-				}
+
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
 
 			if($scope.page < $scope.pagecount) {
 				$scope.loadMainitem($scope.data, $scope.page + 1);
@@ -1944,7 +2228,10 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 		mkgpgmarticleFactory, mainitemFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('mkgpgmarticle' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mkgpgmarticle' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2020,7 +2307,10 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 		mkgpgmFactory, mkgpgmarticleFactory, pageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('mkgpgm' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mkgpgm' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2092,17 +2382,11 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 				});
 		};
 
-		$scope.submittime = null;
-
 		$scope.loadMore = function() {
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 1) {
-					return;
-				}
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
 
 			if($scope.page < $scope.pagecount) {
 				$scope.loadMkgpgm($scope.data, $scope.page + 1);
@@ -2123,12 +2407,15 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 	 * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
 	 */
 
-	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mainitemFactory, memberfollowFactory, shoppingcartFactory, dialogSvc) {
+	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		mainitemFactory, memberfollowFactory, shoppingcartFactory, mainitemSvc, initctrlSvc, dialogSvc, $alert) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		var isload = initctrlSvc.controlLoad('mainitem' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mainitem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2136,179 +2423,31 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			return;
 		}
 
-		$scope.appendSuit = function(mainitem) {
-			var promises = [];
-			_(mainitem.suits).forEach(function(el) {
+		$scope.loadSuccessHandle = function() {
 
-				promises.push(mainitemFactory.get(el.mainitemno, $rootScope.bust));
-			});
+			$rootScope.loadImg();
 
-			$q.all(promises).then(function(suitmainitems) {
+			var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
 
-				mainitem.suits = [];
-				mainitem.suits = suitmainitems;
-			});
-		};
-
-		$scope.follow = null;
-
-		$scope.memberfollow = function(mainitem) {
-
-			memberfollowFactory.selectbyobjectpk(mainitem.pk).then(function(data) {
-					if(data.length > 0) {
-						$scope.follow = data[0];
-					}
-				})
-				.catch(function(err) {
-					console.log(err);
-				});
-
-		};
-
-		$scope.addShoppingcart = function(qty){
-			
-			shoppingcartFactory.get().then(function(data) {
-				
-				  
-				
-				
-			}, function(err) {
-				dialogSvc.error(err);
-			});
-			
-		};
-
-		$scope.appendFollow = function(md) {
-
-			if($rootScope.identify === null) {
-				$state.go('login', {
-					template: ''
-				});
-				return;
+			if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
+				title += ' ' + $scope.mainitem.brand.name;
 			}
+			$rootScope.title = title + ' -' + $rootScope.title;
 
-			memberfollowFactory.saveorupdate({
-				objectpk: md.pk,
-				objectid: md.id,
-				url: $location.absUrl(),
-				followtype: 'mainitem'
+			setTimeout(function() {
+				if($rootScope.identify !== null) {
 
-			}).then(function(data) {
-				$scope.memberfollow($scope.mainitem);
-			}, function(err) {
-				dialogSvc.error(err);
-			});
-
-		};
-
-		$scope.deleteFollow = function(md) {
-
-			memberfollowFactory.delete(md.pk).then(function(data) {
-
-				if(JSON.stringify(data).toLowerCase() === 'true') {
-					$scope.follow = null;
-				} else {
-					dialogSvc.error(data.message);
+					$scope.memberfollow($scope.mainitem);
 				}
+				$scope.appendBrowse($scope.mainitem);
 
-			}, function(err) {
-
-				dialogSvc.error(err);
-			});
+			}, 1000);
 
 		};
 
-		mainitemFactory.get($stateParams.mainitemno, $rootScope.bust).then(function(data) {
+		mainitemSvc.init($scope, $rootScope, $location, $stateParams);
 
-				$scope.mainitem = data;
-
-				if($stateParams.prodspec1 === '') {
-
-					$rootScope.stateParams.prodspec1 = $scope.mainitem.dispunits[0].prodspec1.id;
-				}
-
-				_($scope.mainitem.dispunits).forEach(function(el) {
-
-					if(el.prodspec1.id === $stateParams.prodspec1) {
-
-						$scope.dispunit = el;
-
-						if($stateParams.prodspec2 === '') {
-
-							$rootScope.stateParams.prodspec2 = el.items[0].prodspec2.id;
-						}
-					}
-
-				});
-
-				$scope.appendSuit($scope.mainitem);
-
-				console.info($scope.mainitem);
-				console.info($scope.dispunit);
-
-				var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
-
-				if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
-					title += ' ' + $scope.mainitem.brand.name;
-				}
-				$rootScope.title = title + ' -' + $rootScope.title;
-
-				$rootScope.loadImg();
-
-				setTimeout(function() {
-					if($rootScope.identify !== null) {
-
-						$scope.memberfollow($scope.mainitem);
-					}
-					$rootScope.appendBrowse($scope.mainitem);
-
-				}, 1000);
-
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
-
-		/*
-		 * 选择颜色
-		 */
-		$scope.selectProdSpec1 = function() {
-
-		};
-
-		/*
-		 * 选择尺寸
-		 */
-		$scope.selectProdSpec2 = function() {
-
-		};
-		/*
-		 * 添加购物车
-		 */
-		$scope.addShoppingcart = function() {
-
-		};
-
-		/*
-		 * 修改数量
-		 */
-		$scope.changeQty = function() {
-
-		};
-
-		/*
-		 * 立刻购买
-		 */
-		$scope.buy = function() {
-
-		};
-
-		/*
-		 * 加入我的喜爱
-		 */
-		$scope.favor = function() {
-
-		};
+		$scope.load();
 
 	});
 
@@ -2322,15 +2461,16 @@ define('controllers/itemsearchCtrl',['require', './module'], function(require, m
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('itemsearch' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('itemsearch' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
 			$templateCache.put('itemsearch.html', '');
 			return;
 		}
-
-		
 
 		$rootScope.loadImg();
 
@@ -2344,10 +2484,13 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 	var md5 = require('md5');
 
 	module.controller('loginCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberidentifyFactory) {
+		initctrlSvc, dialogSvc, memberidentifyFactory, shoppingcartFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('login' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('login' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2360,30 +2503,25 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			password: null
 		};
 
-		if($rootScope.identify != null) {
+		if($rootScope.identify !== null) {
 
 			$window.location = 'index.html';
 			return;
 		}
 
-		$scope.submittime = null;
-
 		$scope.login = function(md) {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
 
 			$scope.user.id = md.id;
 			$scope.user.password = md5(md.password);
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
-
 			memberidentifyFactory.login($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
+
 					if(!_.isUndefined($rootScope.loginReturnState) && $rootScope.loginReturnState != null) {
 
 						$state.go($rootScope.loginReturnState.name, $rootScope.loginReturnParams);
@@ -2417,7 +2555,10 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2435,20 +2576,75 @@ define('controllers/orderCtrl',['require', './module'], function(require, module
 
 	var _ = require('lodash');
 
+	/*
+	 * /order/:template/:pk
+	 */
 	module.controller('orderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+		salesorderFactory, shoppingcartFactory, mainitemFactory, initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('order' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('order' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
-
 			$templateCache.put('order.html', '');
 			return;
 		}
 
-		
+		$scope.approve = function() {
 
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			salesorderFactory.approve($stateParams.pk).then(function(data) {
+
+				
+				shoppingcartFactory.clear().then(function(data) {
+
+				}, function(err) {
+					
+				});
+
+				$state.go('orderconfirmsuccess', {
+					template: '',
+					pk: data.pk
+				});
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.load = function() {
+
+			salesorderFactory.get($stateParams.pk).then(function(data) {
+				console.info(data.isapprove);
+				if(data.isapprove) {
+
+					$window.location = 'index.html';
+					return;
+				}
+				$rootScope.loadMainitems(data.lines, 'mainitems');
+				$scope.salesorder = data;
+
+			}, function(err) {
+
+				$window.location = 'index.html';
+
+			});
+
+		};
+
+		$scope.load();
 		$rootScope.loadImg();
 
 	});
@@ -2463,7 +2659,10 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('orderpay' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('orderpay' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2488,7 +2687,10 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 		initctrlSvc, dialogSvc, memberaccountFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('regist' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('regist' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2505,24 +2707,17 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 			client: (new Date()).toISOString()
 		};
 
-		$scope.submittime = null;
-
 		$scope.regist = function(md) {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
 
 			$scope.user.id = md.id;
 			$scope.user.password = md5(md.password);
 			$scope.user.email = md.email;
 			$scope.user.phone = md.phone;
 			$scope.user.authtype = md.authtype;
-
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
- 
 
 			memberaccountFactory.regist($scope.user).then(function(data) {
 
@@ -2550,13 +2745,19 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 define('controllers/shoppingcartCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-var _ = require('lodash');
+	var _ = require('lodash');
 
-	module.controller('shoppingcartCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+	/*
+	 * pk和ver不一致就刷新 
+	 */
+	module.controller('shoppingcartCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		shoppingcartFactory, salesorderFactory, mainitemFactory, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('shoppingcart' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('shoppingcart' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2564,9 +2765,230 @@ var _ = require('lodash');
 			return;
 		}
 
-		
+		$scope.remove = function(line) {
 
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(line.mainitem.name))) {
+				var lines = _.remove($scope.shoppingcart.lines, function(n) {
+					return n.pk === line.pk;
+				});
+
+				$scope.save();
+			}
+
+		};
+
+		$scope.minu = function(line) {
+
+			if(line.txsqty > 2) {
+				line.txsqty = line.txsqty - 1;
+			}
+
+			$scope.save();
+		};
+
+		$scope.plus = function(line) {
+
+			if(line.txsqty < 999) {
+				line.txsqty = line.txsqty + 1;
+			}
+			$scope.save();
+		};
+
+		$scope.convertorder = function() {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			shoppingcartFactory.get().then(function(data) {
+				$rootScope.setShoppingcartKey(data.pk);
+				if(data.ver !== $scope.shoppingcart.ver || data.pk !== $scope.shoppingcart.pk) {
+					$scope.load();
+					return;
+				}
+
+				salesorderFactory.convertfromshoppingcart().then(function(ord) {
+
+					$state.go('order', {
+						template: '',
+						pk: ord.pk
+					});
+
+				}, function(err) {
+
+					dialogSvc.error(err);
+				});
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.save = function() {
+
+			shoppingcartFactory.get().then(function(data) {
+
+				$rootScope.setShoppingcartKey(data.pk);
+
+				if(data.ver !== $scope.shoppingcart.ver || data.pk !== $scope.shoppingcart.pk) {
+					$scope.load();
+					return;
+				}
+
+				shoppingcartFactory.saveorupdate($scope.shoppingcart).then(function(d) {
+
+					$scope.load();
+				}, function(err) {
+
+					dialogSvc.error(err);
+				});
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.load = function() {
+
+			shoppingcartFactory.get().then(function(data) {
+				$rootScope.setShoppingcartKey(data.pk);
+
+			 
+				$rootScope.loadMainitems(data.lines, 'mainitems');
+				$scope.shoppingcart = data;
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.load();
 		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/shoppingcartadditemCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	/*
+	 * 添加到购物车
+	 * /shoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty
+	 * 
+	 */
+	module.controller('shoppingcartadditemCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		shoppingcartFactory, mainitemFactory, mainitemSvc, initctrlSvc, dialogSvc, languageSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('shoppingcartadditem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
+		if(!isload) {
+
+			$templateCache.put('shoppingcartadditem.html', '');
+			return;
+		}
+
+		$scope.loadSuccessHandle = function() {
+
+			$rootScope.loadImg();
+
+			var isRefresh = _.isUndefined($rootScope.fromState) || $rootScope.fromState.name === '';
+			if(!isRefresh && $rootScope.fromState.name !== "shoppingcart") { //防止返回
+
+				$scope.addShoppingcart();
+				return;
+
+			}
+
+			$state.go('shoppingcart', {
+				template: ''
+			});
+
+		};
+
+		$scope.state = 0;
+
+		$scope.addShoppingcart = function() {
+
+			shoppingcartFactory.get().then(function(shoppingcart) {
+
+				$rootScope.setShoppingcartKey(shoppingcart.pk);
+
+				if(shoppingcart.lines === null) {
+					shoppingcart.lines = [];
+				}
+
+				/*
+				 * merge
+				 */
+				var line = {
+					mainitem: {
+						pk: $scope.mainitem.pk
+					},
+					prodspec1: {
+						pk: $scope.prodspec1.pk
+					},
+					prodspec2: {
+						pk: $scope.prodspec2.pk
+					},
+					item: {
+						pk: $scope.item.pk
+					},
+					txsqty: $stateParams.shoppingqty
+				};
+
+				var ismerge = false;
+				for(var i = 0; i < shoppingcart.lines.length; i++) {
+					var el = shoppingcart.lines[i];
+
+					if(el.item.pk === line.item.pk) {
+						el.txsqty = parseInt(el.txsqty) + parseInt(line.txsqty);
+						ismerge = true;
+						break;
+					}
+
+				}
+
+				if(!ismerge) {
+					shoppingcart.lines.push(line);
+				}
+
+				shoppingcartFactory.saveorupdate(shoppingcart).then(function(d) {
+
+					$scope.state = 1;
+
+				}, function(err) {
+					$scope.state = 2;
+				});
+
+			}, function(err) {
+				$scope.state = 2;
+			});
+
+		};
+
+		mainitemSvc.init($scope, $rootScope, $location, $stateParams);
+
+		$scope.load();
 
 	});
 
@@ -2594,18 +3016,21 @@ define('controllers/infoCtrl',['require', './module'], function(require, module)
 	var _ = require('lodash');
 
 	module.controller('infoCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-   
+
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('info' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-	
+		var isload = initctrlSvc.controlLoad('info' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
 		if(!isload) {
 
 			$templateCache.put('info.html', '');
 			return;
 		}
-  
-  		$scope.message = $stateParams.message;
-		
+
+		$scope.message = $stateParams.message;
+
 		$rootScope.loadImg();
 
 	});
@@ -2620,7 +3045,10 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 		initctrlSvc, dialogSvc, memberaccountFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2641,25 +3069,19 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 			}
 		}
 
-		$scope.submittime = null;
-
 		$scope.send = function(md) {
 
-			$scope.actionauth.authfrom = md.authfrom; 
-			
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
+
+			$scope.actionauth.authfrom = md.authfrom;
 
 			memberaccountFactory.actionauth($scope.actionauth).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 					if($scope.actionauth.authtype === 'email') {
-						
+
 						$state.go("info", {
 							template: 'gotoemail',
 							message: ''
@@ -2695,7 +3117,10 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 		initctrlSvc, dialogSvc, memberaccountFactory, memberidentifyFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2704,23 +3129,17 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 		}
 
 		$scope.md = {
-			actionauthpk : $stateParams.actionauthpk,
-			password : null
+			actionauthpk: $stateParams.actionauthpk,
+			password: null
 		};
 
-		$scope.submittime = null;
-
 		$scope.changepassword = function(md) {
-			
-			$scope.md.password = md.password;
-			
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
+
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
+
+			$scope.md.password = md.password;
 
 			memberaccountFactory.changepassword($scope.md.actionauthpk, md5($scope.md.password)).then(function(data) {
 
@@ -2765,7 +3184,10 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 		initctrlSvc, dialogSvc, memberaccountbindingFactory, memberidentifyFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2779,19 +3201,17 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 			client: (new Date()).toISOString()
 		};
 
-		$scope.submittime = null;
-
 		$scope.send = function(md) {
-			
-			$scope.accountbinding.id = md.id;
-			
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
+
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			$scope.accountbinding.id = md.id;
 
 			memberaccountbindingFactory.add($scope.accountbinding).then(function(data) {
 
@@ -2809,7 +3229,7 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 					});
 
 				} else {
-					 
+
 					$.registCallback(data.message);
 
 				}
@@ -2836,7 +3256,10 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory, member2addrFactory, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2846,28 +3269,38 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 
 		$scope.addresslist = [];
 
-		member2addrFactory.select().then(function(data) {
+		$scope.load = function() {
+			member2addrFactory.select().then(function(data) {
+				$scope.addresslist = [];
+				for(var i = 0; i < data.length; i++) {
 
-			for(var i = 0; i < data.length; i++) {
+					if(!data[i].ismajor) {
+						$scope.addresslist.push(data[i]);
+					}
 
-				if(!data[i].ismajor) {
-					$scope.addresslist.push(data[i]);
 				}
 
-			}
-
-		}, function(err) {
-			console.error(err);
-		});
+			}, function(err) {
+				console.error(err);
+			});
+		};
 
 		$scope.delete = function(md) {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			if(dialogSvc.confirm(languageSvc.confirm_delete(md.addr1))) {
 				member2addrFactory.delete(md.pk).then(function(data) {
 
 					if(JSON.stringify(data).toLowerCase() === 'true') {
 
-						location.reload();
+						$scope.load();
 
 					} else {
 
@@ -2883,7 +3316,7 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 		};
 
 		$rootScope.loadImg();
-
+		$scope.load();
 	});
 
 });
@@ -2896,7 +3329,10 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory, member2addrFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2996,6 +3432,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		};
 		$scope.clear = function() {
+
 			$scope.address.country = null;
 			$scope.address.state = null;
 			$scope.address.city = null;
@@ -3069,9 +3506,14 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		};
 
-		$scope.submittime = null;
-
 		$scope.save = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			if($stateParams.ismajor === 'true') {
 				$scope.address.ismajor = true;
@@ -3095,25 +3537,17 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			$scope.address.addr2 = md.addr2;
 			$scope.address.addr3 = md.addr3;
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
-
 			member2addrFactory.saveorupdate($scope.address).then(function(data) {
 
 				if(_.isUndefined(data.errorcode)) {
-					
-					if($stateParams.ismajor === 'true'){
-						
+
+					if($stateParams.ismajor === 'true') {
+
 						$state.go("member", {
 							template: ''
 						});
-					}else{
-						
+					} else {
+
 						$state.go("memberaddresslist", {
 							template: ''
 						});
@@ -3147,7 +3581,10 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 		memberbrowseFactory, mainitemFactory, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberbrowse' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberbrowse' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3157,7 +3594,7 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 
 		$scope.browses = [];
 
-		$scope.loadMainitem = function(data) {
+		$scope.loadDetail = function(data) {
 
 			var promises = [];
 			console.info(data);
@@ -3188,20 +3625,30 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 				});
 		};
 
-		memberbrowseFactory.select().then(function(data) {
-				$scope.loadMainitem(data);
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
+		$scope.load = function() {
+			memberbrowseFactory.select().then(function(data) {
+					$scope.browses = [];
+					$scope.loadDetail(data);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
 
 		$scope.delete = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			memberbrowseFactory.delete(md.pk).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 
-					location.reload();
+					$scope.load();
 
 				} else {
 
@@ -3215,6 +3662,12 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 		};
 
 		$scope.deletelist = function() {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			var pks = [];
 			_.forEach($scope.browses, function(value) {
@@ -3228,7 +3681,7 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 
 					if(JSON.stringify(data).toLowerCase() === 'true') {
 
-						location.reload();
+						$scope.load();
 
 					} else {
 
@@ -3243,6 +3696,8 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 
 		};
 
+		$scope.load();
+
 	});
 
 });
@@ -3255,7 +3710,10 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 		memberfollowFactory, mainitemFactory, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberfollow' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberfollow' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3265,7 +3723,7 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 
 		$scope.follows = [];
 
-		$scope.loadMainitem = function(data) {
+		$scope.loadDetail = function(data) {
 
 			var promises = [];
 			console.info(data);
@@ -3296,20 +3754,29 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 				});
 		};
 
-		memberfollowFactory.select().then(function(data) {
-				$scope.loadMainitem(data);
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
+		$scope.load = function() {
+			memberfollowFactory.select().then(function(data) {
+					$scope.follows = [];
+					$scope.loadDetail(data);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
 
 		$scope.delete = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
 
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 			memberfollowFactory.delete(md.pk).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 
-					location.reload();
+					$scope.load();
 
 				} else {
 
@@ -3323,7 +3790,12 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 		};
 
 		$scope.deletelist = function() {
-
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 			var pks = [];
 			_.forEach($scope.follows, function(value) {
 				pks.push({
@@ -3336,7 +3808,7 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 
 					if(JSON.stringify(data).toLowerCase() === 'true') {
 
-						location.reload();
+						$scope.load();
 
 					} else {
 
@@ -3351,6 +3823,8 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 
 		};
 
+		$scope.load();
+
 	});
 
 });
@@ -3363,7 +3837,10 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 		initctrlSvc, dialogSvc, memberinfoFactory, memberidentifyFactory) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('membermodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('membermodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3381,21 +3858,18 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 
 		});
 
-		$scope.submittime = null;
-
 		$scope.save = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			$scope.user.name = md.name;
 			$scope.user.gendertype = md.gendertype;
-			$scope.user.birthday = md.birthday.replace('年','-').replace('月','-').replace('日','') + ' 00:00:00';
-
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			} 
-			$scope.submittime = new Date();
+			$scope.user.birthday = md.birthday.replace('年', '-').replace('月', '-').replace('日', '') + ' 00:00:00';
 
 			memberinfoFactory.saveorupdate($scope.user).then(function(data) {
 
@@ -3440,7 +3914,10 @@ define('controllers/memberorderlistCtrl',['require', './module'], function(requi
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberorderlist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberorderlist' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3464,7 +3941,10 @@ define('controllers/membermessageCtrl',['require', './module'], function(require
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('membermessage' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('membermessage' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3488,7 +3968,10 @@ define('controllers/memberorderCtrl',['require', './module'], function(require, 
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3509,10 +3992,13 @@ define('controllers/orderconfirmsuccessCtrl',['require', './module'], function(r
 	var _ = require('lodash');
 
 	module.controller('orderconfirmsuccessCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+		salesorderFactory, initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('orderconfirmsuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('orderconfirmsuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3520,7 +4006,28 @@ define('controllers/orderconfirmsuccessCtrl',['require', './module'], function(r
 			return;
 		}
 
-		
+		$scope.load = function() {
+
+			salesorderFactory.get($stateParams.pk).then(function(data) {
+				console.info(data.isapprove);
+				if(!data.isapprove) {
+
+					$window.location = 'index.html';
+					return;
+				}
+ 
+				$rootScope.loadMainitems(data.lines, 'mainitems');
+				$scope.salesorder = data;
+
+			}, function(err) {
+
+				$window.location = 'index.html';
+
+			});
+
+		};
+
+		$scope.load();
 
 		$rootScope.loadImg();
 
@@ -3536,7 +4043,10 @@ define('controllers/orderpaysuccessCtrl',['require', './module'], function(requi
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('orderpaysuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('orderpaysuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -3553,9 +4063,9 @@ define('controllers/orderpaysuccessCtrl',['require', './module'], function(requi
 });
 define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
 		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl',
-		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
+		'./registCtrl', './shoppingcartCtrl', './shoppingcartadditemCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
 		'./bindingemailCtrl', './memberaddresslistCtrl', './memberaddressmodifyCtrl', './memberbrowseCtrl',
-		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl', './membermessageCtrl', './memberorderCtrl', 
+		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl', './membermessageCtrl', './memberorderCtrl',
 		'./orderconfirmsuccessCtrl', './orderpaysuccessCtrl'
 	],
 	function() {
@@ -3601,6 +4111,56 @@ define('filters/nodes',['require', './module'], function(require, module) {
 	});
 
 });
+define('filters/hasnodes',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('hasnodes', function() {
+
+		return function(sitemap, pid) {
+
+			var result = [];
+
+			_.forIn(sitemap, function(value, key) {
+				if(value.psitemapid === pid) {						
+					result.push(value);
+				}
+			});
+ 
+ 
+			return result.length > 0;
+		};
+
+	});
+
+});
+define('filters/nothasnodes',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('nothasnodes', function() {
+
+		return function(sitemap, pid) {
+
+			var result = [];
+
+			_.forIn(sitemap, function(value, key) {
+				if(value.psitemapid === pid) {						
+					result.push(value);
+				}
+			});
+ 
+ 
+			return result.length === 0;
+		};
+
+	});
+
+});
 define('filters/nodeattr',['require', './module'], function(require, module) {
 	'use strict';
 
@@ -3625,6 +4185,31 @@ define('filters/nodeattr',['require', './module'], function(require, module) {
 			return _.get(el, property);
 
 		};
+	});
+
+});
+define('filters/nodeslength',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('nodeslength', function() {
+
+		return function(sitemap, pid) {
+
+			var result = [];
+
+			_.forIn(sitemap, function(value, key) {
+				if(value.psitemapid === pid) {						
+					result.push(value);
+				}
+			});
+ 
+ 
+			return result.length;
+		};
+
 	});
 
 });
@@ -3756,7 +4341,7 @@ define('filters/cutindex',['require', './module'], function(require, module) {
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring', './nvl', './cutindex'],
+define('filters/main',['./testFilter', './nodes', './hasnodes', './nothasnodes', './nodeattr', './nodeslength', './ifvalue', './range', './privatestring', './nvl', './cutindex'],
 	function() {
 
 		'use strict';

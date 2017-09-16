@@ -71,7 +71,7 @@ define(['require'], function(require) {
 				},
 				controller: 'memberCtrl'
 			}).state('order', {
-				url: '/order/:template',
+				url: '/order/:template/:pk',
 				template: function() {
 					return '<div ng-include="' + "'order.html'" + '"></div>';
 				},
@@ -88,6 +88,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'shoppingcart.html'" + '"></div>';
 				},
 				controller: 'shoppingcartCtrl'
+			}).state('shoppingcartadditem', {
+				url: '/shoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty',
+				template: function() {
+					return '<div ng-include="' + "'shoppingcartadditem.html'" + '"></div>';
+				},
+				controller: 'shoppingcartadditemCtrl'
 			}).state('mkgpgm', {
 				url: '/mkgpgm/:template/:id/:page',
 				template: function() {
@@ -173,13 +179,13 @@ define(['require'], function(require) {
 				},
 				controller: 'memberorderCtrl'
 			}).state('orderconfirmsuccess', {
-				url: '/orderconfirmsuccess/:template',
+				url: '/orderconfirmsuccess/:template/:pk',
 				template: function() {
 					return '<div ng-include="' + "'orderconfirmsuccess.html'" + '"></div>';
 				},
 				controller: 'orderconfirmsuccessCtrl'
 			}).state('orderpaysuccess', {
-				url: '/orderpaysuccess/:template',
+				url: '/orderpaysuccess/:template/:pk',
 				template: function() {
 					return '<div ng-include="' + "'orderpaysuccess.html'" + '"></div>';
 				},
