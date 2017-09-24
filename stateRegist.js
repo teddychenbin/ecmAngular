@@ -4,13 +4,7 @@ define(['require'], function(require) {
 		//arg0 template
 		//arg1 id
 		stateProvider
-			.state('test', {
-				url: '/test',
-				template: function() {
-					return '<div ng-include="' + "'test.html'" + '"></div>';
-				},
-				controller: 'testCtrl'
-			}).state('load', {
+			.state('load', {
 				url: '/load',
 				template: function() {
 					return '<div ng-include="' + "'load.html'" + '"></div>';
@@ -70,12 +64,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'member.html'" + '"></div>';
 				},
 				controller: 'memberCtrl'
-			}).state('order', {
-				url: '/order/:template',
+			}).state('salesorder', {
+				url: '/salesorder/:template/:pk',
 				template: function() {
-					return '<div ng-include="' + "'order.html'" + '"></div>';
+					return '<div ng-include="' + "'salesorder.html'" + '"></div>';
 				},
-				controller: 'orderCtrl'
+				controller: 'salesorderCtrl'
 			}).state('orderpay', {
 				url: '/orderpay/:template',
 				template: function() {
@@ -86,8 +80,14 @@ define(['require'], function(require) {
 				url: '/shoppingcart/:template',
 				template: function() {
 					return '<div ng-include="' + "'shoppingcart.html'" + '"></div>';
-				},
+				},				
 				controller: 'shoppingcartCtrl'
+			}).state('shoppingcartadditem', {
+				url: '/shoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty',
+				template: function() {
+					return '<div ng-include="' + "'shoppingcartadditem.html'" + '"></div>';
+				},
+				controller: 'shoppingcartadditemCtrl'
 			}).state('mkgpgm', {
 				url: '/mkgpgm/:template/:id/:page',
 				template: function() {
@@ -160,6 +160,30 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'memberorderlist.html'" + '"></div>';
 				},
 				controller: 'memberorderlistCtrl'
+			}).state('membermessage', {
+				url: '/membermessage/:template',
+				template: function() {
+					return '<div ng-include="' + "'membermessage.html'" + '"></div>';
+				},
+				controller: 'membermessageCtrl'
+			}).state('memberorder', {
+				url: '/memberorder/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberorder.html'" + '"></div>';
+				},
+				controller: 'memberorderCtrl'
+			}).state('orderconfirmsuccess', {
+				url: '/orderconfirmsuccess/:template/:pk',
+				template: function() {
+					return '<div ng-include="' + "'orderconfirmsuccess.html'" + '"></div>';
+				},
+				controller: 'orderconfirmsuccessCtrl'
+			}).state('orderpaysuccess', {
+				url: '/orderpaysuccess/:template/:pk',
+				template: function() {
+					return '<div ng-include="' + "'orderpaysuccess.html'" + '"></div>';
+				},
+				controller: 'orderpaysuccessCtrl'
 			});
 
 	};

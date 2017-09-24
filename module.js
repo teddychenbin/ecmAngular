@@ -1,740 +1,1022 @@
-define('factorys/module',['require'], function(require) {
+define('jsons/module',['require'], function(require) {
     'use strict';
     var ng = require('angular'); 
-    return ng.module('app.factorys', []);
+    return ng.module('app.jsons', []);
 });
 
-define('factorys/testFactory',['require', './module'], function(require, module) {
+define('jsons/advertJson',['require', './module'], function(require, module) {
 	'use strict';
- 	
+
+	module.service('advertJson', function($http, $q, jsonhost) {
+
+		this.get = function(bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/adv/merge.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('jsons/articlecontentJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	var angular = require('angular');
+
+	module.service('articlecontentJson', function($http, $q, jsonhost) {
+
+		this.get = function(pageid, isAsync, bust) {
+			if(!isAsync) {
+
+				var result = "";
+
+				$.ajax({
+					url: jsonhost + '/article/' + pageid + '.content.json?bust' + bust,
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'html',
+					success: function(data) {
+						result = data;
+					},
+					error: function(XMLHTTPRequest, textStatus, errorThrown) {
+						console.info(XMLHTTPRequest.status);
+					}
+				});
+
+				return result;
+			} else {
+
+				var deferred = $q.defer();
+				$.ajax({
+					url: jsonhost + '/article/' + pageid + '.content.json?bust' + bust,
+					type: "get",
+					dataType: 'html',
+					success: function(result) {
+						deferred.resolve(result);
+					},
+					error: function(XMLHTTPRequest, textStatus, errorThrown) {
+						console.info(XMLHTTPRequest.status);
+						deferred.reject(XMLHTTPRequest.status);
+					}
+				});
+
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
+define('jsons/articleJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('articleJson', function($http, $q, jsonhost) {
+
+		this.get = function(articleid, bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/article/' + articleid + '.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('jsons/configJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('configJson', function($http, $q, jsonhost) {
+
+		this.get = function(bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/config/config.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('jsons/countryJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('countryJson', function($http, $q, jsonhost) {
+
+		this.get = function(bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/country/country.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+
+		};
+
+	});
+
+});
+define('jsons/govadmdivJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('govadmdivJson', function($http, $q, jsonhost) {
+
+		this.get = function(id, isAsync, bust) {
+			if(!isAsync) {
+
+				var result = "";
+
+				$.ajax({
+					url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'html',
+					success: function(data) {
+						result = data;
+					},
+					error: function(XMLHTTPRequest, textStatus, errorThrown) {
+						console.info(XMLHTTPRequest.status);
+					}
+				});
+
+				return result;
+
+			} else {
+
+				var deferred = $q.defer();
+				$http({
+					url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
+					method: 'get'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+
+			}
+
+		};
+
+	});
+
+});
+define('jsons/mainitemJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('mainitemJson', function($http, $q, jsonhost) {
+
+		this.get = function(id, bust) {
+
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/mainitem/' + id + '.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+
+		};
+
+	});
+
+});
+define('jsons/mkgdispgroupJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('mkgdispgroupJson', function($http, $q, jsonhost) {
+
+		this.get = function(id, bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/mkgdispgroup/' + id + '.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+
+		};
+
+	});
+
+});
+define('jsons/mkgpgmarticleJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('mkgpgmarticleJson', function($http, $q, jsonhost) {
+
+		this.get = function(id, bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/mkgpgmarticle/' + id + '.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+
+		};
+
+	});
+
+});
+define('jsons/mkgpgmJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('mkgpgmJson', function($http, $q, jsonhost) {
+
+		this.get = function(id, bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/mkgpgm/' + id + '.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+
+		};
+
+	});
+
+});
+define('jsons/sitemapJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('sitemapJson', function($http, $q, jsonhost) {
+
+		this.get = function(root, bust) {
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/sitemap/sitemap.' + root + '.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+
+		};
+
+	});
+
+});
+define('jsons/webpagecontentJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	var angular = require('angular');
+
+	module.service('webpagecontentJson', function($http, $q, webpagehost, viewprefix) {
+
+		this.get = function(pageid, isAsync, bust) {
+			if(!isAsync) {
+
+				var result = "";
+
+				$.ajax({
+					url: webpagehost + '/webpage/' + viewprefix + pageid + '.content.json?bust' + bust,
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'html',
+					success: function(data) {
+						result = data;
+					},
+					error: function(XMLHTTPRequest, textStatus, errorThrown) {
+						console.info(XMLHTTPRequest.status);
+					}
+				});
+
+				return result;
+			} else {
+
+				var deferred = $q.defer();
+				$.ajax({
+					url: webpagehost + '/webpage/' + viewprefix + pageid + '.content.json?bust' + bust,
+					type: "get",
+					dataType: 'html',
+					success: function(result) {
+						deferred.resolve(result);
+					},
+					error: function(XMLHTTPRequest, textStatus, errorThrown) {
+						console.info(XMLHTTPRequest.status);
+						deferred.reject(XMLHTTPRequest.status);
+					}
+				});
+
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
+define('jsons/webpageJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	var angular = require('angular');
+
+	module.service('webpageJson', function($http, $q, webpagehost, viewprefix) {
+
+		this.get = function(pageid, isAsync, bust) {
+
+			if(!isAsync) {
+
+				var result = "";
+				$.ajax({
+					url: webpagehost + '/webpage/' + viewprefix + pageid + '.json?bust' + bust,
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'json',
+					success: function(data) {
+						result = data;
+					}
+				});
+
+				return angular.fromJson(result);
+			} else {
+
+				var deferred = $q.defer();
+				$http({
+					url: webpagehost + '/webpage/' + viewprefix + pageid + '.json?bust' + bust,
+					method: 'get'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
+/*
+ * json层文件都是用get的方式去访问，有浏览器 缓存
+ * 不能用factory 会直接执行
+ */
+define('jsons/main',['./advertJson', './articlecontentJson', './articleJson',
+		'./configJson', './countryJson', './govadmdivJson',
+		'./mainitemJson', './mkgdispgroupJson', './mkgpgmarticleJson', './mkgpgmJson',
+		'./sitemapJson', './webpagecontentJson', './webpageJson'
+
+	],
+	function() {
+
+		'use strict';
+
+	});
+define('apis/module',['require'], function(require) {
+    'use strict';
+    var ng = require('angular'); 
+    return ng.module('app.apis', []);
+});
+
+define('apis/member2addrApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('member2addrApi', function($http, $q, apihost) {
+
+		this.select = function(pk) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/query/bmb/memberaddr/select',
+				method: 'post'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.get = function(pkvalue) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberaddr/get',
+				method: 'post',
+				params: {
+					pk: pkvalue
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.delete = function(pkvalue) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberaddr/delete',
+				method: 'post',
+				params: {
+					pk: pkvalue
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+		this.saveorupdate = function(addr) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberaddr/saveorupdate',
+				method: 'post',
+				params: {
+					data: angular.toJson(addr)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/memberaccountbindingApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('memberaccountbindingApi', function($http, $q, apihost) {
+
+		this.add = function(accountbinding) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberaccountbinding/add',
+				method: 'post',
+				params: {
+					data: angular.toJson(accountbinding)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/memberaccountApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('memberaccountApi', function($http, $q, apihost) {
+
+		this.regist = function(user) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/memberaccount/regist',
+				method: 'post',
+				params: {
+					data: angular.toJson(user)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.actionauth = function(actionauth) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/memberaccount/actionauth',
+				method: 'post',
+				params: {
+					data: angular.toJson(actionauth)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.changepassword = function(actionauthpk, pwd) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/memberaccount/changepassword',
+				method: 'post',
+				params: {
+					actionauthpk: actionauthpk,
+					password: pwd
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/memberbrowseApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('memberbrowseApi', function($http, $q, apihost) {
+
+		this.select = function() {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/query/bmb/memberbrowse/select',
+				method: 'post',
+				params: {
+
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+		this.saveorupdate = function(data) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberbrowse/saveorupdate',
+				method: 'post',
+				params: {
+					data: angular.toJson(data)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.delete = function(pkvalue) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberbrowse/delete',
+				method: 'post',
+				params: {
+					pk: pkvalue
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.deletelist = function(pks) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberbrowse/deletelist',
+				method: 'post',
+				params: {
+					deleltepks: angular.toJson(pks)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/memberfollowApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('memberfollowApi', function($http, $q, apihost) {
+
+		this.select = function() {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/query/bmb/memberfollow/select',
+				method: 'post',
+				params: {
+
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.selectbyobjectpk = function(objectpkvalue) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/query/bmb/memberfollow/selectbyobjectpk',
+				method: 'post',
+				params: {
+					objectpk: objectpkvalue
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.saveorupdate = function(data) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberfollow/saveorupdate',
+				method: 'post',
+				params: {
+					data: angular.toJson(data)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.delete = function(pkvalue) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberfollow/delete',
+				method: 'post',
+				params: {
+					pk: pkvalue
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.deletelist = function(pks) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberfollow/deletelist',
+				method: 'post',
+				params: {
+					deleltepks: angular.toJson(pks)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/memberidentifyApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('memberidentifyApi', function($http, $q, apihost) {
+
+		this.login = function(user) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/memberidentify/login',
+				method: 'post',
+				params: {
+					data: angular.toJson(user)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.logout = function() {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/memberidentify/logout',
+				method: 'post',
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.getIdentify = function(isAsync) {
+
+			if(!isAsync) {
+
+				var result = "";
+
+				$.ajax({
+					url: apihost + '/security/memberidentify/getidentify',
+					cache: false,
+					async: false,
+					type: "post",
+					dataType: 'html',
+					success: function(data) {
+						result = data;
+					},
+					error: function(XMLHTTPRequest, textStatus, errorThrown) {
+						console.info(XMLHTTPRequest.status);
+					}
+				});
+
+				return result;
+
+			} else {
+				//post 不緩存
+				var deferred = $q.defer();
+				$http({
+					url: apihost + '/security/memberidentify/getidentify',
+					method: 'post'
+				}).then(function(result) {
+					deferred.resolve(result.data);
+				}).catch(function(result) {
+					console.error(result);
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			}
+
+		};
+
+	});
+
+});
+define('apis/memberinfoApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('memberinfoApi', function($http, $q, apihost) {
+
+		this.get = function() {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberinfo/get',
+				method: 'post',
+				params: {
+
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.saveorupdate = function(user) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/bmb/memberinfo/saveorupdate',
+				method: 'post',
+				params: {
+					data: angular.toJson(user)
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/salesorderApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('salesorderApi', function($http, $q, apihost) {
+
+		this.get = function(value) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/eso/salesorder/get',
+				method: 'post',
+				params: {
+					pk: value
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.setshippingaddr = function(pkvalue, addrpkvalue) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/eso/salesorder/setshippingaddr',
+				method: 'post',
+				params: {
+					pk: pkvalue,
+					addrpk: addrpkvalue
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.approve = function(value) {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/eso/salesorder/approve',
+				method: 'post',
+				params: {
+					pk: value
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.convertfromshoppingcart = function() {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/entity/eso/salesorder/convertfromshoppingcart',
+				method: 'post'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
+define('apis/shoppingcartApi',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('shoppingcartApi', function($http, $q, apihost) {
+
+		this.get = function() {
+
+	 
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/shoppingcart/get',
+				method: 'post',
+				params: {
+
+				}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		/*
+		 * 必须同步否则会和get并发
+		 */
+		this.initfromshoppingcartkey = function(value) {
  
-
-});
-define('factorys/sitemapFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('sitemapFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(root, bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/sitemap/sitemap.' + root + '.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/configFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('configFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/config/config.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/mkgdispgroupFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('mkgdispgroupFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(id, bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/mkgdispgroup/' + id + '.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/mkgpgmarticleFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('mkgpgmarticleFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(id, bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/mkgpgmarticle/' + id + '.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/mkgpgmFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('mkgpgmFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(id, bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/mkgpgm/' + id + '.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/mainitemFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('mainitemFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(id, bust) {
-
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/mainitem/' + id + '.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/articleFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('articleFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(articleid, bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/article/' + articleid + '.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/advertFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('advertFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/adv/merge.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/webpageFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	var angular = require('angular');
-
-	module.factory('webpageFactory', function($http, $q, webpagehost) {
-
-		return {
-
-			get: function(pageid, isAsync, bust) {
-
-				if(!isAsync) {
-
-					var result = "";
-					$.ajax({
-						url: webpagehost + '/webpage/' + pageid + '.json?bust' + bust,
-						cache: false,
-						async: false,
-						type: "get",
-						dataType: 'json',
-						success: function(data) {
-							result = data;
-						}
-					});
-
-					return angular.fromJson(result);
-				} else {
-
-					var deferred = $q.defer();
-					$http({
-						url: webpagehost + '/webpage/' + pageid + '.json?bust' + bust,
-						method: 'get'
-					}).then(function(result) {
-						deferred.resolve(result.data);
-					}).catch(function(result) {
-						console.error(result);
-						deferred.reject(result);
-					});
-					return deferred.promise;
+			var result = "";
+			$.ajax({
+				url: apihost + '/security/shoppingcart/initfromshoppingcartkey',
+				cache: false,
+				async: false,
+				type: "post",
+				dataType: 'json',
+				data: {
+					pk: value
+				},
+				success: function(data) {
+					result = data;
 				}
+			});
 
-			}
+			return angular.fromJson(result);
+
 		};
+		this.saveorupdate = function(md) {
+	 
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/shoppingcart/saveorupdate',
+				method: 'post',
+				params: {
 
-	});
-
-});
-define('factorys/webpagecontentFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	var angular = require('angular');
-
-	module.factory('webpagecontentFactory', function($http, $q, webpagehost) {
-
-		return {
-
-			get: function(pageid, isAsync, bust) {
-				if(!isAsync) {
-
-					var result = "";
-
-					$.ajax({
-						url: webpagehost + '/webpage/' + pageid + '.content.json?bust' + bust,
-						cache: false,
-						async: false,
-						type: "get",
-						dataType: 'html',
-						success: function(data) {
-							result = data;
-						},
-						error: function(XMLHTTPRequest, textStatus, errorThrown) {
-							console.info(XMLHTTPRequest.status);
-						}
-					});
-
-					return result;
-				} else {
-
-					var deferred = $q.defer();
-					$.ajax({
-						url: webpagehost + '/webpage/' + pageid + '.content.json?bust' + bust,
-						type: "get",
-						dataType: 'html',
-						success: function(result) {
-							deferred.resolve(result);
-						},
-						error: function(XMLHTTPRequest, textStatus, errorThrown) {
-							console.info(XMLHTTPRequest.status);
-							deferred.reject(XMLHTTPRequest.status);
-						}
-					});
-
-					return deferred.promise;
+					data: angular.toJson(md)
 				}
-
-			}
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+		this.clear = function() {
+			var deferred = $q.defer();
+			$http({
+				url: apihost + '/security/shoppingcart/clear',
+				method: 'post'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
 		};
 
 	});
 
 });
-define('factorys/articlecontentFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	var angular = require('angular');
-
-	module.factory('articlecontentFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(pageid, isAsync, bust) {
-				if(!isAsync) {
-
-					var result = "";
-
-					$.ajax({
-						url: jsonhost + '/article/' + pageid + '.content.json?bust' + bust,
-						cache: false,
-						async: false,
-						type: "get",
-						dataType: 'html',
-						success: function(data) {
-							result = data;
-						},
-						error: function(XMLHTTPRequest, textStatus, errorThrown) {
-							console.info(XMLHTTPRequest.status);
-						}
-					});
-
-					return result;
-				} else {
-
-					var deferred = $q.defer();
-					$.ajax({
-						url: jsonhost + '/article/' + pageid + '.content.json?bust' + bust,
-						type: "get",
-						dataType: 'html',
-						success: function(result) {
-							deferred.resolve(result);
-						},
-						error: function(XMLHTTPRequest, textStatus, errorThrown) {
-							console.info(XMLHTTPRequest.status);
-							deferred.reject(XMLHTTPRequest.status);
-						}
-					});
-
-					return deferred.promise;
-				}
-
-			}
-		};
-
-	});
-
-});
-define('factorys/memberidentifyFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('memberidentifyFactory', function($http, $q, apihost) {
-
-		return {
-
-			login: function(user) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/security/memberidentify/login',
-					method: 'post',
-					params: {
-						data: JSON.stringify(user)
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			logout: function() {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/security/memberidentify/logout',
-					method: 'post',
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			getIdentify: function(isAsync) {
-
-				if(!isAsync) {
-					
-					var result = "";
-
-					$.ajax({
-						url: apihost + '/security/memberidentify/getidentify',
-						cache: false,
-						async: false,
-						type: "get",
-						dataType: 'html',
-						success: function(data) {
-							result = data;
-						},
-						error: function(XMLHTTPRequest, textStatus, errorThrown) {
-							console.info(XMLHTTPRequest.status);
-						}
-					});
-
-					return result;
-					
-				} else {
-
-					var deferred = $q.defer();
-					$http({
-						url: apihost + '/security/memberidentify/getidentify',
-						method: 'get'
-					}).then(function(result) {
-						deferred.resolve(result.data);
-					}).catch(function(result) {
-						console.error(result);
-						deferred.reject(result);
-					});
-					return deferred.promise;
-				}
-
-			}
-
-		};
-
-	});
-
-});
-define('factorys/memberaccountFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('memberaccountFactory', function($http, $q, apihost) {
-
-		return {
-
-			regist: function(user) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/security/memberaccount/regist',
-					method: 'post',
-					params: {
-						data: JSON.stringify(user)
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			actionauth: function(actionauth) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/security/memberaccount/actionauth',
-					method: 'post',
-					params: {
-						data: JSON.stringify(actionauth)
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			changepassword: function(actionauthpk, pwd) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/security/memberaccount/changepassword',
-					method: 'post',
-					params: {
-						actionauthpk: actionauthpk,
-						password: pwd
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-
-		};
-
-	});
-
-});
-define('factorys/memberaccountbindingFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('memberaccountbindingFactory', function($http, $q, apihost) {
-
-		return {
-
-			add: function(accountbinding) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/entity/bmb/memberaccountbinding/add',
-					method: 'post',
-					params: {
-						data: JSON.stringify(accountbinding)
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/memberinfoFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('memberinfoFactory', function($http, $q, apihost) {
-
-		return {
-			get: function() {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/entity/bmb/memberinfo/get',
-					method: 'get',
-					params: {
-
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			saveorupdate: function(user) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/entity/bmb/memberinfo/saveorupdate',
-					method: 'post',
-					params: {
-						data: JSON.stringify(user)
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-
-		};
-
-	});
-
-});
-define('factorys/countryFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('countryFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(bust) {
-				var deferred = $q.defer();
-				$http({
-					url: jsonhost + '/country/country.json?bust' + bust,
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-		};
-
-	});
-
-});
-define('factorys/govadmdivFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('govadmdivFactory', function($http, $q, jsonhost) {
-
-		return {
-
-			get: function(id, isAsync, bust) {
-				if(!isAsync) {
-
-					var result = "";
-
-					$.ajax({
-						url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
-						cache: false,
-						async: false,
-						type: "get",
-						dataType: 'html',
-						success: function(data) {
-							result = data;
-						},
-						error: function(XMLHTTPRequest, textStatus, errorThrown) {
-							console.info(XMLHTTPRequest.status);
-						}
-					});
-
-					return result;
-
-				} else {
-
-					var deferred = $q.defer();
-					$http({
-						url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
-						method: 'get'
-					}).then(function(result) {
-						deferred.resolve(result.data);
-					}).catch(function(result) {
-						console.error(result);
-						deferred.reject(result);
-					});
-					return deferred.promise;
-
-				}
-
-			}
-		};
-
-	});
-
-});
-define('factorys/member2addrFactory',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.factory('member2addrFactory', function($http, $q, apihost) {
-
-		return {
-			select: function(pk) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/query/bmb/member2addr/select',
-					method: 'get'
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			get: function(pkvalue) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/entity/bmb/member2addr/get',
-					method: 'get',
-					params: {
-						pk: pkvalue
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-			delete: function(pkvalue) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/entity/bmb/member2addr/delete',
-					method: 'post',
-					params: {
-						pk: pkvalue
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			},
-
-			saveorupdate: function(addr) {
-				var deferred = $q.defer();
-				$http({
-					url: apihost + '/entity/bmb/member2addr/saveorupdate',
-					method: 'post',
-					params: {
-						data: JSON.stringify(addr)
-					}
-				}).then(function(result) {
-					deferred.resolve(result.data);
-				}).catch(function(result) {
-					console.error(result);
-					deferred.reject(result);
-				});
-				return deferred.promise;
-			}
-
-		};
-
-	});
-
-});
-define('factorys/main',['./testFactory', './sitemapFactory', './configFactory',
-
-		'./mkgdispgroupFactory', './mkgpgmarticleFactory', './mkgpgmFactory', './mainitemFactory',
-		'./articleFactory', './advertFactory', './webpageFactory', './webpagecontentFactory', './articlecontentFactory',
-		'./memberidentifyFactory', './memberaccountFactory', './memberaccountbindingFactory', './memberinfoFactory',
-		'./countryFactory', './govadmdivFactory', './member2addrFactory'
+/*
+ * api层用Post的方式去访问，不能缓存
+ * 不能用factory 会直接执行
+ */
+define('apis/main',['./member2addrApi', './memberaccountbindingApi', './memberaccountApi',
+		'./memberbrowseApi', './memberfollowApi',
+		'./memberidentifyApi', './memberinfoApi',
+		'./salesorderApi', './shoppingcartApi'
 
 	],
 	function() {
@@ -828,7 +1110,8 @@ define('services/codeSvc',['require', './module'], function(require, module) {
 	module.service('codeSvc', function() {
 
 		this.pagetype = {
-
+			
+			
 			'page': '1452',
 			'embeddedPage': '1453'
 		};
@@ -842,9 +1125,12 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function($http, $q, $cacheFactory, $window, mockidentify, pages, views, webpagehost, webpageFactory,
-		webpagecontentFactory, sitemapFactory, configFactory, govadmdivFactory,
-		advertFactory, memberidentifyFactory, dialogSvc, dateformat, $modal, $aside, $alert, $select) {
+	module.service('initctrlSvc', function(viewprefix, defaultstate, defaultstateparams,
+		$http, $q, $cacheFactory, $window, mockidentify,
+		pages, views, webpagehost, currency,
+		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson,
+		advertJson, memberidentifyApi, memberbrowseApi, memberfollowApi, shoppingcartApi,
+		dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
 		this.cachePage = function(rootScope, name, value) {
 
@@ -870,10 +1156,10 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			if(pageContent === null) {
 				//没有预加载，同步加载
 
-				var pageValue = webpageFactory.get(pageid, false, rootScope.bust);
+				var pageValue = webpageJson.get(pageid, false, rootScope.bust);
 				this.cachePage(rootScope, 'page_' + pageid, pageValue);
 
-				var pageContentValue = webpagecontentFactory.get(pageid, false, rootScope.bust);
+				var pageContentValue = webpagecontentJson.get(pageid, false, rootScope.bust);
 				this.cachePage(rootScope, 'page_' + pageid + '_content', pageContentValue);
 
 				pageContent = sessionStorage.getItem('page_' + pageid + '_content');
@@ -939,7 +1225,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				pathString = template;
 			}
 
-			var paths = []; 
+			var paths = [];
 			var arr = _.words(pathString, /[^_ ]+/g);
 			var route = '';
 			_(arr).forEach(function(el) {
@@ -949,25 +1235,13 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				route += el;
 				console.info('path ' + route);
-				paths.push(route); 
+				paths.push(route);
 
 			});
 
-			rootScope.paths = paths; 
-			
-			
-		};
+			rootScope.paths = paths;
 
-		//设置自定义变量
-		//		this.customVar = function(rootScope) {
-		//
-		//			rootScope.customVar0 = null;
-		//
-		//			rootScope.setCustomVar0 = function(value) {
-		//				rootScope.customVar0 = value;
-		//			};
-		//
-		//		};
+		};
 
 		//设置自定义session变量
 		this.sessionVar = function(rootScope) {
@@ -985,23 +1259,36 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
-		this.initIdentify = function(rootScope, state, requireLogin) {
+		this.initIdentify = function(rootScope, state, loginConfig) {
+
+			rootScope.loginValid = function() {
+				var data = memberidentifyApi.getIdentify(false);
+				if(data === "") {
+					state.go('login', {
+						template: ''
+					}, {
+						reload: true
+					});
+					return false;
+				}
+				return true;
+			};
 
 			if(mockidentify !== null) {
 				rootScope.identify = mockidentify;
 				return;
 			}
 			/*
-			 * requireLogin === true 强验证模式必须同步等待
-			 * requireLogin === false 抓取会员信息用异步就可以，加快非会员页面的速度
+			 * loginConfig.auth === true 强验证模式必须同步等待
+			 * loginConfig.auth === false 抓取会员信息用异步就可以，加快非会员页面的速度
 			 */
 			rootScope.identify = null;
 
-			if(requireLogin) {
-				var data = memberidentifyFactory.getIdentify(false);
+			if(!loginConfig.isAsync) {
+				var data = memberidentifyApi.getIdentify(false);
 				if(data === "") {
 					rootScope.identify = null;
-					if(requireLogin) {
+					if(loginConfig.auth) {
 						state.go('login', {
 							template: ''
 						});
@@ -1016,12 +1303,16 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				}
 			} else {
-				memberidentifyFactory.getIdentify(true).then(function(data) {
+
+				memberidentifyApi.getIdentify(true).then(function(data) {
 					if(data !== "") {
 						rootScope.identify = data;
+						console.info('identify');
+						console.info(rootScope.identify);
 						if(!_.isUndefined(rootScope.identify.birthday)) {
 							rootScope.identify.birthday = rootScope.identify.birthday.substring(0, 10);
 						}
+
 					}
 
 				}, function(err) {
@@ -1032,17 +1323,21 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
-		this.logout = function() {
+		this.initLogout = function(rootScope, state) {
 
-			memberidentifyFactory.logout().then(function(data) {
-				$window.location = 'index.html';
-			}, function(err) {
-				dialogSvc.error("net error!");
-			});
+			rootScope.logout = function() {
+
+				memberidentifyApi.logout().then(function(data) {
+					rootScope.gohome();
+				}, function(err) {
+					dialogSvc.error("net error!");
+				});
+
+			};
 
 		};
 
-		this.initAside = function(rootScope) {
+		this.initAside = function(rootScope, viewprefix) {
 
 			rootScope.hideAside = function() {
 				rootScope.aside.$promise.then(function() {
@@ -1050,15 +1345,19 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				});
 			};
 
-			rootScope.showAsidemenu = function(md) {
-				//				var contentHtml = $window.getAsideMenu(md);
+			rootScope.showAsidemenu = function() {
 
 				rootScope.aside = $aside({
 					scope: rootScope,
-					title: md.title,
 					animation: "am-slide-left",
-					placement: (_.isUndefined(md.placement) ? 'left' : md.animation),
-					templateUrl: webpagehost + '/webpage/asidemenu.content.json?bust' + rootScope.bust
+					placement: 'left',
+					templateUrl: webpagehost + '/webpage/' + viewprefix + 'asidemenu.content.json?bust' + rootScope.bust,
+					onBeforeHide: function() {
+						if(!_.isUndefined(window.beforeHideAsidemenu)) {
+							window.beforeHideAsidemenu();
+						}
+
+					}
 				});
 
 				rootScope.aside.$promise.then(function() {
@@ -1076,50 +1375,25 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		};
 
-		//		this.initShoppingcart = function(rootScope) {
-		//
-		//			rootScope.saveShoppingcart = function(data) { 
-		//			};
-		//
-		//			rootScope.getShoppingcart = function() { 
-		//				
-		//			};
-		//
-		//		};
+		this.initMemberBrowse = function(rootScope, location) {
 
-		//		this.initMemberFollow = function(rootScope) {
-		//
-		//			rootScope.appendFollow = function(data) {
-		//			
-		//			};
-		//
-		//			rootScope.removeFollow = function(pk) {
-		//
-		//			};
-		//		};
-
-		this.initMemberBrowse = function(rootScope) {
-
-			rootScope.appendBrowse = function(data, url) {
+			rootScope.appendBrowse = function(data) {
 
 				if(rootScope.identify === null) {
-					rootScope.appendLocalBrowse(data, url);
+					rootScope.appendLocalBrowse(data, location.absUrl());
 				} else {
-					rootScope.appendSvcBrowse(data, url);
+					rootScope.appendSvcBrowse(data, location.absUrl());
 				}
 
 			};
 
-			/*
-			 *  本地瀏覽記錄
-			 */
-			rootScope.appendLocalBrowse = function(data, url) {
+			rootScope.appendStorageBrowse = function(storagekey, data, url) {
 
-				var memberbrowses = localStorage.getItem('memberbrowses');
+				var memberbrowses = localStorage.getItem(storagekey);
 				if(memberbrowses === null) {
 					memberbrowses = [];
 				} else {
-					memberbrowses = JSON.parse(localStorage.getItem('memberbrowses'));
+					memberbrowses = JSON.parse(localStorage.getItem(storagekey));
 				}
 
 				for(var i = 0; i < memberbrowses.length; i++) {
@@ -1132,57 +1406,221 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				data.url = url;
 				memberbrowses.splice(0, 0, data);
 
-				localStorage.setItem('memberbrowses', JSON.stringify(memberbrowses));
+				localStorage.setItem(storagekey, JSON.stringify(memberbrowses));
 
 			};
+
+			/*
+			 *  加入本地瀏覽記錄
+			 */
+			rootScope.appendLocalBrowse = function(data, url) {
+				rootScope.appendStorageBrowse('localbrowses', data, url);
+			};
+			/*
+			 * 加入服務端瀏覽記錄
+			 */
+			rootScope.appendSvcBrowse = function(data, _url) {
+
+				memberbrowseApi.saveorupdate({
+					objectpk: data.pk,
+					objectid: data.id,
+					url: _url,
+					browsetype: 'mainitem'
+
+				}).then(function(data) {
+
+				}, function(err) {});
+
+			};
+
 			/*
 			 * 獲取本地瀏覽記錄
 			 */
 			rootScope.getLocalBrowses = function() {
-				var memberbrowses = localStorage.getItem('memberbrowses');
-				if(memberbrowses === null) {
-					memberbrowses = [];
+				var result = localStorage.getItem('localbrowses');
+				if(result === null) {
+					result = [];
 				} else {
-					memberbrowses = JSON.parse(localStorage.getItem('memberbrowses'));
+					result = JSON.parse(localStorage.getItem('localbrowses'));
 				}
-
-				return memberbrowses;
-			};
-
-			/*
-			 * 服務端瀏覽記錄
-			 */
-			rootScope.appendSvcBrowse = function(data, url) {
-
-			};
-
-			/*
-			 * 刪除服務器端瀏覽記錄
-			 */
-			rootScope.removeBrowse = function(mainitempk) {
-
+				return result;
 			};
 
 		};
 
-		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, requireLogin) {
+		this.initImageLazyLoad = function(rootScope) {
+
+			rootScope.loadImg = function() {
+
+				setTimeout(function() {
+					$("img.lazy").lazyload();
+				}, 500);
+			};
+
+		};
+
+		this.initSubmittime = function(rootScope) {
+
+			rootScope.submittime = null;
+
+			rootScope.submittimeValid = function() {
+
+				if(rootScope.submittime != null) {
+					var sec = parseInt((new Date()) - rootScope.submittime) / 1000;
+					if(sec < 1) {
+						return false;
+					}
+				}
+
+				rootScope.submittime = new Date();
+				return true;
+
+			};
+		};
+
+		this.localShoppingcart = function(rootScope) {
+
+			/*
+			 * 登陆状态不保存
+			 */
+			rootScope.setShoppingcartKey = function(key) {
+
+				localStorage.setItem('shoppingcartkey', key);
+
+				memberidentifyApi.getIdentify(true).then(function(data) {
+					if(data !== "") {
+						localStorage.setItem('shoppingcartkey', null);
+					}
+
+				}, function(err) {
+
+				});
+			};
+
+			/*
+			 * 系统执行一次本地购物车同步服务购物车
+			 */
+			if(sessionStorage.getItem('isinitfromshoppingcartkey') === null) {
+				if(localStorage.getItem('shoppingcartkey') != null) {
+					console.info(localStorage.getItem('shoppingcartkey'));
+					shoppingcartApi.initfromshoppingcartkey(localStorage.getItem('shoppingcartkey'));
+				}
+				sessionStorage.setItem('isinitfromshoppingcartkey', true);
+			}
+
+		};
+
+		this.initFastShoppingcart = function(rootScope) {
+
+			rootScope.loadFastShoppingcart = function() {
+
+				shoppingcartApi.get().then(function(data) {
+
+					rootScope.setShoppingcartKey(data.pk);
+
+					rootScope.fastshoppingcartmainitems = [];
+					rootScope.loadMainitems(data.lines, 'fastshoppingcartmainitems');
+					rootScope.fastshoppingcart = data;
+
+				}, function(err) {
+
+				});
+
+			};
+
+			//延迟否则影响shoppingcart 显示
+			setTimeout(function() {
+				rootScope.loadFastShoppingcart();
+			}, 3000);
+
+		};
+
+		this.initMainitems = function(rootScope) {
+
+			rootScope.loadMainitems = function(lines, targetName) {
+
+				if(_.isUndefined(lines) || lines === null) {
+					return;
+				}
+
+				var promises = [];
+
+				for(var i = 0; i < lines.length; i++) {
+					var mainitemno = lines[i].mainitem.id;
+					promises.push(mainitemJson.get(mainitemno, rootScope.bust));
+				}
+
+				$q.all(promises).then(function(values) {
+
+						var target = values;
+
+						for(var i = 0; i < values.length; i++) {
+
+							for(var j = 0; j < values[i].dispunits.length; j++) {
+								var el = values[i].dispunits[j];
+
+								if(el.prodspec1.id === lines[i].prodspec1.id) {
+									target[i].dispunit = el;
+
+								}
+
+							}
+
+						}
+
+						_.set(rootScope, targetName, values);
+
+						if(!_.isUndefined($window.afterLoadMainitems)) {
+
+							$window.afterLoadMainitems();
+						}
+
+					})
+					.catch(function(err) {
+						console.log(err);
+					});
+			};
+
+		};
+
+		this.initExt = function(rootScope, state) {
+			rootScope.go = function(name, params) {
+				state.go(name, params, {
+					reload: true
+				});
+			};
+
+			rootScope.gohome = function() {
+				state.go(defaultstate, defaultstateparams, {
+					reload: true
+				});
+			};
+
+		};
+
+		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, loginConfig) {
 
 			if(sessionStorage.getItem('config') != null) {
 
-				rootScope.logout = this.logout;
 				rootScope.bust = sessionStorage.getItem("bust");
+				rootScope.currency = currency;
 
 				this.initViews(rootScope, templateCache, pageid);
 				this.initRootScope(rootScope, stateParams);
 				this.initTitle(pageid, rootScope);
 				this.initPath(rootScope, stateParams, state);
-				this.initAside(rootScope);
-				this.initIdentify(rootScope, state, requireLogin);
+				this.initAside(rootScope, viewprefix);
+				this.initIdentify(rootScope, state, loginConfig);
 				this.sessionVar(rootScope);
-				//				this.initShoppnigcart(rootScope);
-				//				this.initMemberFollow(rootScope);
-
-				this.initMemberBrowse(rootScope);
+				//				this.initShoppnigcart(rootScope); 
+				this.initMemberBrowse(rootScope, location);
+				this.initImageLazyLoad(rootScope);
+				this.initSubmittime(rootScope);
+				this.localShoppingcart(rootScope);
+				this.initMainitems(rootScope);
+				this.initFastShoppingcart(rootScope);
+				this.initExt(rootScope, state);
+				this.initLogout(rootScope, state);
 
 				rootScope.localbrowses = rootScope.getLocalBrowses();
 
@@ -1190,7 +1628,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			} else {
 
 				sessionStorage.setItem('redirect', location.absUrl());
-				state.go('load');
+				state.go('load', {}, {
+					reload: true
+				});
 				return false;
 			}
 		};
@@ -1202,7 +1642,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			return result;
 		};
 
-		this.resourcesInit = function(win, rootScope) {
+		this.resourcesInit = function(win, rootScope, state) {
 
 			var bust = (new Date()).getTime();
 			sessionStorage.setItem("bust", bust);
@@ -1210,19 +1650,19 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			var promises = [];
 			var objectNames = ['config', 'webpc', 'menu', 'utility', 'advert'];
 
-			promises.push(configFactory.get(bust));
-			promises.push(sitemapFactory.get('webpc', bust));
-			promises.push(sitemapFactory.get('menu', bust));
-			promises.push(sitemapFactory.get('utility', bust));
-			promises.push(advertFactory.get(bust));
+			promises.push(configJson.get(bust));
+			promises.push(sitemapJson.get('webpc', bust));
+			promises.push(sitemapJson.get('menu', bust));
+			promises.push(sitemapJson.get('utility', bust));
+			promises.push(advertJson.get(bust));
 			var forms = [];
 			$.merge(forms, pages);
 			$.merge(forms, views);
 
 			_(forms).forEach(function(page) {
 
-				promises.push(webpageFactory.get(page, true, bust));
-				promises.push(webpagecontentFactory.get(page, true, bust));
+				promises.push(webpageJson.get(page, true, bust));
+				promises.push(webpagecontentJson.get(page, true, bust));
 
 				objectNames.push('page_' + page);
 				objectNames.push('page_' + page + "_content");
@@ -1231,6 +1671,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 			var cachePage = this.cachePage;
 
+			var _state = state;
 			$q.all(promises).then(function(values) {
 
 				for(var i = 0; i < values.length; ++i) {
@@ -1243,8 +1684,11 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				var redirect = sessionStorage.getItem('redirect');
 				sessionStorage.removeItem('redirect');
+
 				if(_.isNull(redirect)) {
-					win.location = 'index.html';
+					_state.go(defaultstate, defaultstateparams, {
+						reload: true
+					});
 				} else {
 					win.location = redirect;
 				}
@@ -1327,77 +1771,6 @@ define('services/pageSvc',['require', './module'], function(require, module) {
 	});
 
 });
-define('services/shoppingcartSvc',['require', './module'], function(require, module) {
-	'use strict';
-
-	var _ = require('lodash');
-	var angular = require('angular');
-
-	/*
-	 * 购物车服务
-	 */
-	module.service('shoppingcartSvc', function() {
-
-		this.items = [];
-
-		/*
-		 * 清空购物车
-		 */
-		this.clear = function() {
-
-		};
-
-		/*
-		 * 获取所有货号
-		 */
-		this.getItems = function(index) {
-
-		};
-		/*
-		 * 获取货号
-		 */
-		this.getItem = function(index) {
-
-		};
-		/*
-		 * 添加货号
-		 */
-		this.addItem = function(item) {
-			this.items.push(item);
-		};
-		/*
-		 * 移除货号
-		 */
-		this.removeItem = function(index) {
-
-		};
-
-		/*
-		 * 修改数量
-		 */
-		this.changeQty = function(index, value) {
-			this.items[index].qty = value;
-		};
-
-		/*
-		 * 数量合计
-		 */
-		this.getTotalQty = function() {
-			
-		};
-
-		/*
-		 * 金额合计
-		 */
-		this.getTotalAmt = function() {
-
-		};
-		
-		
-
-	});
-
-});
 define('services/dialogSvc',['require', './module'], function(require, module) {
 	'use strict';
 
@@ -1408,14 +1781,31 @@ define('services/dialogSvc',['require', './module'], function(require, module) {
 
 		this.error = function(message) {
 
-			$modal({
+			var alert = $alert({
 				title: languageSvc.error(),
 				content: message,
+				placement: 'top',
+				animation: 'am-fade-and-slide-top',
+				type: 'danger',
+				duration: 3,
 				show: true
-			});
+			}); 
 
 		};
 
+
+		this.error = function(message) {
+
+			var alert = $alert({
+				title: languageSvc.error(),
+				content: message,
+				placement: 'top',
+				animation: 'am-fade-and-slide-top',
+				type: 'danger', 
+				show: true
+			}); 
+		};
+		
 		this.confirm = function(message) {
 			return window.confirm(message);
 		};
@@ -1429,8 +1819,9 @@ define('services/languageSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-
 	module.service('languageSvc', function(lanuage) {
+
+	 
 
 		this.warning = function(message) {
 
@@ -1453,7 +1844,7 @@ define('services/languageSvc',['require', './module'], function(require, module)
 		this.confirm_delete = function(message) {
 
 			if(lanuage === 'zh-TW') {
-				return '確定要刪除 ' + message + '嗎？';
+				return '確定要刪除' + message + '嗎？';
 			}
 
 			return '';
@@ -1462,7 +1853,161 @@ define('services/languageSvc',['require', './module'], function(require, module)
 	});
 
 });
-define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './shoppingcartSvc', './dialogSvc', './languageSvc'],
+define('services/mainitemSvc',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.service('mainitemSvc', function($q, mainitemJson, memberfollowApi, dialogSvc) {
+
+		this.init = function(scope, rootScope, location, stateParams) {
+
+			scope.follow = null;
+			scope.itemqty = 1;
+			scope.mainitem = null;
+
+			scope.appendSuit = function(mainitem) {
+				var promises = [];
+				_(mainitem.suits).forEach(function(el) {
+
+					promises.push(mainitemJson.get(el.mainitemno, rootScope.bust));
+				});
+
+				$q.all(promises).then(function(suitmainitems) {
+
+					mainitem.suits = [];
+					mainitem.suits = suitmainitems;
+				});
+			};
+
+			scope.memberfollow = function(mainitem) {
+
+				memberfollowApi.selectbyobjectpk(mainitem.pk).then(function(data) {
+						if(data.length > 0) {
+							scope.follow = data[0];
+						}
+					})
+					.catch(function(err) {
+						console.log(err);
+					});
+
+			};
+
+			scope.appendFollow = function(md, evt) { 
+				
+				if(!rootScope.loginValid()) {  
+					return;
+				}
+
+				memberfollowApi.saveorupdate({
+					objectpk: md.pk,
+					objectid: md.id,
+					url: location.absUrl(),
+					followtype: 'mainitem'
+
+				}).then(function(data) {
+					scope.memberfollow(scope.mainitem); 
+				}, function(err) {
+					dialogSvc.error(err);  
+				});
+
+			};
+
+			scope.deleteFollow = function(md, evt) {
+ 
+				
+				memberfollowApi.delete(md.pk).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+						scope.follow = null;
+					} else {
+						dialogSvc.error(data.message);
+					}
+					 
+
+				}, function(err) {
+
+					dialogSvc.error(err); 
+				});
+
+			};
+
+			scope.plusItemQty = function() {
+				if(scope.itemqty < 999) {
+					scope.itemqty = scope.itemqty + 1;
+				}
+
+			};
+
+			scope.minuItemQty = function() {
+				if(scope.itemqty >= 2) {
+					scope.itemqty = scope.itemqty - 1;
+				}
+
+			};
+
+			/*
+			 * loadSuccessHandle
+			 */
+			scope.load = function() {
+
+				mainitemJson.get(stateParams.mainitemno, rootScope.bust).then(function(data) {
+
+						scope.mainitem = data;
+
+						scope.prodspec1 = scope.mainitem.dispunits[0].prodspec1;
+						_(scope.mainitem.dispunits).forEach(function(el) {
+							if(stateParams.prodspec1 === el.prodspec1.id) {
+								scope.prodspec1 = el.prodspec1;
+							}
+						});
+
+						_(scope.mainitem.dispunits).forEach(function(el) {
+
+							if(el.prodspec1.id === scope.prodspec1.id) {
+
+								scope.dispunit = el;
+								scope.prodspec2 = el.items[0].prodspec2;
+								scope.item = el.items[0];
+
+								_(el.items).forEach(function(item) {
+									if(stateParams.prodspec2 === item.prodspec2.id) {
+										scope.prodspec2 = item.prodspec2;
+										scope.item = item;
+									}
+								});
+
+							}
+
+						});
+
+						scope.appendSuit(scope.mainitem);
+
+						console.info('mainitem');
+						console.info(scope.mainitem);
+						console.info('dispunit');
+						console.info(scope.dispunit);
+						console.info('item');
+						console.info(scope.item);
+
+						if(!_.isUndefined(scope.loadSuccessHandle)) {
+							scope.loadSuccessHandle();
+						}
+
+					})
+					.catch(function(err) {
+						console.log(err);
+					});
+
+			};
+
+		};
+
+	});
+
+});
+define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './dialogSvc', './languageSvc', './mainitemSvc'],
 	function() {
 
 		'use strict';
@@ -1473,33 +2018,17 @@ define('controllers/module',['require'], function(require) {
 	var ng = require('angular');
 	return ng.module('app.controllers', []);
 });
-define('controllers/testCtrl',['require', './module'], function(require, module) {
-	'use strict';
-
-	module.controller('testCtrl', function($scope, $rootScope, $templateCache, $state, $location, $window, initctrlSvc) {
-
-		var webpage = initctrlSvc.getWebpage('test', $state, $location);
-
-		if(webpage == null) {
-			$templateCache.put('test.html', '');
-			return;
-		}
-
-		$templateCache.put('test.html', webpage.content);
-		initctrlSvc.rootScopeFromCache($rootScope);
-		initctrlSvc.initTitle(webpage, $rootScope);
-
-	});
-
-});
 define('controllers/articleCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
-	module.controller('articleCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc, articlecontentFactory) {
+	module.controller('articleCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc, articlecontentJson) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		var isload = initctrlSvc.controlLoad('article' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('article' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -1507,7 +2036,7 @@ define('controllers/articleCtrl',['require', './module'], function(require, modu
 			return;
 		}
 
-		var content = articlecontentFactory.get($stateParams.id, false, $rootScope.bust);
+		var content = articlecontentJson.get($stateParams.id, false, $rootScope.bust);
 		$templateCache.put('content.html', content);
 
 	});
@@ -1519,20 +2048,20 @@ define('controllers/errorCtrl',['require', './module'], function(require, module
 	var _ = require('lodash');
 
 	module.controller('errorCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-   
+
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('error' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-	
+		var isload = initctrlSvc.controlLoad('error' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
 		if(!isload) {
 
 			$templateCache.put('error.html', '');
 			return;
 		}
-   
-		
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+
+		$rootScope.loadImg();
 
 	});
 
@@ -1543,22 +2072,21 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 	var _ = require('lodash');
 
 	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-   
-  
+
 		var template = initctrlSvc.getTemplate($stateParams);
-	 
-		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache);
- 
+
+		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
 		if(!isload) {
 
 			$templateCache.put('home.html', '');
 			return;
 		}
- 
-		
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		 
+		$rootScope.loadImg();
 
 	});
 
@@ -1568,12 +2096,15 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 	var _ = require('lodash');
 
-	module.controller('mkgdispgroupCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mkgdispgroupFactory, mainitemFactory, pageSvc, webpagehost, $modal, $aside, $alert, $select) {
+	module.controller('mkgdispgroupCtrl', function(viewprefix, $q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
+		mkgdispgroupJson, mainitemJson, pageSvc, webpagehost, $modal, $aside, $alert, $select) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		var isload = initctrlSvc.controlLoad('mkgdispgroup' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mkgdispgroup' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -1589,29 +2120,30 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 				templage: $stateParams.template,
 				id: $stateParams.id,
 				page: pg
+			}, {
+				reload: true
 			});
 		};
 
-		$scope.showMkgdispgroupasidefilter = function(md) {
+		$scope.showMkgdispgroupasidefilter = function() {
 			//			var contentHtml = $window.getAsideFilter(md);
-			
-			$scope.aside = $aside({
-				scope: $scope,
-				title: md.title,
+
+			$rootScope.aside = $aside({
+				scope: $scope,				
 				animation: "am-slide-left",
-				placement: (_.isUndefined(md.placement) ? 'left' : md.animation),
-				templateUrl: webpagehost + '/webpage/mkgdispgroupasidefilter.content.json?bust' + $rootScope.bust
+				placement: 'left',
+				templateUrl: webpagehost + '/webpage/' + viewprefix + 'mkgdispgroupasidefilter.content.json?bust' + $rootScope.bust
 			});
 
-			$scope.aside.$promise.then(function() {
-				$scope.aside.show();
+			$rootScope.aside.$promise.then(function() {
+				$rootScope.aside.show();
 			});
 
 		};
 
 		$scope.load = function(page) {
 
-			mkgdispgroupFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
+			mkgdispgroupJson.get($stateParams.id, $rootScope.bust).then(function(data) {
 
 					$scope.data = data;
 
@@ -1638,7 +2170,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 			for(var i = fetch.first; i < fetch.max; i++) {
 				if(i < data.lines.length) {
 					var mainitemno = data.lines[i].mainitemno;
-					promises.push(mainitemFactory.get(mainitemno, $rootScope.bust));
+					promises.push(mainitemJson.get(mainitemno, $rootScope.bust));
 				}
 			}
 
@@ -1651,9 +2183,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 
 					console.info($scope.mkgdispgroup);
 
-					setTimeout(function() {
-						$("img.lazy").lazyload();
-					}, 200);
+					$rootScope.loadImg();
 
 					if(!_.isUndefined($window.afterLoad)) {
 
@@ -1666,17 +2196,11 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 				});
 		};
 
-		$scope.submittime = null;
-
 		$scope.loadMore = function() {
-		 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 1) {
-					return;
-				}
+
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
 
 			if($scope.page < $scope.pagecount) {
 				$scope.loadMainitem($scope.data, $scope.page + 1);
@@ -1694,10 +2218,13 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 	var _ = require('lodash');
 
 	module.controller('mkgpgmarticleCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mkgpgmarticleFactory, mainitemFactory) {
+		mkgpgmarticleJson, mainitemJson) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('mkgpgmarticle' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mkgpgmarticle' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -1709,7 +2236,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 			var promises = [];
 			_(mainitem.suits).forEach(function(el) {
 
-				promises.push(mainitemFactory.get(el.mainitemno));
+				promises.push(mainitemJson.get(el.mainitemno));
 			});
 
 			$q.all(promises).then(function(suitmainitems) {
@@ -1718,7 +2245,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 			});
 		};
 
-		mkgpgmarticleFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
+		mkgpgmarticleJson.get($stateParams.id, $rootScope.bust).then(function(data) {
 
 				var title = '[' + data.name + ' ' + data.id + ']';
 
@@ -1727,13 +2254,13 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 				_.forEach(data.lines, function(mainitem) {
 					mainitemnos.push(mainitem.id);
 				});
-		 
+
 				$scope.mkgpgmarticle.lines = [];
 
 				var promises = [];
 
 				for(var i = 0; i < mainitemnos.length; i++) {
-					promises.push(mainitemFactory.get(mainitemnos[i], $rootScope.bust));
+					promises.push(mainitemJson.get(mainitemnos[i], $rootScope.bust));
 				}
 
 				$q.all(promises).then(function(values) {
@@ -1743,14 +2270,12 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 						$scope.appendSuit(mainitem);
 
 						title += ' [' + mainitem.name + ' ' + mainitem.dispunits[0].id + ' ' + mainitem.dispunits[0].prodspec1.name + ']';
-						
+
 						$scope.mkgpgmarticle.lines.push(mainitem);
 
 					});
 
-					setTimeout(function() {
-						$("img.lazy").lazyload();
-					}, 200);
+					$rootScope.loadImg();
 
 					$rootScope.title = title + ' -' + $rootScope.title;
 
@@ -1772,10 +2297,13 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 	var _ = require('lodash');
 
 	module.controller('mkgpgmCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mkgpgmFactory, mkgpgmarticleFactory, pageSvc) {
+		mkgpgmJson, mkgpgmarticleJson, pageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('mkgpgm' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mkgpgm' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -1791,12 +2319,14 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 				templage: $stateParams.template,
 				id: $stateParams.id,
 				page: pg
+			}, {
+				reload: true
 			});
 		};
 
 		$scope.load = function(page) {
 
-			mkgpgmFactory.get($stateParams.id, $rootScope.bust).then(function(data) {
+			mkgpgmJson.get($stateParams.id, $rootScope.bust).then(function(data) {
 
 					$scope.data = data;
 
@@ -1825,7 +2355,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 			for(var i = fetch.first; i < fetch.max; i++) {
 				if(i < data.lines.length) {
 					var articleid = data.lines[i].articleid;
-					promises.push(mkgpgmarticleFactory.get(articleid, $rootScope.bust));
+					promises.push(mkgpgmarticleJson.get(articleid, $rootScope.bust));
 				}
 			}
 
@@ -1835,9 +2365,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 						$scope.mkgpgm.lines.push(mkgpgmarticle);
 					});
 
-					setTimeout(function() {
-						$("img.lazy").lazyload();
-					}, 200);
+					$rootScope.loadImg();
 
 					if(!_.isUndefined($window.afterLoad)) {
 
@@ -1849,17 +2377,11 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 				});
 		};
 
-		$scope.submittime = null;
-
 		$scope.loadMore = function() {
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 1) {
-					return;
-				}
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
 
 			if($scope.page < $scope.pagecount) {
 				$scope.loadMkgpgm($scope.data, $scope.page + 1);
@@ -1876,127 +2398,51 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 	var _ = require('lodash');
 
-/*
- * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
- */
+	/*
+	 * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
+	 */
 
-	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc,
-		mainitemFactory) {
-
+	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		mainitemJson, memberfollowApi, shoppingcartApi, mainitemSvc, initctrlSvc, dialogSvc, $alert) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		var isload = initctrlSvc.controlLoad('mainitem' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('mainitem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
 			$templateCache.put('mainitem.html', '');
 			return;
 		}
-		
- 
 
-		$scope.appendSuit = function(mainitem) {
-			var promises = [];
-			_(mainitem.suits).forEach(function(el) {
+		$scope.loadSuccessHandle = function() {
 
-				promises.push(mainitemFactory.get(el.mainitemno, $rootScope.bust));
-			});
+			$rootScope.loadImg();
 
-			$q.all(promises).then(function(suitmainitems) {
-					
-				mainitem.suits = [];
-				mainitem.suits = suitmainitems;
-			});
-		};
+			var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
 
-		mainitemFactory.get($stateParams.mainitemno, $rootScope.bust).then(function(data) {
+			if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
+				title += ' ' + $scope.mainitem.brand.name;
+			}
+			$rootScope.title = title + ' -' + $rootScope.title;
 
-				$scope.mainitem = data;
-				
-				if($stateParams.prodspec1 === ''){
-						
-					$rootScope.stateParams.prodspec1 = $scope.mainitem.dispunits[0].prodspec1.id;
+			setTimeout(function() {
+				if($rootScope.identify !== null) {
+
+					$scope.memberfollow($scope.mainitem);
 				}
-					
-				_($scope.mainitem.dispunits).forEach(function(el) {
+				$scope.appendBrowse($scope.mainitem);
 
-				
-					if(el.prodspec1.id === $stateParams.prodspec1) {
-						
-						$scope.dispunit = el;
-						
-						if($stateParams.prodspec2 === ''){
-					 		 
-							$rootScope.stateParams.prodspec2 = el.items[0].prodspec2.id;
-						}
-					}
-
-				});
-
-				$scope.appendSuit($scope.mainitem);
-
-				console.info($scope.mainitem);
-				console.info($scope.dispunit);
-
-				$rootScope.appendBrowse($scope.mainitem, $location.absUrl());
-
-				var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
-
-				if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
-					title += ' ' + $scope.mainitem.brand.name;
-				}
-				$rootScope.title = title + ' -' + $rootScope.title;
-
-				setTimeout(function() {
-					$("img.lazy").lazyload();
-				}, 200);
-
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
-
-		/*
-		 * 选择颜色
-		 */
-		$scope.selectProdSpec1 = function() {
+			}, 1000);
 
 		};
 
-		/*
-		 * 选择尺寸
-		 */
-		$scope.selectProdSpec2 = function() {
+		mainitemSvc.init($scope, $rootScope, $location, $stateParams);
 
-		};
-		/*
-		 * 添加购物车
-		 */
-		$scope.addShoppingcart = function() {
-
-		};
-
-		/*
-		 * 修改数量
-		 */
-		$scope.changeQty = function() {
-
-		};
-
-		/*
-		 * 立刻购买
-		 */
-		$scope.buy = function() {
-
-		};
-
-		/*
-		 * 加入我的喜爱
-		 */
-		$scope.favor = function() {
-
-		};
+		$scope.load();
 
 	});
 
@@ -2010,7 +2456,10 @@ define('controllers/itemsearchCtrl',['require', './module'], function(require, m
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('itemsearch' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('itemsearch' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2018,11 +2467,7 @@ define('controllers/itemsearchCtrl',['require', './module'], function(require, m
 			return;
 		}
 
-		
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2034,10 +2479,13 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 	var md5 = require('md5');
 
 	module.controller('loginCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberidentifyFactory) {
+		initctrlSvc, dialogSvc, memberidentifyApi, shoppingcartApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('login' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('login' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2049,46 +2497,45 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			id: null,
 			password: null
 		};
- 		
-		if($rootScope.identify != null) {
 
-			$window.location = 'index.html';
+		if($rootScope.identify !== null) {
+
+			$rootScope.gohome();
 			return;
 		}
-		 
-		$scope.submittime = null;
 
 		$scope.login = function(md) {
-			
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
 			$scope.user.id = md.id;
 			$scope.user.password = md5(md.password);
-			 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
-		  
-			memberidentifyFactory.login($scope.user).then(function(data) {
+
+			memberidentifyApi.login($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
+
 					if(!_.isUndefined($rootScope.loginReturnState) && $rootScope.loginReturnState != null) {
-						$state.go($rootScope.loginReturnState, $rootScope.loginReturnParams);
+
+						$state.go($rootScope.loginReturnState.name, $rootScope.loginReturnParams, {
+							reload: true
+						});
+
 					} else {
-						$window.location = 'index.html';
+						$rootScope.gohome();
 					}
 
 				} else {
 
-					$.registCallback(data.message);
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
@@ -2105,7 +2552,10 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('member' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2113,37 +2563,410 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 			return;
 		}
 
-	
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
 });
-define('controllers/orderCtrl',['require', './module'], function(require, module) {
+define('controllers/salesorderCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
 	var _ = require('lodash');
 
-	module.controller('orderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+	/*
+	 * /order/:template/:pk
+	 */
+	module.controller('salesorderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		salesorderApi, shoppingcartApi, member2addrApi, mainitemJson, initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('order' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('salesorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
-
-			$templateCache.put('order.html', '');
+			$templateCache.put('salesorder.html', '');
 			return;
 		}
 
-		
+		$scope.addresslist = [];
+		$scope.salesorder = null;
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$scope.approve = function() {
+
+			$.bizerror('');
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			salesorderApi.approve($stateParams.pk).then(function(data) {
+
+				if(!_.isUndefined(data.errorcode)) {
+					$.bizerror(data.message);
+					return;
+				}
+
+				$state.go('orderconfirmsuccess', {
+					template: '',
+					pk: data.pk
+				}, {
+					reload: true
+				});
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.load = function() {
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			salesorderApi.get($stateParams.pk).then(function(data) {
+				console.info(data.isapprove);
+				if(data.isapprove) {
+
+					$rootScope.gohome();
+					return;
+				}
+				$rootScope.loadMainitems(data.lines, 'mainitems');
+				$scope.salesorder = data;
+
+			}, function(err) {
+
+				$rootScope.gohome();
+
+			});
+
+		};
+
+		$scope.setShippingaddr = function(md) {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			salesorderApi.setshippingaddr($stateParams.pk, md.pk).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					$scope.addresslist = [];
+					$scope.load();
+
+				}
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+		};
+
+		$scope.toggleAddrs = function() {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			if($scope.addresslist.length === 0) {
+
+				member2addrApi.select().then(function(data) {
+
+					$scope.addresslist = data;
+
+				}, function(err) {
+					console.error(err);
+				});
+
+			} else {
+				$scope.addresslist = [];
+			}
+
+		};
+
+		$scope.load();
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/shoppingcartadditemCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	/*
+	 * 添加到购物车
+	 * /shoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty
+	 * 
+	 */
+	module.controller('shoppingcartadditemCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		shoppingcartApi, mainitemJson, mainitemSvc, initctrlSvc, dialogSvc, languageSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('shoppingcartadditem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
+		if(!isload) {
+
+			$templateCache.put('shoppingcartadditem.html', '');
+			return;
+		}
+
+		$scope.loadSuccessHandle = function() {
+
+			$rootScope.loadImg();
+
+			var isRefresh = _.isUndefined($rootScope.fromState) || $rootScope.fromState.name === '';
+			if(!isRefresh && $rootScope.fromState.name !== "shoppingcart") { //防止返回
+
+				$scope.addShoppingcart();
+				return;
+
+			}
+
+			$state.go('shoppingcart', {
+				template: ''
+			}, {
+				reload: true
+			});
+
+		};
+
+		$scope.state = 0;
+
+		$scope.addShoppingcart = function() {
+
+			shoppingcartApi.get().then(function(shoppingcart) {
+
+				$rootScope.setShoppingcartKey(shoppingcart.pk);
+
+				if(shoppingcart.lines === null) {
+					shoppingcart.lines = [];
+				}
+
+				/*
+				 * merge
+				 */
+				var line = {
+					mainitem: {
+						pk: $scope.mainitem.pk
+					},
+					prodspec1: {
+						pk: $scope.prodspec1.pk
+					},
+					prodspec2: {
+						pk: $scope.prodspec2.pk
+					},
+					item: {
+						pk: $scope.item.pk
+					},
+					txsqty: $stateParams.shoppingqty
+				};
+
+				var ismerge = false;
+				for(var i = 0; i < shoppingcart.lines.length; i++) {
+					var el = shoppingcart.lines[i];
+
+					if(el.item.pk === line.item.pk) {
+						el.txsqty = parseInt(el.txsqty) + parseInt(line.txsqty);
+						ismerge = true;
+						break;
+					}
+
+				}
+
+				if(!ismerge) {
+					shoppingcart.lines.push(line);
+				}
+
+				shoppingcartApi.saveorupdate(shoppingcart).then(function(d) {
+
+					$scope.state = 1;
+
+				}, function(err) {
+					$scope.state = 2;
+				});
+
+			}, function(err) {
+				$scope.state = 2;
+			});
+
+		};
+
+		mainitemSvc.init($scope, $rootScope, $location, $stateParams);
+
+		$scope.load();
+
+	});
+
+});
+define('controllers/shoppingcartCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	/*
+	 * pk和ver不一致就刷新 
+	 */
+	module.controller('shoppingcartCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		shoppingcartApi, salesorderApi, mainitemJson, initctrlSvc, dialogSvc, languageSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('shoppingcart' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
+
+		if(!isload) {
+
+			$templateCache.put('shoppingcart.html', '');
+			return;
+		}
+
+		$scope.remove = function(line) {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(line.mainitem.name))) {
+				var lines = _.remove($scope.shoppingcart.lines, function(n) {
+					return n.pk === line.pk;
+				});
+
+				$scope.save();
+			}
+
+		};
+
+		$scope.minu = function(line) {
+
+			if(line.txsqty >= 2) {
+				line.txsqty = line.txsqty - 1;
+			}
+
+			$scope.save();
+		};
+
+		$scope.plus = function(line) {
+
+			if(line.txsqty < 999) {
+				line.txsqty = line.txsqty + 1;
+			}
+			$scope.save();
+		};
+
+		$scope.convertorder = function() {
+
+			$.bizerror('');
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			shoppingcartApi.get().then(function(data) {
+
+				$rootScope.setShoppingcartKey(data.pk);
+				if(data.ver !== $scope.shoppingcart.ver || data.pk !== $scope.shoppingcart.pk) {
+					$scope.load();
+					return;
+				}
+
+				salesorderApi.convertfromshoppingcart().then(function(ord) {
+
+					if(!_.isUndefined(ord.errorcode)) {
+						$.bizerror(ord.message);
+						return;
+					}
+
+					$state.go('salesorder', {
+						template: '',
+						pk: ord.pk
+					}, {
+						reload: true
+					});
+
+				}, function(err) {
+
+					dialogSvc.error(err);
+				});
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.save = function() {
+
+			shoppingcartApi.get().then(function(data) {
+
+				$rootScope.setShoppingcartKey(data.pk);
+
+				if(data.ver !== $scope.shoppingcart.ver || data.pk !== $scope.shoppingcart.pk) {
+					$scope.load();
+					return;
+				}
+
+				shoppingcartApi.saveorupdate($scope.shoppingcart).then(function(d) {
+
+					$scope.load();
+				}, function(err) {
+
+					dialogSvc.error(err);
+				});
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.load = function() {
+			 
+				
+			shoppingcartApi.get().then(function(data) {
+	
+				$rootScope.setShoppingcartKey(data.pk);
+
+				$rootScope.loadMainitems(data.lines, 'mainitems');
+				$scope.shoppingcart = data;
+
+			}, function(err) {
+
+				dialogSvc.error(err);
+			});
+
+		};
+
+		$scope.load();
+		$rootScope.loadImg();
 
 	});
 
@@ -2157,7 +2980,10 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('orderpay' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('orderpay' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2165,11 +2991,80 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 			return;
 		}
 
-		
+		$rootScope.loadImg();
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+	});
+
+});
+define('controllers/orderconfirmsuccessCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('orderconfirmsuccessCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		salesorderApi, initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('orderconfirmsuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
+
+		if(!isload) {
+
+			$templateCache.put('orderconfirmsuccess.html', '');
+			return;
+		}
+
+		$scope.load = function() {
+
+			salesorderApi.get($stateParams.pk).then(function(data) {
+				console.info(data.isapprove);
+				if(!data.isapprove) {
+
+					$rootScope.gohome();
+					return;
+				}
+
+				$rootScope.loadMainitems(data.lines, 'mainitems');
+				$scope.salesorder = data;
+
+			}, function(err) {
+
+				$rootScope.gohome();
+
+			});
+
+		};
+
+		$scope.load();
+
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/orderpaysuccessCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('orderpaysuccessCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('orderpaysuccess' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
+
+		if(!isload) {
+
+			$templateCache.put('orderpaysuccess.html', '');
+			return;
+		}
+
+		$rootScope.loadImg();
 
 	});
 
@@ -2181,10 +3076,13 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 	var md5 = require('md5');
 
 	module.controller('registCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberaccountFactory) {
+		initctrlSvc, dialogSvc, memberaccountApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('regist' + template, $state, $location, $rootScope, $stateParams, $templateCache);
+		var isload = initctrlSvc.controlLoad('regist' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2196,46 +3094,41 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 			id: null,
 			password: null,
 			email: null,
-			phone: null,
+			mobphoneno: null,
 			authtype: null,
 			client: (new Date()).toISOString()
 		};
 
-		$scope.submittime = null;
-
 		$scope.regist = function(md) {
+
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
 
 			$scope.user.id = md.id;
 			$scope.user.password = md5(md.password);
 			$scope.user.email = md.email;
-			$scope.user.phone = md.phone;
+			$scope.user.mobphoneno = md.mobphoneno;
 			$scope.user.authtype = md.authtype;
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
- 
-
-			memberaccountFactory.regist($scope.user).then(function(data) {
+			memberaccountApi.regist($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 					$state.go("info", {
 						template: 'registsuccess',
 						message: $scope.user.id
+					}, {
+						reload: true
 					});
 				} else {
 
-					$.registCallback(data.message);
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
@@ -2243,46 +3136,20 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 	});
 
 });
-define('controllers/shoppingcartCtrl',['require', './module'], function(require, module) {
-	'use strict';
-
-var _ = require('lodash');
-
-	module.controller('shoppingcartCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
-
-		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('shoppingcart' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
-
-		if(!isload) {
-
-			$templateCache.put('shoppingcart.html', '');
-			return;
-		}
-
-		
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
-
-	});
-
-});
 define('controllers/loadCtrl',['require', './module'], function(require, module) {
 	'use strict';
 
 	module.controller('loadCtrl', function($scope, $rootScope, $templateCache, $state, $window,
-		initctrlSvc, webpageFactory, webpagecontentFactory) {
- 
-//		var webpage = webpageFactory.get('load', false); 加快速度避免過多同步
+		initctrlSvc, webpageJson, webpagecontentJson) {
+
+		//		var webpage = webpageJson.get('load', false); 加快速度避免過多同步
 		$rootScope.title = '';
 		$rootScope.icon = '';
-		var webpagecontent = webpagecontentFactory.get('load', false);
-	 
-		$templateCache.put('load.html', webpagecontent);   
-		initctrlSvc.resourcesInit($window, $rootScope); 
-		 
+		var webpagecontent = webpagecontentJson.get('load', false);
+
+		$templateCache.put('load.html', webpagecontent);
+		initctrlSvc.resourcesInit($window, $rootScope, $state);
+
 	});
 
 });
@@ -2292,21 +3159,22 @@ define('controllers/infoCtrl',['require', './module'], function(require, module)
 	var _ = require('lodash');
 
 	module.controller('infoCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-   
+
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('info' + template, $state, $location, $rootScope, $stateParams, $templateCache);
-	
+		var isload = initctrlSvc.controlLoad('info' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
 		if(!isload) {
 
 			$templateCache.put('info.html', '');
 			return;
 		}
-  
-  		$scope.message = $stateParams.message;
-		
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+
+		$scope.message = $stateParams.message;
+
+		$rootScope.loadImg();
 
 	});
 
@@ -2317,10 +3185,13 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 	var _ = require('lodash');
 
 	module.controller('actionauthCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberaccountFactory) {
+		initctrlSvc, dialogSvc, memberaccountApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('actionauth' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2341,48 +3212,42 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 			}
 		}
 
-		$scope.submittime = null;
-
 		$scope.send = function(md) {
 
-			$scope.actionauth.authfrom = md.authfrom; 
-			
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
+			if(!$rootScope.submittimeValid()) {
+				return;
 			}
-			$scope.submittime = new Date();
 
-			memberaccountFactory.actionauth($scope.actionauth).then(function(data) {
+			$scope.actionauth.authfrom = md.authfrom;
+
+			memberaccountApi.actionauth($scope.actionauth).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 					if($scope.actionauth.authtype === 'email') {
-						
+
 						$state.go("info", {
 							template: 'gotoemail',
 							message: ''
+						}, {
+							reload: true
 						});
 					}
 
 				} else {
 
-					$.registCallback(data.message);
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2394,10 +3259,13 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 	var md5 = require('md5');
 
 	module.controller('changepasswordCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberaccountFactory, memberidentifyFactory) {
+		initctrlSvc, dialogSvc, memberaccountApi, memberidentifyApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, false);
+		var isload = initctrlSvc.controlLoad('changepassword' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
 
 		if(!isload) {
 
@@ -2406,33 +3274,29 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 		}
 
 		$scope.md = {
-			actionauthpk : $stateParams.actionauthpk,
-			password : null
+			actionauthpk: $stateParams.actionauthpk,
+			password: null
 		};
 
-		$scope.submittime = null;
-
 		$scope.changepassword = function(md) {
-			
-			$scope.md.password = md.password;
-			
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
 
-			memberaccountFactory.changepassword($scope.md.actionauthpk, md5($scope.md.password)).then(function(data) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			$scope.md.password = md.password;
+
+			memberaccountApi.changepassword($scope.md.actionauthpk, md5($scope.md.password)).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 
-					memberidentifyFactory.logout().then(function(da) {
+					memberidentifyApi.logout().then(function(da) {
 
 						$state.go("info", {
 							template: 'changepasswordsuccess',
 							message: ''
+						}, {
+							reload: true
 						});
 
 					}, function(err) {
@@ -2441,21 +3305,19 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 
 				} else {
 
-					$.registCallback(data.message);
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2466,10 +3328,13 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 	var _ = require('lodash');
 
 	module.controller('bindingemailCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberaccountbindingFactory, memberidentifyFactory) {
+		initctrlSvc, dialogSvc, memberaccountbindingApi, memberidentifyApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('bindingemail' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2483,29 +3348,29 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 			client: (new Date()).toISOString()
 		};
 
-		$scope.submittime = null;
-
 		$scope.send = function(md) {
-			
-			$scope.accountbinding.id = md.id;
-			
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
 
-			memberaccountbindingFactory.add($scope.accountbinding).then(function(data) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			$scope.accountbinding.id = md.id;
+
+			memberaccountbindingApi.add($scope.accountbinding).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 
-					memberidentifyFactory.logout().then(function(da) {
+					memberidentifyApi.logout().then(function(da) {
 
 						$state.go("info", {
 							template: 'gotoemail',
 							message: $rootScope.identify.email
+						}, {
+							reload: true
 						});
 
 					}, function(err) {
@@ -2513,22 +3378,20 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 					});
 
 				} else {
-					 
-					$.registCallback(data.message);
+
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2539,10 +3402,13 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 	var _ = require('lodash');
 
 	module.controller('memberaddresslistCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, countryFactory, govadmdivFactory, member2addrFactory, languageSvc) {
+		initctrlSvc, dialogSvc, countryJson, govadmdivJson, member2addrApi, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberaddresslist' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2552,46 +3418,47 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 
 		$scope.addresslist = [];
 
-		member2addrFactory.select().then(function(data) {
+		$scope.load = function() {
+			member2addrApi.select().then(function(data) {
+				$scope.addresslist = data;
 
-			for(var i = 0; i < data.length; i++) {
-
-				if(!data[i].ismajor) {
-					$scope.addresslist.push(data[i]);
-				}
-
-			}
-
-		}, function(err) {
-			console.error(err);
-		});
+			}, function(err) {
+				console.error(err);
+			});
+		};
 
 		$scope.delete = function(md) {
 
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
 			if(dialogSvc.confirm(languageSvc.confirm_delete(md.addr1))) {
-				member2addrFactory.delete(md.pk).then(function(data) {
+				member2addrApi.delete(md.pk).then(function(data) {
 
 					if(JSON.stringify(data).toLowerCase() === 'true') {
 
-						location.reload();
+						$scope.load();
 
 					} else {
 
-						$.registCallback(data.message);
+						dialogSvc.error(data.message);
 
 					}
 
 				}, function(err) {
-					console.error(err);
+					dialogSvc.error(err);
 				});
 
 			}
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
-
+		$rootScope.loadImg();
+		$scope.load();
 	});
 
 });
@@ -2601,10 +3468,13 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 	var _ = require('lodash');
 
 	module.controller('memberaddressmodifyCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, govadmdivFactory, countryFactory, member2addrFactory) {
+		initctrlSvc, dialogSvc, govadmdivJson, countryJson, member2addrApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberaddressmodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2631,7 +3501,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		$scope.currGovadmdiv = [];
 
-		countryFactory.get($rootScope.bust).then(function(data) {
+		countryJson.get($rootScope.bust).then(function(data) {
 			$scope.govadmdiv = data;
 			$scope.currGovadmdiv = data;
 		}, function(err) {
@@ -2640,20 +3510,20 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		$scope.load = function(pk) {
 
-			member2addrFactory.get(pk).then(function(data) {
+			member2addrApi.get(pk).then(function(data) {
 				$scope.address = data;
 				$scope.currGovadmdiv = [];
 				console.info($scope.address);
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 			});
 		};
 
 		if($stateParams.ismajor === 'true') {
 			//主地址查询
 
-			member2addrFactory.select().then(function(data) {
+			member2addrApi.select().then(function(data) {
 				for(var i = 0; i < data.length; i++) {
 					if(data[i].ismajor) {
 						$scope.load(data[i].pk);
@@ -2678,7 +3548,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			var isCountry = _.isUndefined(arg.lines);
 			if(isCountry) {
 
-				govadmdivFactory.get(arg.id, true, $rootScope.bust).then(function(data) {
+				govadmdivJson.get(arg.id, true, $rootScope.bust).then(function(data) {
 					arg.lines = data;
 					if(arg.lines.length > 0) {
 						$scope.currGovadmdiv = arg.lines;
@@ -2704,6 +3574,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		};
 		$scope.clear = function() {
+
 			$scope.address.country = null;
 			$scope.address.state = null;
 			$scope.address.city = null;
@@ -2777,9 +3648,14 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		};
 
-		$scope.submittime = null;
-
 		$scope.save = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			if($stateParams.ismajor === 'true') {
 				$scope.address.ismajor = true;
@@ -2803,47 +3679,41 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			$scope.address.addr2 = md.addr2;
 			$scope.address.addr3 = md.addr3;
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			}
-			$scope.submittime = new Date();
-
-			member2addrFactory.saveorupdate($scope.address).then(function(data) {
+			member2addrApi.saveorupdate($scope.address).then(function(data) {
 
 				if(_.isUndefined(data.errorcode)) {
-					
-					if($stateParams.ismajor === 'true'){
-						
+
+					if($stateParams.ismajor === 'true') {
+
 						$state.go("member", {
 							template: ''
+						}, {
+							reload: true
 						});
-					}else{
-						
+					} else {
+
 						$state.go("memberaddresslist", {
 							template: ''
+						}, {
+							reload: true
 						});
 					}
 
 				} else {
 
-					$.registCallback(data.message);
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2853,11 +3723,14 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 
 	var _ = require('lodash');
 
-	module.controller('memberbrowseCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+	module.controller('memberbrowseCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		memberbrowseApi, mainitemJson, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberbrowse' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberbrowse' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2865,11 +3738,111 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 			return;
 		}
 
-		
+		$scope.browses = [];
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$scope.loadDetail = function(data) {
+
+			var promises = [];
+			console.info(data);
+			for(var i = 0; i < data.length; i++) {
+				var mainitemno = data[i].objectid;
+				promises.push(mainitemJson.get(mainitemno, $rootScope.bust));
+			}
+
+			$q.all(promises).then(function(values) {
+
+					for(var i = 0; i < values.length; i++) {
+						values[i].url = data[i].url;
+						values[i].pk = data[i].pk;
+						$scope.browses.push(values[i]);
+
+					}
+
+					$rootScope.loadImg();
+
+					if(!_.isUndefined($window.afterLoad)) {
+
+						$window.afterLoad();
+					}
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.load = function() {
+			memberbrowseApi.select().then(function(data) {
+					$scope.browses = [];
+					$scope.loadDetail(data);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.delete = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			memberbrowseApi.delete(md.pk).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					$scope.load();
+
+				} else {
+
+					dialogSvc.error(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+		};
+
+		$scope.deletelist = function() {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+
+			var pks = [];
+			_.forEach($scope.browses, function(value) {
+				pks.push({
+					pk: value.pk
+				});
+			});
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(""))) {
+				memberbrowseApi.deletelist(pks).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+
+						$scope.load();
+
+					} else {
+
+						dialogSvc.error(data.message);
+
+					}
+
+				}, function(err) {
+					dialogSvc.error(err);
+				});
+			}
+
+		};
+
+		$scope.load();
 
 	});
 
@@ -2879,11 +3852,14 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 
 	var _ = require('lodash');
 
-	module.controller('memberfollowCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc) {
+	module.controller('memberfollowCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		memberfollowApi, mainitemJson, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberfollow' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberfollow' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2891,11 +3867,109 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 			return;
 		}
 
-		
+		$scope.follows = [];
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$scope.loadDetail = function(data) {
+
+			var promises = [];
+			console.info(data);
+			for(var i = 0; i < data.length; i++) {
+				var mainitemno = data[i].objectid;
+				promises.push(mainitemJson.get(mainitemno, $rootScope.bust));
+			}
+
+			$q.all(promises).then(function(values) {
+
+					for(var i = 0; i < values.length; i++) {
+						values[i].url = data[i].url;
+						values[i].pk = data[i].pk;
+						$scope.follows.push(values[i]);
+
+					}
+
+					$rootScope.loadImg();
+
+					if(!_.isUndefined($window.afterLoad)) {
+
+						$window.afterLoad();
+					}
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.load = function() {
+			memberfollowApi.select().then(function(data) {
+					$scope.follows = [];
+					$scope.loadDetail(data);
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		};
+
+		$scope.delete = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+			memberfollowApi.delete(md.pk).then(function(data) {
+
+				if(JSON.stringify(data).toLowerCase() === 'true') {
+
+					$scope.load();
+
+				} else {
+
+					dialogSvc.error(data.message);
+
+				}
+
+			}, function(err) {
+				dialogSvc.error(err);
+			});
+		};
+
+		$scope.deletelist = function() {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+			if(!$rootScope.loginValid()) {
+				return;
+			}
+			var pks = [];
+			_.forEach($scope.follows, function(value) {
+				pks.push({
+					pk: value.pk
+				});
+			});
+
+			if(dialogSvc.confirm(languageSvc.confirm_delete(""))) {
+				memberfollowApi.deletelist(pks).then(function(data) {
+
+					if(JSON.stringify(data).toLowerCase() === 'true') {
+
+						$scope.load();
+
+					} else {
+
+						dialogSvc.error(data.message);
+
+					}
+
+				}, function(err) {
+					dialogSvc.error(err);
+				});
+			}
+
+		};
+
+		$scope.load();
 
 	});
 
@@ -2906,10 +3980,13 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 	var _ = require('lodash');
 
 	module.controller('membermodifyCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		initctrlSvc, dialogSvc, memberinfoFactory, memberidentifyFactory) {
+		initctrlSvc, dialogSvc, memberinfoApi, memberidentifyApi) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('membermodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('membermodify' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2917,41 +3994,40 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 			return;
 		}
 
-		memberinfoFactory.get().then(function(data) {
+		memberinfoApi.get().then(function(data) {
 
 			$scope.user = data;
 			console.info($scope.user);
 		}, function(err) {
 			dialogSvc.error("net error!");
-			$.registCallback('');
+			$.bizerror('');
 
 		});
 
-		$scope.submittime = null;
-
 		$scope.save = function(md) {
+			if(!$rootScope.submittimeValid()) {
+				return;
+			}
+
+			if(!$rootScope.loginValid()) {
+				return;
+			}
 
 			$scope.user.name = md.name;
 			$scope.user.gendertype = md.gendertype;
-			$scope.user.birthday = md.birthday.replace('年','-').replace('月','-').replace('日','') + ' 00:00:00';
+			$scope.user.birthday = md.birthday.replace('年', '-').replace('月', '-').replace('日', '') + ' 00:00:00';
 
-			if($scope.submittime != null) {
-				var sec = parseInt((new Date()) - $scope.submittime) / 1000;
-				if(sec < 3) {
-					return;
-				}
-			} 
-			$scope.submittime = new Date();
-
-			memberinfoFactory.saveorupdate($scope.user).then(function(data) {
+			memberinfoApi.saveorupdate($scope.user).then(function(data) {
 
 				if(JSON.stringify(data).toLowerCase() === 'true') {
 
-					memberidentifyFactory.logout().then(function(da) {
+					memberidentifyApi.logout().then(function(da) {
 
 						$state.go("info", {
 							template: 'membermodifysuccess',
 							message: ''
+						}, {
+							reload: true
 						});
 
 					}, function(err) {
@@ -2960,21 +4036,19 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 
 				} else {
 
-					$.registCallback(data.message);
+					$.bizerror(data.message);
 
 				}
 
 			}, function(err) {
 				dialogSvc.error("net error!");
-				$.registCallback('');
+				$.bizerror('');
 
 			});
 
 		};
 
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
@@ -2988,7 +4062,10 @@ define('controllers/memberorderlistCtrl',['require', './module'], function(requi
 		initctrlSvc, dialogSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
-		var isload = initctrlSvc.controlLoad('memberorderlist' + template, $state, $location, $rootScope, $stateParams, $templateCache, true);
+		var isload = initctrlSvc.controlLoad('memberorderlist' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
 
 		if(!isload) {
 
@@ -2996,20 +4073,71 @@ define('controllers/memberorderlistCtrl',['require', './module'], function(requi
 			return;
 		}
 
-		
-
-		setTimeout(function() {
-			$("img.lazy").lazyload();
-		}, 200);
+		$rootScope.loadImg();
 
 	});
 
 });
-define('controllers/main',['./testCtrl', './articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
-		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl', './orderCtrl', './orderpayCtrl',
-		'./registCtrl', './shoppingcartCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
+define('controllers/membermessageCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('membermessageCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('membermessage' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
+
+		if(!isload) {
+
+			$templateCache.put('membermessage.html', '');
+			return;
+		}
+
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/memberorderCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('memberorderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('memberorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
+
+		if(!isload) {
+
+			$templateCache.put('memberorder.html', '');
+			return;
+		}
+
+		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/main',['./articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
+		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl',
+		'./salesorderCtrl',
+		
+		'./shoppingcartadditemCtrl', './shoppingcartCtrl',
+		'./orderpayCtrl', './orderconfirmsuccessCtrl', './orderpaysuccessCtrl',
+		
+		'./registCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',
 		'./bindingemailCtrl', './memberaddresslistCtrl', './memberaddressmodifyCtrl', './memberbrowseCtrl',
-		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl'
+		'./memberfollowCtrl', './membermodifyCtrl', './memberorderlistCtrl', './membermessageCtrl', './memberorderCtrl'
 	],
 	function() {
 
@@ -3054,6 +4182,56 @@ define('filters/nodes',['require', './module'], function(require, module) {
 	});
 
 });
+define('filters/hasnodes',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('hasnodes', function() {
+
+		return function(sitemap, pid) {
+
+			var result = [];
+
+			_.forIn(sitemap, function(value, key) {
+				if(value.psitemapid === pid) {						
+					result.push(value);
+				}
+			});
+ 
+ 
+			return result.length > 0;
+		};
+
+	});
+
+});
+define('filters/nothasnodes',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('nothasnodes', function() {
+
+		return function(sitemap, pid) {
+
+			var result = [];
+
+			_.forIn(sitemap, function(value, key) {
+				if(value.psitemapid === pid) {						
+					result.push(value);
+				}
+			});
+ 
+ 
+			return result.length === 0;
+		};
+
+	});
+
+});
 define('filters/nodeattr',['require', './module'], function(require, module) {
 	'use strict';
 
@@ -3078,6 +4256,31 @@ define('filters/nodeattr',['require', './module'], function(require, module) {
 			return _.get(el, property);
 
 		};
+	});
+
+});
+define('filters/nodeslength',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('nodeslength', function() {
+
+		return function(sitemap, pid) {
+
+			var result = [];
+
+			_.forIn(sitemap, function(value, key) {
+				if(value.psitemapid === pid) {						
+					result.push(value);
+				}
+			});
+ 
+ 
+			return result.length;
+		};
+
 	});
 
 });
@@ -3188,8 +4391,11 @@ define('filters/cutindex',['require', './module'], function(require, module) {
 	module.filter('cutindex', function() {
 
 		return function(input, len) {
-
+			
 			var result = [];
+			if(_.isUndefined(input)){
+				return result; 
+			}
 			var count = input.length;
 			if(count === 0) {
 
@@ -3206,13 +4412,13 @@ define('filters/cutindex',['require', './module'], function(require, module) {
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './nodeattr', './ifvalue', './range', './privatestring', './nvl', './cutindex'],
+define('filters/main',['./testFilter', './nodes', './hasnodes', './nothasnodes', './nodeattr', './nodeslength', './ifvalue', './range', './privatestring', './nvl', './cutindex'],
 	function() {
 
 		'use strict';
 
 	});
-define('app/main',['../factorys/main', '../directives/main', '../services/main', '../controllers/main', '../filters/main'],
+define('app/main',['../jsons/main', '../apis/main', '../directives/main', '../services/main', '../controllers/main', '../filters/main'],
 	function() {
 
 		'use strict';
@@ -3224,14 +4430,16 @@ define('app/module',['require', './main'], function(require) {
 
 	var ng = require('angular');
 
-	var app = ng.module('app', ['app.factorys', 'app.directives', 'app.services',
-		'app.controllers', 'app.filters',
-		'ui.router', 
+	var app = ng.module('app', [
+		'ui.router',
+		'ui.router.state',
 		'ngAnimate',
 		'mgcrea.ngStrap',
-		'monospaced.qrcode'
-	]);
+		'monospaced.qrcode',
+		'app.jsons', 'app.apis', 'app.directives', 'app.services',
+		'app.controllers', 'app.filters'
 
+	]);
 
 	//'jqwidgets', 
 	return app;
