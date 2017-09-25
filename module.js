@@ -1526,13 +1526,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 				});
 
-			};
-
-			//延迟否则影响shoppingcart 显示
-			setTimeout(function() {
-				rootScope.loadFastShoppingcart();
-			}, 3000);
-
+			}; 
 		};
 
 		this.initMainitems = function(rootScope) {
@@ -2035,6 +2029,7 @@ define('controllers/articleCtrl',['require', './module'], function(require, modu
 			$templateCache.put('article.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		var content = articlecontentJson.get($stateParams.id, false, $rootScope.bust);
 		$templateCache.put('content.html', content);
@@ -2060,6 +2055,7 @@ define('controllers/errorCtrl',['require', './module'], function(require, module
 			$templateCache.put('error.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -2111,6 +2107,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 			$templateCache.put('mkgdispgroup.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.fetch = function(pg) {
 			if(!_.isNumber(pg)) {
@@ -2231,6 +2228,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 			$templateCache.put('mkgpgmarticle.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.appendSuit = function(mainitem) {
 			var promises = [];
@@ -2310,6 +2308,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 			$templateCache.put('mkgpgm.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.fetch = function(pg) {
 			if(!_.isNumber(pg)) {
@@ -2417,6 +2416,7 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			$templateCache.put('mainitem.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.loadSuccessHandle = function() {
 
@@ -2466,6 +2466,7 @@ define('controllers/itemsearchCtrl',['require', './module'], function(require, m
 			$templateCache.put('itemsearch.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -2492,6 +2493,7 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 			$templateCache.put('login.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.user = {
 			id: null,
@@ -2562,6 +2564,7 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 			$templateCache.put('member.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -2577,7 +2580,7 @@ define('controllers/salesorderCtrl',['require', './module'], function(require, m
 	 * /order/:template/:pk
 	 */
 	module.controller('salesorderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		salesorderApi, shoppingcartApi, member2addrApi, mainitemJson, initctrlSvc, dialogSvc) {
+		salesorderApi, shoppingcartApi, member2addrApi, mainitemJson, initctrlSvc, dialogSvc, mockidentify) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('salesorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
@@ -2589,6 +2592,8 @@ define('controllers/salesorderCtrl',['require', './module'], function(require, m
 			$templateCache.put('salesorder.html', '');
 			return;
 		}
+
+		$rootScope.loadFastShoppingcart();
 
 		$scope.addresslist = [];
 		$scope.salesorder = null;
@@ -2701,7 +2706,12 @@ define('controllers/salesorderCtrl',['require', './module'], function(require, m
 
 		};
 
-		$scope.load();
+		if(mockidentify !== null) {
+
+		} else {
+			$scope.load();
+		}
+
 		$rootScope.loadImg();
 
 	});
@@ -2802,6 +2812,7 @@ define('controllers/shoppingcartadditemCtrl',['require', './module'], function(r
 				shoppingcartApi.saveorupdate(shoppingcart).then(function(d) {
 
 					$scope.state = 1;
+					$rootScope.loadFastShoppingcart();
 
 				}, function(err) {
 					$scope.state = 2;
@@ -2842,6 +2853,7 @@ define('controllers/shoppingcartCtrl',['require', './module'], function(require,
 			$templateCache.put('shoppingcart.html', '');
 			return;
 		}
+		
 
 		$scope.remove = function(line) {
 
@@ -2957,6 +2969,8 @@ define('controllers/shoppingcartCtrl',['require', './module'], function(require,
 
 				$rootScope.loadMainitems(data.lines, 'mainitems');
 				$scope.shoppingcart = data;
+				
+				//$rootScope.loadFastShoppingcart();
 
 			}, function(err) {
 
@@ -2967,6 +2981,88 @@ define('controllers/shoppingcartCtrl',['require', './module'], function(require,
 
 		$scope.load();
 		$rootScope.loadImg();
+
+	});
+
+});
+define('controllers/presalesorderCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	/*
+	 * /order/:template/:pk
+	 */
+	module.controller('presalesorderCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		salesorderApi, shoppingcartApi, member2addrApi, mainitemJson, initctrlSvc, dialogSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('presalesorder' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: true,
+			isAsync: false
+		});
+
+		if(!isload) {
+			$templateCache.put('presalesorder.html', '');
+			return;
+		}
+	 
+
+	});
+
+});
+define('controllers/preshoppingcartadditemCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	/*
+	 * 添加到购物车
+	 * /preshoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty
+	 * 
+	 */
+	module.controller('preshoppingcartadditemCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		shoppingcartApi, mainitemJson, mainitemSvc, initctrlSvc, dialogSvc, languageSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('preshoppingcartadditem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
+		if(!isload) {
+
+			$templateCache.put('preshoppingcartadditem.html', '');
+			return;
+		}
+
+	 
+
+	});
+
+});
+define('controllers/preshoppingcartCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	/*
+	 * pk和ver不一致就刷新 
+	 */
+	module.controller('preshoppingcartCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
+		shoppingcartApi, salesorderApi, mainitemJson, initctrlSvc, dialogSvc, languageSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('preshoppingcart' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: false
+		});
+
+		if(!isload) {
+
+			$templateCache.put('preshoppingcart.html', '');
+			return;
+		}
 
 	});
 
@@ -2990,6 +3086,7 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 			$templateCache.put('orderpay.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -3015,6 +3112,7 @@ define('controllers/orderconfirmsuccessCtrl',['require', './module'], function(r
 			$templateCache.put('orderconfirmsuccess.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.load = function() {
 
@@ -3063,6 +3161,7 @@ define('controllers/orderpaysuccessCtrl',['require', './module'], function(requi
 			$templateCache.put('orderpaysuccess.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -3089,6 +3188,7 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 			$templateCache.put('regist.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.user = {
 			id: null,
@@ -3171,6 +3271,7 @@ define('controllers/infoCtrl',['require', './module'], function(require, module)
 			$templateCache.put('info.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.message = $stateParams.message;
 
@@ -3198,6 +3299,7 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 			$templateCache.put('actionauth.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.actionauth = {
 			actiontype: $stateParams.actiontype,
@@ -3272,6 +3374,7 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 			$templateCache.put('changepassword.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.md = {
 			actionauthpk: $stateParams.actionauthpk,
@@ -3415,6 +3518,7 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 			$templateCache.put('memberaddresslist.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.addresslist = [];
 
@@ -3481,6 +3585,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 			$templateCache.put('memberaddressmodify.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.address = {
 			addrtype: null,
@@ -3737,6 +3842,7 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 			$templateCache.put('memberbrowse.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.browses = [];
 
@@ -3866,6 +3972,7 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 			$templateCache.put('memberfollow.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$scope.follows = [];
 
@@ -3993,6 +4100,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 			$templateCache.put('membermodify.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		memberinfoApi.get().then(function(data) {
 
@@ -4072,6 +4180,7 @@ define('controllers/memberorderlistCtrl',['require', './module'], function(requi
 			$templateCache.put('memberorderlist.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -4097,6 +4206,7 @@ define('controllers/membermessageCtrl',['require', './module'], function(require
 			$templateCache.put('membermessage.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -4122,6 +4232,7 @@ define('controllers/memberorderCtrl',['require', './module'], function(require, 
 			$templateCache.put('memberorder.html', '');
 			return;
 		}
+		$rootScope.loadFastShoppingcart();
 
 		$rootScope.loadImg();
 
@@ -4130,9 +4241,9 @@ define('controllers/memberorderCtrl',['require', './module'], function(require, 
 });
 define('controllers/main',['./articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
 		'./mainitemCtrl', './itemsearchCtrl', './loginCtrl', './memberCtrl',
-		'./salesorderCtrl',
+		'./salesorderCtrl','./shoppingcartadditemCtrl', './shoppingcartCtrl',
+		'./presalesorderCtrl','./preshoppingcartadditemCtrl', './preshoppingcartCtrl',
 		
-		'./shoppingcartadditemCtrl', './shoppingcartCtrl',
 		'./orderpayCtrl', './orderconfirmsuccessCtrl', './orderpaysuccessCtrl',
 		
 		'./registCtrl', './loadCtrl', './infoCtrl', './actionauthCtrl', './changepasswordCtrl',

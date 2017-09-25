@@ -70,6 +70,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'salesorder.html'" + '"></div>';
 				},
 				controller: 'salesorderCtrl'
+			}).state('presalesorder', {
+				url: '/presalesorder/:template/:pk',
+				template: function() {
+					return '<div ng-include="' + "'presalesorder.html'" + '"></div>';
+				},
+				controller: 'presalesorderCtrl'
 			}).state('orderpay', {
 				url: '/orderpay/:template',
 				template: function() {
@@ -82,12 +88,24 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'shoppingcart.html'" + '"></div>';
 				},				
 				controller: 'shoppingcartCtrl'
+			}).state('preshoppingcart', {
+				url: '/preshoppingcart/:template',
+				template: function() {
+					return '<div ng-include="' + "'preshoppingcart.html'" + '"></div>';
+				},				
+				controller: 'preshoppingcartCtrl'
 			}).state('shoppingcartadditem', {
 				url: '/shoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty',
 				template: function() {
 					return '<div ng-include="' + "'shoppingcartadditem.html'" + '"></div>';
 				},
 				controller: 'shoppingcartadditemCtrl'
+			}).state('preshoppingcartadditem', {
+				url: '/preshoppingcartadditem/:template/:mainitemno/:prodspec1/:prodspec2/:shoppingqty',
+				template: function() {
+					return '<div ng-include="' + "'preshoppingcartadditem.html'" + '"></div>';
+				},
+				controller: 'preshoppingcartadditemCtrl'
 			}).state('mkgpgm', {
 				url: '/mkgpgm/:template/:id/:page',
 				template: function() {
