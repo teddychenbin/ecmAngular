@@ -11,7 +11,7 @@ define(['require'], function(require) {
 				},
 				controller: 'loadCtrl'
 			}).state('error', {
-				url: '/error/:template',
+				url: '/error/:template/:message',
 				template: function() {
 					return '<div ng-include="' + "'error.html'" + '"></div>';
 				},
@@ -46,6 +46,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'itemsearch.html'" + '"></div>';
 				},
 				controller: 'itemsearchCtrl'
+			}).state('itemsearchlist', {
+				url: '/itemsearchlist/:template/:value/:page',
+				template: function() {
+					return '<div ng-include="' + "'itemsearchlist.html'" + '"></div>';
+				},
+				controller: 'itemsearchlistCtrl'
 			}).state('login', {
 				url: '/login/:template',
 				template: function() {
@@ -64,6 +70,24 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'member.html'" + '"></div>';
 				},
 				controller: 'memberCtrl'
+			}).state('memberbalancelist', {
+				url: '/memberbalancelist/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberbalancelist.html'" + '"></div>';
+				},
+				controller: 'memberbalancelistCtrl'
+			}).state('membercouponlist', {
+				url: '/membercouponlist/:template',
+				template: function() {
+					return '<div ng-include="' + "'membercouponlist.html'" + '"></div>';
+				},
+				controller: 'membercouponlistCtrl'
+			}).state('memberintegrallist', {
+				url: '/memberintegrallist/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberintegrallist.html'" + '"></div>';
+				},
+				controller: 'memberintegrallistCtrl'
 			}).state('salesorder', {
 				url: '/salesorder/:template/:pk',
 				template: function() {
@@ -142,6 +166,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'bindingemail.html'" + '"></div>';
 				},
 				controller: 'bindingemailCtrl'
+			}).state('bindingphone', {
+				url: '/bindingphone/:template',
+				template: function() {
+					return '<div ng-include="' + "'bindingphone.html'" + '"></div>';
+				},
+				controller: 'bindingphoneCtrl'
 			}).state('memberaddresslist', {
 				url: '/memberaddresslist/:template',
 				template: function() {
@@ -178,6 +208,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'memberorderlist.html'" + '"></div>';
 				},
 				controller: 'memberorderlistCtrl'
+			}).state('memberrepairlist', {
+				url: '/memberrepairlist/:template',
+				template: function() {
+					return '<div ng-include="' + "'memberrepairlist.html'" + '"></div>';
+				},
+				controller: 'memberrepairlistCtrl'
 			}).state('membermessage', {
 				url: '/membermessage/:template',
 				template: function() {
@@ -185,11 +221,23 @@ define(['require'], function(require) {
 				},
 				controller: 'membermessageCtrl'
 			}).state('memberorder', {
-				url: '/memberorder/:template',
+				url: '/memberorder/:template/:pk',
 				template: function() {
 					return '<div ng-include="' + "'memberorder.html'" + '"></div>';
 				},
 				controller: 'memberorderCtrl'
+			}).state('memberrepair', {
+				url: '/memberrepair/:template/:pk',
+				template: function() {
+					return '<div ng-include="' + "'memberrepair.html'" + '"></div>';
+				},
+				controller: 'memberrepairCtrl'
+			}).state('wechatpay', {
+				url: '/wechatpay/:template/:pk',
+				template: function() {
+					return '<div ng-include="' + "'wechatpay.html'" + '"></div>';
+				},
+				controller: 'wechatpayCtrl'
 			}).state('orderconfirmsuccess', {
 				url: '/orderconfirmsuccess/:template/:pk',
 				template: function() {
