@@ -106,17 +106,21 @@ define('jsons/configJson',['require', './module'], function(require, module) {
 	module.service('configJson', function($http, $q, jsonhost) {
 
 		this.get = function(bust) {
-			var deferred = $q.defer();
-			$http({
+
+			var result = "";
+			$.ajax({
 				url: jsonhost + '/config/config.json?bust' + bust,
-				method: 'get'
-			}).then(function(result) {
-				deferred.resolve(result.data);
-			}).catch(function(result) {
-				console.error(result);
-				deferred.reject(result);
+				cache: false,
+				async: false,
+				type: "get",
+				dataType: 'json',
+				success: function(data) {
+					result = data;
+				}
 			});
-			return deferred.promise;
+
+			return angular.fromJson(result);
+
 		};
 
 	});
@@ -408,2691 +412,40 @@ define('jsons/countryphoneprefixJson',['require', './module'], function(require,
 
 	module.service('countryphoneprefixJson', function($http, $q, jsonhost, lanuage) {
 
-		this.get = function() {
-
+		this.get = function(bust) {
+			var result = "";
 			if(lanuage === 'zh-TW') {
-				return [{
-						"callingcode": "975",
-						"countrycode": "BT",
-						"value": "BT",
-						"content": "不丹 +975"
-					},
-					{
-						"callingcode": "670",
-						"countrycode": "TL",
-						"value": "TL",
-						"content": "東帝汶 +670"
-					},
-					{
-						"callingcode": "86",
-						"countrycode": "CN",
-						"value": "CN",
-						"content": "中國大陸 +86"
-					},
-					{
-						"callingcode": "236",
-						"countrycode": "CF",
-						"value": "CF",
-						"content": "中非共和國 +236"
-					},
-					{
-						"callingcode": "45",
-						"countrycode": "DK",
-						"value": "DK",
-						"content": "丹麥 +45"
-					},
-					{
-						"callingcode": "380",
-						"countrycode": "UA",
-						"value": "UA",
-						"content": "烏克蘭 +380"
-					},
-					{
-						"callingcode": "998",
-						"countrycode": "UZ",
-						"value": "UZ",
-						"content": "烏茲別克斯坦 +998"
-					},
-					{
-						"callingcode": "256",
-						"countrycode": "UG",
-						"value": "UG",
-						"content": "烏干達 +256"
-					},
-					{
-						"callingcode": "598",
-						"countrycode": "UY",
-						"value": "UY",
-						"content": "烏拉圭 +598"
-					},
-					{
-						"callingcode": "235",
-						"countrycode": "TD",
-						"value": "TD",
-						"content": "乍得 +235"
-					},
-					{
-						"callingcode": "967",
-						"countrycode": "YE",
-						"value": "YE",
-						"content": "葉門 +967"
-					},
-					{
-						"callingcode": "374",
-						"countrycode": "AM",
-						"value": "AM",
-						"content": "亞美尼亞 +374"
-					},
-					{
-						"callingcode": "972",
-						"countrycode": "IL",
-						"value": "IL",
-						"content": "以色列 +972"
-					},
-					{
-						"callingcode": "964",
-						"countrycode": "IQ",
-						"value": "IQ",
-						"content": "伊拉克 +964"
-					},
-					{
-						"callingcode": "98",
-						"countrycode": "IR",
-						"value": "IR",
-						"content": "伊朗 +98"
-					},
-					{
-						"callingcode": "501",
-						"countrycode": "BZ",
-						"value": "BZ",
-						"content": "伯利茲 +501"
-					},
-					{
-						"callingcode": "238",
-						"countrycode": "CV",
-						"value": "CV",
-						"content": "佛得角 +238"
-					},
-					{
-						"callingcode": "7",
-						"countrycode": "RU",
-						"value": "RU",
-						"content": "俄羅斯 +7"
-					},
-					{
-						"callingcode": "359",
-						"countrycode": "BG",
-						"value": "BG",
-						"content": "保加利亞 +359"
-					},
-					{
-						"callingcode": "385",
-						"countrycode": "HR",
-						"value": "HR",
-						"content": "克羅地亞 +385"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "GU",
-						"value": "GU",
-						"content": "關島 +1"
-					},
-					{
-						"callingcode": "220",
-						"countrycode": "GM",
-						"value": "GM",
-						"content": "岡比亞 +220"
-					},
-					{
-						"callingcode": "354",
-						"countrycode": "IS",
-						"value": "IS",
-						"content": "冰島 +354"
-					},
-					{
-						"callingcode": "224",
-						"countrycode": "GN",
-						"value": "GN",
-						"content": "幾內亞 +224"
-					},
-					{
-						"callingcode": "245",
-						"countrycode": "GW",
-						"value": "GW",
-						"content": "幾內亞比紹 +245"
-					},
-					{
-						"callingcode": "423",
-						"countrycode": "LI",
-						"value": "LI",
-						"content": "列支敦士登 +423"
-					},
-					{
-						"callingcode": "242",
-						"countrycode": "CG",
-						"value": "CG",
-						"content": "剛果 +242"
-					},
-					{
-						"callingcode": "243",
-						"countrycode": "CD",
-						"value": "CD",
-						"content": "剛果（金） +243"
-					},
-					{
-						"callingcode": "218",
-						"countrycode": "LY",
-						"value": "LY",
-						"content": "利比亞 +218"
-					},
-					{
-						"callingcode": "231",
-						"countrycode": "LR",
-						"value": "LR",
-						"content": "利比理亞 +231"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "CA",
-						"value": "CA",
-						"content": "加拿大 +1"
-					},
-					{
-						"callingcode": "233",
-						"countrycode": "GH",
-						"value": "GH",
-						"content": "加納 +233"
-					},
-					{
-						"callingcode": "241",
-						"countrycode": "GA",
-						"value": "GA",
-						"content": "加蓬 +241"
-					},
-					{
-						"callingcode": "36",
-						"countrycode": "HU",
-						"value": "HU",
-						"content": "匈牙利 +36"
-					},
-					{
-						"callingcode": "211",
-						"countrycode": "SS",
-						"value": "SS",
-						"content": "南蘇丹 +211"
-					},
-					{
-						"callingcode": "27",
-						"countrycode": "ZA",
-						"value": "ZA",
-						"content": "南非 +27"
-					},
-					{
-						"callingcode": "267",
-						"countrycode": "BW",
-						"value": "BW",
-						"content": "博茨瓦納 +267"
-					},
-					{
-						"callingcode": "974",
-						"countrycode": "QA",
-						"value": "QA",
-						"content": "卡塔爾 +974"
-					},
-					{
-						"callingcode": "250",
-						"countrycode": "RW",
-						"value": "RW",
-						"content": "盧旺達 +250"
-					},
-					{
-						"callingcode": "352",
-						"countrycode": "LU",
-						"value": "LU",
-						"content": "盧森堡 +352"
-					},
-					{
-						"callingcode": "91",
-						"countrycode": "IN",
-						"value": "IN",
-						"content": "印度 +91"
-					},
-					{
-						"callingcode": "62",
-						"countrycode": "ID",
-						"value": "ID",
-						"content": "印尼 +62"
-					},
-					{
-						"callingcode": "502",
-						"countrycode": "GT",
-						"value": "GT",
-						"content": "瓜地馬拉 +502"
-					},
-					{
-						"callingcode": "593",
-						"countrycode": "EC",
-						"value": "EC",
-						"content": "厄瓜多爾 +593"
-					},
-					{
-						"callingcode": "291",
-						"countrycode": "ER",
-						"value": "ER",
-						"content": "厄立特里亞 +291"
-					},
-					{
-						"callingcode": "963",
-						"countrycode": "SY",
-						"value": "SY",
-						"content": "敘利亞 +963"
-					},
-					{
-						"callingcode": "53",
-						"countrycode": "CU",
-						"value": "CU",
-						"content": "古巴 +53"
-					},
-					{
-						"callingcode": "886",
-						"countrycode": "TW",
-						"value": "TW",
-						"content": "臺灣 +886"
-					},
-					{
-						"callingcode": "996",
-						"countrycode": "KG",
-						"value": "KG",
-						"content": "吉爾吉斯坦 +996"
-					},
-					{
-						"callingcode": "253",
-						"countrycode": "DJ",
-						"value": "DJ",
-						"content": "吉布地 +253"
-					},
-					{
-						"callingcode": "7",
-						"countrycode": "KZ",
-						"value": "KZ",
-						"content": "哈薩克斯坦 +7"
-					},
-					{
-						"callingcode": "57",
-						"countrycode": "CO",
-						"value": "CO",
-						"content": "哥倫比亞 +57"
-					},
-					{
-						"callingcode": "506",
-						"countrycode": "CR",
-						"value": "CR",
-						"content": "哥斯大黎加 +506"
-					},
-					{
-						"callingcode": "237",
-						"countrycode": "CM",
-						"value": "CM",
-						"content": "喀麥隆 +237"
-					},
-					{
-						"callingcode": "688",
-						"countrycode": "TV",
-						"value": "TV",
-						"content": "圖瓦盧 +688"
-					},
-					{
-						"callingcode": "993",
-						"countrycode": "TM",
-						"value": "TM",
-						"content": "土庫曼斯坦 +993"
-					},
-					{
-						"callingcode": "90",
-						"countrycode": "TR",
-						"value": "TR",
-						"content": "土耳其 +90"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "LC",
-						"value": "LC",
-						"content": "聖盧西亞 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "KN",
-						"value": "KN",
-						"content": "聖基茨和尼維斯 +1"
-					},
-					{
-						"callingcode": "239",
-						"countrycode": "ST",
-						"value": "ST",
-						"content": "聖多美及普林西比島 +239"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "VC",
-						"value": "VC",
-						"content": "聖文森特和格林納丁斯群島St.Vincent群島 +1"
-					},
-					{
-						"callingcode": "508",
-						"countrycode": "PM",
-						"value": "PM",
-						"content": "聖皮爾和密克隆島 +508"
-					},
-					{
-						"callingcode": "378",
-						"countrycode": "SM",
-						"value": "SM",
-						"content": "聖馬利諾 +378"
-					},
-					{
-						"callingcode": "592",
-						"countrycode": "GY",
-						"value": "GY",
-						"content": "圭亞那 +592"
-					},
-					{
-						"callingcode": "255",
-						"countrycode": "TZ",
-						"value": "TZ",
-						"content": "坦桑尼亞 +255"
-					},
-					{
-						"callingcode": "20",
-						"countrycode": "EG",
-						"value": "EG",
-						"content": "埃及 +20"
-					},
-					{
-						"callingcode": "251",
-						"countrycode": "ET",
-						"value": "ET",
-						"content": "埃塞俄比亞 +251"
-					},
-					{
-						"callingcode": "686",
-						"countrycode": "KI",
-						"value": "KI",
-						"content": "基裡巴斯 +686"
-					},
-					{
-						"callingcode": "992",
-						"countrycode": "TJ",
-						"value": "TJ",
-						"content": "塔吉克斯坦 +992"
-					},
-					{
-						"callingcode": "221",
-						"countrycode": "SN",
-						"value": "SN",
-						"content": "塞內加爾 +221"
-					},
-					{
-						"callingcode": "381",
-						"countrycode": "RS",
-						"value": "RS",
-						"content": "塞爾維亞 +381"
-					},
-					{
-						"callingcode": "232",
-						"countrycode": "SL",
-						"value": "SL",
-						"content": "塞拉里昂 +232"
-					},
-					{
-						"callingcode": "357",
-						"countrycode": "CY",
-						"value": "CY",
-						"content": "賽普勒斯 +357"
-					},
-					{
-						"callingcode": "248",
-						"countrycode": "SC",
-						"value": "SC",
-						"content": "塞舌耳 +248"
-					},
-					{
-						"callingcode": "52",
-						"countrycode": "MX",
-						"value": "MX",
-						"content": "墨西哥 +52"
-					},
-					{
-						"callingcode": "228",
-						"countrycode": "TG",
-						"value": "TG",
-						"content": "多哥 +228"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "DM",
-						"value": "DM",
-						"content": "多明尼加 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "DO",
-						"value": "DO",
-						"content": "多明尼加共和國 +1"
-					},
-					{
-						"callingcode": "358",
-						"countrycode": "AX",
-						"value": "AX",
-						"content": "奧蘭群島 +358"
-					},
-					{
-						"callingcode": "43",
-						"countrycode": "AT",
-						"value": "AT",
-						"content": "奧地利 +43"
-					},
-					{
-						"callingcode": "58",
-						"countrycode": "VE",
-						"value": "VE",
-						"content": "委內瑞拉 +58"
-					},
-					{
-						"callingcode": "880",
-						"countrycode": "BD",
-						"value": "BD",
-						"content": "孟加拉 +880"
-					},
-					{
-						"callingcode": "244",
-						"countrycode": "AO",
-						"value": "AO",
-						"content": "安哥拉 +244"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "AG",
-						"value": "AG",
-						"content": "安堤瓜及巴爾布達 +1"
-					},
-					{
-						"callingcode": "376",
-						"countrycode": "AD",
-						"value": "AD",
-						"content": "安道爾 +376"
-					},
-					{
-						"callingcode": "691",
-						"countrycode": "FM",
-						"value": "FM",
-						"content": "密克羅尼西亞 +691"
-					},
-					{
-						"callingcode": "505",
-						"countrycode": "NI",
-						"value": "NI",
-						"content": "尼加拉瓜 +505"
-					},
-					{
-						"callingcode": "234",
-						"countrycode": "NG",
-						"value": "NG",
-						"content": "尼日利亞 +234"
-					},
-					{
-						"callingcode": "227",
-						"countrycode": "NE",
-						"value": "NE",
-						"content": "尼日爾 +227"
-					},
-					{
-						"callingcode": "977",
-						"countrycode": "NP",
-						"value": "NP",
-						"content": "尼泊爾 +977"
-					},
-					{
-						"callingcode": "970",
-						"countrycode": "PS",
-						"value": "PS",
-						"content": "巴勒斯坦 +970"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "BS",
-						"value": "BS",
-						"content": "巴哈馬 +1"
-					},
-					{
-						"callingcode": "92",
-						"countrycode": "PK",
-						"value": "PK",
-						"content": "巴基斯坦 +92"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "BB",
-						"value": "BB",
-						"content": "巴巴多斯 +1"
-					},
-					{
-						"callingcode": "675",
-						"countrycode": "PG",
-						"value": "PG",
-						"content": "巴布亞新磯內亞 +675"
-					},
-					{
-						"callingcode": "595",
-						"countrycode": "PY",
-						"value": "PY",
-						"content": "巴拉圭 +595"
-					},
-					{
-						"callingcode": "507",
-						"countrycode": "PA",
-						"value": "PA",
-						"content": "巴拿馬 +507"
-					},
-					{
-						"callingcode": "973",
-						"countrycode": "BH",
-						"value": "BH",
-						"content": "巴林 +973"
-					},
-					{
-						"callingcode": "55",
-						"countrycode": "BR",
-						"value": "BR",
-						"content": "巴西 +55"
-					},
-					{
-						"callingcode": "226",
-						"countrycode": "BF",
-						"value": "BF",
-						"content": "伯基納法索 +226"
-					},
-					{
-						"callingcode": "257",
-						"countrycode": "BI",
-						"value": "BI",
-						"content": "布隆迪 +257"
-					},
-					{
-						"callingcode": "30",
-						"countrycode": "GR",
-						"value": "GR",
-						"content": "希臘 +30"
-					},
-					{
-						"callingcode": "680",
-						"countrycode": "PW",
-						"value": "PW",
-						"content": "帕勞群島 +680"
-					},
-					{
-						"callingcode": "682",
-						"countrycode": "CK",
-						"value": "CK",
-						"content": "科克群島 +682"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "KY",
-						"value": "KY",
-						"content": "開曼群島 +1"
-					},
-					{
-						"callingcode": "49",
-						"countrycode": "DE",
-						"value": "DE",
-						"content": "德國 +49"
-					},
-					{
-						"callingcode": "39",
-						"countrycode": "IT",
-						"value": "IT",
-						"content": "義大利 +39"
-					},
-					{
-						"callingcode": "677",
-						"countrycode": "SB",
-						"value": "SB",
-						"content": "所羅門群島 +677"
-					},
-					{
-						"callingcode": "371",
-						"countrycode": "LV",
-						"value": "LV",
-						"content": "拉脫維亞 +371"
-					},
-					{
-						"callingcode": "47",
-						"countrycode": "NO",
-						"value": "NO",
-						"content": "挪威 +47"
-					},
-					{
-						"callingcode": "420",
-						"countrycode": "CZ",
-						"value": "CZ",
-						"content": "捷克共和國 +420"
-					},
-					{
-						"callingcode": "373",
-						"countrycode": "MD",
-						"value": "MD",
-						"content": "莫爾達瓦 +373"
-					},
-					{
-						"callingcode": "212",
-						"countrycode": "MA",
-						"value": "MA",
-						"content": "摩洛哥 +212"
-					},
-					{
-						"callingcode": "377",
-						"countrycode": "MC",
-						"value": "MC",
-						"content": "摩納哥 +377"
-					},
-					{
-						"callingcode": "673",
-						"countrycode": "BN",
-						"value": "BN",
-						"content": "汶萊 +673"
-					},
-					{
-						"callingcode": "679",
-						"countrycode": "FJ",
-						"value": "FJ",
-						"content": "斐濟 +679"
-					},
-					{
-						"callingcode": "268",
-						"countrycode": "SZ",
-						"value": "SZ",
-						"content": "斯威士蘭 +268"
-					},
-					{
-						"callingcode": "421",
-						"countrycode": "SK",
-						"value": "SK",
-						"content": "斯洛伐克 +421"
-					},
-					{
-						"callingcode": "386",
-						"countrycode": "SI",
-						"value": "SI",
-						"content": "斯洛文尼亞 +386"
-					},
-					{
-						"callingcode": "94",
-						"countrycode": "LK",
-						"value": "LK",
-						"content": "斯里蘭卡 +94"
-					},
-					{
-						"callingcode": "65",
-						"countrycode": "SG",
-						"value": "SG",
-						"content": "新加坡 +65"
-					},
-					{
-						"callingcode": "687",
-						"countrycode": "NC",
-						"value": "NC",
-						"content": "新赫里多尼亞 +687"
-					},
-					{
-						"callingcode": "64",
-						"countrycode": "NZ",
-						"value": "NZ",
-						"content": "新西蘭 +64"
-					},
-					{
-						"callingcode": "81",
-						"countrycode": "JP",
-						"value": "JP",
-						"content": "日本 +81"
-					},
-					{
-						"callingcode": "56",
-						"countrycode": "CL",
-						"value": "CL",
-						"content": "智利 +56"
-					},
-					{
-						"callingcode": "850",
-						"countrycode": "KP",
-						"value": "KP",
-						"content": "朝鮮 +850"
-					},
-					{
-						"callingcode": "855",
-						"countrycode": "KH",
-						"value": "KH",
-						"content": "柬埔寨 +855"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "GD",
-						"value": "GD",
-						"content": "格林伍德 +1"
-					},
-					{
-						"callingcode": "299",
-						"countrycode": "GL",
-						"value": "GL",
-						"content": "格陵蘭島 +299"
-					},
-					{
-						"callingcode": "995",
-						"countrycode": "GE",
-						"value": "GE",
-						"content": "格魯吉亞 +995"
-					},
-					{
-						"callingcode": "32",
-						"countrycode": "BE",
-						"value": "BE",
-						"content": "比利時 +32"
-					},
-					{
-						"callingcode": "222",
-						"countrycode": "MR",
-						"value": "MR",
-						"content": "茅利塔尼亞 +222"
-					},
-					{
-						"callingcode": "230",
-						"countrycode": "MU",
-						"value": "MU",
-						"content": "毛里求斯 +230"
-					},
-					{
-						"callingcode": "676",
-						"countrycode": "TO",
-						"value": "TO",
-						"content": "湯加 +676"
-					},
-					{
-						"callingcode": "966",
-						"countrycode": "SA",
-						"value": "SA",
-						"content": "沙烏地阿拉伯 +966"
-					},
-					{
-						"callingcode": "33",
-						"countrycode": "FR",
-						"value": "FR",
-						"content": "法國 +33"
-					},
-					{
-						"callingcode": "594",
-						"countrycode": "GF",
-						"value": "GF",
-						"content": "法屬圭亞那 +594"
-					},
-					{
-						"callingcode": "689",
-						"countrycode": "PF",
-						"value": "PF",
-						"content": "法屬波利尼西亞 +689"
-					},
-					{
-						"callingcode": "298",
-						"countrycode": "FO",
-						"value": "FO",
-						"content": "法羅群島 +298"
-					},
-					{
-						"callingcode": "48",
-						"countrycode": "PL",
-						"value": "PL",
-						"content": "波蘭 +48"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "PR",
-						"value": "PR",
-						"content": "波多黎各 +1"
-					},
-					{
-						"callingcode": "387",
-						"countrycode": "BA",
-						"value": "BA",
-						"content": "波黑 +387"
-					},
-					{
-						"callingcode": "66",
-						"countrycode": "TH",
-						"value": "TH",
-						"content": "泰國 +66"
-					},
-					{
-						"callingcode": "263",
-						"countrycode": "ZW",
-						"value": "ZW",
-						"content": "辛巴威 +263"
-					},
-					{
-						"callingcode": "504",
-						"countrycode": "HN",
-						"value": "HN",
-						"content": "洪都拉斯 +504"
-					},
-					{
-						"callingcode": "509",
-						"countrycode": "HT",
-						"value": "HT",
-						"content": "海地 +509"
-					},
-					{
-						"callingcode": "61",
-						"countrycode": "AU",
-						"value": "AU",
-						"content": "澳大利亞 +61"
-					},
-					{
-						"callingcode": "853",
-						"countrycode": "MO",
-						"value": "MO",
-						"content": "澳門 +853"
-					},
-					{
-						"callingcode": "353",
-						"countrycode": "IE",
-						"value": "IE",
-						"content": "愛爾蘭 +353"
-					},
-					{
-						"callingcode": "372",
-						"countrycode": "EE",
-						"value": "EE",
-						"content": "愛沙尼亞 +372"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "JM",
-						"value": "JM",
-						"content": "牙買加 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "TC",
-						"value": "TC",
-						"content": "特克斯和凱科斯群島 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "TT",
-						"value": "TT",
-						"content": "特立尼達和多巴哥 +1"
-					},
-					{
-						"callingcode": "591",
-						"countrycode": "BO",
-						"value": "BO",
-						"content": "玻利維亞 +591"
-					},
-					{
-						"callingcode": "674",
-						"countrycode": "NR",
-						"value": "NR",
-						"content": "瑙魯 +674"
-					},
-					{
-						"callingcode": "46",
-						"countrycode": "SE",
-						"value": "SE",
-						"content": "瑞典 +46"
-					},
-					{
-						"callingcode": "41",
-						"countrycode": "CH",
-						"value": "CH",
-						"content": "瑞士 +41"
-					},
-					{
-						"callingcode": "590",
-						"countrycode": "GP",
-						"value": "GP",
-						"content": "瓜德羅普島 +590"
-					},
-					{
-						"callingcode": "678",
-						"countrycode": "VU",
-						"value": "VU",
-						"content": "瓦努阿圖 +678"
-					},
-					{
-						"callingcode": "262",
-						"countrycode": "RE",
-						"value": "RE",
-						"content": "留尼旺島 +262"
-					},
-					{
-						"callingcode": "375",
-						"countrycode": "BY",
-						"value": "BY",
-						"content": "白俄羅斯 +375"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "BM",
-						"value": "BM",
-						"content": "百慕大 +1"
-					},
-					{
-						"callingcode": "350",
-						"countrycode": "GI",
-						"value": "GI",
-						"content": "直布羅陀 +350"
-					},
-					{
-						"callingcode": "500",
-						"countrycode": "FK",
-						"value": "FK",
-						"content": "福克蘭群島（瑪律維納斯） +500"
-					},
-					{
-						"callingcode": "965",
-						"countrycode": "KW",
-						"value": "KW",
-						"content": "科威特 +965"
-					},
-					{
-						"callingcode": "269",
-						"countrycode": "KM",
-						"value": "KM",
-						"content": "科摩羅 +269"
-					},
-					{
-						"callingcode": "225",
-						"countrycode": "CI",
-						"value": "CI",
-						"content": "象牙海岸 +225"
-					},
-					{
-						"callingcode": "51",
-						"countrycode": "PE",
-						"value": "PE",
-						"content": "秘魯 +51"
-					},
-					{
-						"callingcode": "216",
-						"countrycode": "TN",
-						"value": "TN",
-						"content": "突尼斯 +216"
-					},
-					{
-						"callingcode": "370",
-						"countrycode": "LT",
-						"value": "LT",
-						"content": "立陶宛 +370"
-					},
-					{
-						"callingcode": "252",
-						"countrycode": "SO",
-						"value": "SO",
-						"content": "索馬里 +252"
-					},
-					{
-						"callingcode": "962",
-						"countrycode": "JO",
-						"value": "JO",
-						"content": "約旦 +962"
-					},
-					{
-						"callingcode": "264",
-						"countrycode": "NA",
-						"value": "NA",
-						"content": "納米比亞 +264"
-					},
-					{
-						"callingcode": "683",
-						"countrycode": "NU",
-						"value": "NU",
-						"content": "紐埃島 +683"
-					},
-					{
-						"callingcode": "95",
-						"countrycode": "MM",
-						"value": "MM",
-						"content": "緬甸 +95"
-					},
-					{
-						"callingcode": "40",
-						"countrycode": "RO",
-						"value": "RO",
-						"content": "羅馬尼亞 +40"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "US",
-						"value": "US",
-						"content": "美國 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "VI",
-						"value": "VI",
-						"content": "美屬維爾京群島 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "AS",
-						"value": "AS",
-						"content": "美屬薩摩亞 +1"
-					},
-					{
-						"callingcode": "856",
-						"countrycode": "LA",
-						"value": "LA",
-						"content": "老撾 +856"
-					},
-					{
-						"callingcode": "254",
-						"countrycode": "KE",
-						"value": "KE",
-						"content": "肯雅 +254"
-					},
-					{
-						"callingcode": "358",
-						"countrycode": "FI",
-						"value": "FI",
-						"content": "芬蘭 +358"
-					},
-					{
-						"callingcode": "249",
-						"countrycode": "SD",
-						"value": "SD",
-						"content": "蘇丹 +249"
-					},
-					{
-						"callingcode": "597",
-						"countrycode": "SR",
-						"value": "SR",
-						"content": "蘇里南 +597"
-					},
-					{
-						"callingcode": "44",
-						"countrycode": "GB",
-						"value": "GB",
-						"content": "英國 +44"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "VG",
-						"value": "VG",
-						"content": "英屬維京群島 +1"
-					},
-					{
-						"callingcode": "31",
-						"countrycode": "NL",
-						"value": "NL",
-						"content": "荷蘭 +31"
-					},
-					{
-						"callingcode": "0",
-						"countrycode": "AN",
-						"value": "AN",
-						"content": "荷屬安的列斯 +0"
-					},
-					{
-						"callingcode": "258",
-						"countrycode": "MZ",
-						"value": "MZ",
-						"content": "莫三比克 +258"
-					},
-					{
-						"callingcode": "266",
-						"countrycode": "LS",
-						"value": "LS",
-						"content": "萊索托 +266"
-					},
-					{
-						"callingcode": "63",
-						"countrycode": "PH",
-						"value": "PH",
-						"content": "菲律賓 +63"
-					},
-					{
-						"callingcode": "503",
-						"countrycode": "SV",
-						"value": "SV",
-						"content": "薩爾瓦多 +503"
-					},
-					{
-						"callingcode": "685",
-						"countrycode": "WS",
-						"value": "WS",
-						"content": "薩摩亞群島 +685"
-					},
-					{
-						"callingcode": "351",
-						"countrycode": "PT",
-						"value": "PT",
-						"content": "葡萄牙 +351"
-					},
-					{
-						"callingcode": "976",
-						"countrycode": "MN",
-						"value": "MN",
-						"content": "蒙古 +976"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "MS",
-						"value": "MS",
-						"content": "蒙特塞拉特島 +1"
-					},
-					{
-						"callingcode": "34",
-						"countrycode": "ES",
-						"value": "ES",
-						"content": "西班牙 +34"
-					},
-					{
-						"callingcode": "672",
-						"countrycode": "NF",
-						"value": "NF",
-						"content": "諾福克島 +672"
-					},
-					{
-						"callingcode": "229",
-						"countrycode": "BJ",
-						"value": "BJ",
-						"content": "貝寧 +229"
-					},
-					{
-						"callingcode": "260",
-						"countrycode": "ZM",
-						"value": "ZM",
-						"content": "尚比亞 +260"
-					},
-					{
-						"callingcode": "240",
-						"countrycode": "GQ",
-						"value": "GQ",
-						"content": "赤道幾內亞 +240"
-					},
-					{
-						"callingcode": "84",
-						"countrycode": "VN",
-						"value": "VN",
-						"content": "越南 +84"
-					},
-					{
-						"callingcode": "994",
-						"countrycode": "AZ",
-						"value": "AZ",
-						"content": "阿塞拜疆 +994"
-					},
-					{
-						"callingcode": "93",
-						"countrycode": "AF",
-						"value": "AF",
-						"content": "阿富汗 +93"
-					},
-					{
-						"callingcode": "213",
-						"countrycode": "DZ",
-						"value": "DZ",
-						"content": "阿爾及利亞 +213"
-					},
-					{
-						"callingcode": "355",
-						"countrycode": "AL",
-						"value": "AL",
-						"content": "阿爾巴尼亞 +355"
-					},
-					{
-						"callingcode": "968",
-						"countrycode": "OM",
-						"value": "OM",
-						"content": "阿曼 +968"
-					},
-					{
-						"callingcode": "54",
-						"countrycode": "AR",
-						"value": "AR",
-						"content": "阿根廷 +54"
-					},
-					{
-						"callingcode": "971",
-						"countrycode": "AE",
-						"value": "AE",
-						"content": "阿聯酋 +971"
-					},
-					{
-						"callingcode": "297",
-						"countrycode": "AW",
-						"value": "AW",
-						"content": "阿魯巴島 +297"
-					},
-					{
-						"callingcode": "82",
-						"countrycode": "KR",
-						"value": "KR",
-						"content": "韓國 +82"
-					},
-					{
-						"callingcode": "852",
-						"countrycode": "HK",
-						"value": "HK",
-						"content": "香港 +852"
-					},
-					{
-						"callingcode": "389",
-						"countrycode": "MK",
-						"value": "MK",
-						"content": "馬其頓 +389"
-					},
-					{
-						"callingcode": "960",
-						"countrycode": "MV",
-						"value": "MV",
-						"content": "馬爾代夫 +960"
-					},
-					{
-						"callingcode": "265",
-						"countrycode": "MW",
-						"value": "MW",
-						"content": "馬拉維 +265"
-					},
-					{
-						"callingcode": "596",
-						"countrycode": "MQ",
-						"value": "MQ",
-						"content": "馬提尼克島 +596"
-					},
-					{
-						"callingcode": "60",
-						"countrycode": "MY",
-						"value": "MY",
-						"content": "馬來西亞 +60"
-					},
-					{
-						"callingcode": "692",
-						"countrycode": "MH",
-						"value": "MH",
-						"content": "馬紹爾群島 +692"
-					},
-					{
-						"callingcode": "356",
-						"countrycode": "MT",
-						"value": "MT",
-						"content": "馬爾他 +356"
-					},
-					{
-						"callingcode": "261",
-						"countrycode": "MG",
-						"value": "MG",
-						"content": "馬達加斯加 +261"
-					},
-					{
-						"callingcode": "223",
-						"countrycode": "ML",
-						"value": "ML",
-						"content": "馬里 +223"
-					},
-					{
-						"callingcode": "961",
-						"countrycode": "LB",
-						"value": "LB",
-						"content": "黎巴嫩 +961"
-					},
-					{
-						"callingcode": "382",
-						"countrycode": "ME",
-						"value": "ME",
-						"content": "黑山 +382"
+				
+	 
+				$.ajax({
+					url: jsonhost + '/countryphone/zh-TW.json?bust' + bust,
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'json',
+					success: function(data) {
+						result = data;
 					}
-				];
-
-			} else if(lanuage === 'zh-CN') {
-				return [{
-						"callingcode": "975",
-						"countrycode": "BT",
-						"value": "BT",
-						"content": "不丹 +975"
-					},
-					{
-						"callingcode": "670",
-						"countrycode": "TL",
-						"value": "TL",
-						"content": "东帝汶 +670"
-					},
-					{
-						"callingcode": "86",
-						"countrycode": "CN",
-						"value": "CN",
-						"content": "中国大陆 +86"
-					},
-					{
-						"callingcode": "236",
-						"countrycode": "CF",
-						"value": "CF",
-						"content": "中非共和国 +236"
-					},
-					{
-						"callingcode": "45",
-						"countrycode": "DK",
-						"value": "DK",
-						"content": "丹麦 +45"
-					},
-					{
-						"callingcode": "380",
-						"countrycode": "UA",
-						"value": "UA",
-						"content": "乌克兰 +380"
-					},
-					{
-						"callingcode": "998",
-						"countrycode": "UZ",
-						"value": "UZ",
-						"content": "乌兹别克斯坦 +998"
-					},
-					{
-						"callingcode": "256",
-						"countrycode": "UG",
-						"value": "UG",
-						"content": "乌干达 +256"
-					},
-					{
-						"callingcode": "598",
-						"countrycode": "UY",
-						"value": "UY",
-						"content": "乌拉圭 +598"
-					},
-					{
-						"callingcode": "235",
-						"countrycode": "TD",
-						"value": "TD",
-						"content": "乍得 +235"
-					},
-					{
-						"callingcode": "967",
-						"countrycode": "YE",
-						"value": "YE",
-						"content": "也门 +967"
-					},
-					{
-						"callingcode": "374",
-						"countrycode": "AM",
-						"value": "AM",
-						"content": "亚美尼亚 +374"
-					},
-					{
-						"callingcode": "972",
-						"countrycode": "IL",
-						"value": "IL",
-						"content": "以色列 +972"
-					},
-					{
-						"callingcode": "964",
-						"countrycode": "IQ",
-						"value": "IQ",
-						"content": "伊拉克 +964"
-					},
-					{
-						"callingcode": "98",
-						"countrycode": "IR",
-						"value": "IR",
-						"content": "伊朗 +98"
-					},
-					{
-						"callingcode": "501",
-						"countrycode": "BZ",
-						"value": "BZ",
-						"content": "伯利兹 +501"
-					},
-					{
-						"callingcode": "238",
-						"countrycode": "CV",
-						"value": "CV",
-						"content": "佛得角 +238"
-					},
-					{
-						"callingcode": "7",
-						"countrycode": "RU",
-						"value": "RU",
-						"content": "俄罗斯 +7"
-					},
-					{
-						"callingcode": "359",
-						"countrycode": "BG",
-						"value": "BG",
-						"content": "保加利亚 +359"
-					},
-					{
-						"callingcode": "385",
-						"countrycode": "HR",
-						"value": "HR",
-						"content": "克罗地亚 +385"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "GU",
-						"value": "GU",
-						"content": "关岛 +1"
-					},
-					{
-						"callingcode": "220",
-						"countrycode": "GM",
-						"value": "GM",
-						"content": "冈比亚 +220"
-					},
-					{
-						"callingcode": "354",
-						"countrycode": "IS",
-						"value": "IS",
-						"content": "冰岛 +354"
-					},
-					{
-						"callingcode": "224",
-						"countrycode": "GN",
-						"value": "GN",
-						"content": "几内亚 +224"
-					},
-					{
-						"callingcode": "245",
-						"countrycode": "GW",
-						"value": "GW",
-						"content": "几内亚比绍 +245"
-					},
-					{
-						"callingcode": "423",
-						"countrycode": "LI",
-						"value": "LI",
-						"content": "列支敦士登 +423"
-					},
-					{
-						"callingcode": "242",
-						"countrycode": "CG",
-						"value": "CG",
-						"content": "刚果 +242"
-					},
-					{
-						"callingcode": "243",
-						"countrycode": "CD",
-						"value": "CD",
-						"content": "刚果（金） +243"
-					},
-					{
-						"callingcode": "218",
-						"countrycode": "LY",
-						"value": "LY",
-						"content": "利比亚 +218"
-					},
-					{
-						"callingcode": "231",
-						"countrycode": "LR",
-						"value": "LR",
-						"content": "利比里亚 +231"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "CA",
-						"value": "CA",
-						"content": "加拿大 +1"
-					},
-					{
-						"callingcode": "233",
-						"countrycode": "GH",
-						"value": "GH",
-						"content": "加纳 +233"
-					},
-					{
-						"callingcode": "241",
-						"countrycode": "GA",
-						"value": "GA",
-						"content": "加蓬 +241"
-					},
-					{
-						"callingcode": "36",
-						"countrycode": "HU",
-						"value": "HU",
-						"content": "匈牙利 +36"
-					},
-					{
-						"callingcode": "211",
-						"countrycode": "SS",
-						"value": "SS",
-						"content": "南苏丹 +211"
-					},
-					{
-						"callingcode": "27",
-						"countrycode": "ZA",
-						"value": "ZA",
-						"content": "南非 +27"
-					},
-					{
-						"callingcode": "267",
-						"countrycode": "BW",
-						"value": "BW",
-						"content": "博茨瓦纳 +267"
-					},
-					{
-						"callingcode": "974",
-						"countrycode": "QA",
-						"value": "QA",
-						"content": "卡塔尔 +974"
-					},
-					{
-						"callingcode": "250",
-						"countrycode": "RW",
-						"value": "RW",
-						"content": "卢旺达 +250"
-					},
-					{
-						"callingcode": "352",
-						"countrycode": "LU",
-						"value": "LU",
-						"content": "卢森堡 +352"
-					},
-					{
-						"callingcode": "91",
-						"countrycode": "IN",
-						"value": "IN",
-						"content": "印度 +91"
-					},
-					{
-						"callingcode": "62",
-						"countrycode": "ID",
-						"value": "ID",
-						"content": "印度尼西亚 +62"
-					},
-					{
-						"callingcode": "502",
-						"countrycode": "GT",
-						"value": "GT",
-						"content": "危地马拉 +502"
-					},
-					{
-						"callingcode": "593",
-						"countrycode": "EC",
-						"value": "EC",
-						"content": "厄瓜多尔 +593"
-					},
-					{
-						"callingcode": "291",
-						"countrycode": "ER",
-						"value": "ER",
-						"content": "厄立特里亚 +291"
-					},
-					{
-						"callingcode": "963",
-						"countrycode": "SY",
-						"value": "SY",
-						"content": "叙利亚 +963"
-					},
-					{
-						"callingcode": "53",
-						"countrycode": "CU",
-						"value": "CU",
-						"content": "古巴 +53"
-					},
-					{
-						"callingcode": "886",
-						"countrycode": "TW",
-						"value": "TW",
-						"content": "台湾 +886"
-					},
-					{
-						"callingcode": "996",
-						"countrycode": "KG",
-						"value": "KG",
-						"content": "吉尔吉斯坦 +996"
-					},
-					{
-						"callingcode": "253",
-						"countrycode": "DJ",
-						"value": "DJ",
-						"content": "吉布提 +253"
-					},
-					{
-						"callingcode": "7",
-						"countrycode": "KZ",
-						"value": "KZ",
-						"content": "哈萨克斯坦 +7"
-					},
-					{
-						"callingcode": "57",
-						"countrycode": "CO",
-						"value": "CO",
-						"content": "哥伦比亚 +57"
-					},
-					{
-						"callingcode": "506",
-						"countrycode": "CR",
-						"value": "CR",
-						"content": "哥斯达黎加 +506"
-					},
-					{
-						"callingcode": "237",
-						"countrycode": "CM",
-						"value": "CM",
-						"content": "喀麦隆 +237"
-					},
-					{
-						"callingcode": "688",
-						"countrycode": "TV",
-						"value": "TV",
-						"content": "图瓦卢 +688"
-					},
-					{
-						"callingcode": "993",
-						"countrycode": "TM",
-						"value": "TM",
-						"content": "土库曼斯坦 +993"
-					},
-					{
-						"callingcode": "90",
-						"countrycode": "TR",
-						"value": "TR",
-						"content": "土耳其 +90"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "LC",
-						"value": "LC",
-						"content": "圣卢西亚 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "KN",
-						"value": "KN",
-						"content": "圣基茨和尼维斯 +1"
-					},
-					{
-						"callingcode": "239",
-						"countrycode": "ST",
-						"value": "ST",
-						"content": "圣多美和普林西比 +239"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "VC",
-						"value": "VC",
-						"content": "圣文森特和格林纳丁斯群岛 +1"
-					},
-					{
-						"callingcode": "508",
-						"countrycode": "PM",
-						"value": "PM",
-						"content": "圣皮埃尔和密克隆岛 +508"
-					},
-					{
-						"callingcode": "378",
-						"countrycode": "SM",
-						"value": "SM",
-						"content": "圣马力诺 +378"
-					},
-					{
-						"callingcode": "592",
-						"countrycode": "GY",
-						"value": "GY",
-						"content": "圭亚那 +592"
-					},
-					{
-						"callingcode": "255",
-						"countrycode": "TZ",
-						"value": "TZ",
-						"content": "坦桑尼亚 +255"
-					},
-					{
-						"callingcode": "20",
-						"countrycode": "EG",
-						"value": "EG",
-						"content": "埃及 +20"
-					},
-					{
-						"callingcode": "251",
-						"countrycode": "ET",
-						"value": "ET",
-						"content": "埃塞俄比亚 +251"
-					},
-					{
-						"callingcode": "686",
-						"countrycode": "KI",
-						"value": "KI",
-						"content": "基里巴斯 +686"
-					},
-					{
-						"callingcode": "992",
-						"countrycode": "TJ",
-						"value": "TJ",
-						"content": "塔吉克斯坦 +992"
-					},
-					{
-						"callingcode": "221",
-						"countrycode": "SN",
-						"value": "SN",
-						"content": "塞内加尔 +221"
-					},
-					{
-						"callingcode": "381",
-						"countrycode": "RS",
-						"value": "RS",
-						"content": "塞尔维亚 +381"
-					},
-					{
-						"callingcode": "232",
-						"countrycode": "SL",
-						"value": "SL",
-						"content": "塞拉利昂 +232"
-					},
-					{
-						"callingcode": "357",
-						"countrycode": "CY",
-						"value": "CY",
-						"content": "塞浦路斯 +357"
-					},
-					{
-						"callingcode": "248",
-						"countrycode": "SC",
-						"value": "SC",
-						"content": "塞舌尔 +248"
-					},
-					{
-						"callingcode": "52",
-						"countrycode": "MX",
-						"value": "MX",
-						"content": "墨西哥 +52"
-					},
-					{
-						"callingcode": "228",
-						"countrycode": "TG",
-						"value": "TG",
-						"content": "多哥 +228"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "DM",
-						"value": "DM",
-						"content": "多米尼加 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "DO",
-						"value": "DO",
-						"content": "多米尼加共和国 +1"
-					},
-					{
-						"callingcode": "358",
-						"countrycode": "AX",
-						"value": "AX",
-						"content": "奥兰群岛 +358"
-					},
-					{
-						"callingcode": "43",
-						"countrycode": "AT",
-						"value": "AT",
-						"content": "奥地利 +43"
-					},
-					{
-						"callingcode": "58",
-						"countrycode": "VE",
-						"value": "VE",
-						"content": "委内瑞拉 +58"
-					},
-					{
-						"callingcode": "880",
-						"countrycode": "BD",
-						"value": "BD",
-						"content": "孟加拉国 +880"
-					},
-					{
-						"callingcode": "244",
-						"countrycode": "AO",
-						"value": "AO",
-						"content": "安哥拉 +244"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "AG",
-						"value": "AG",
-						"content": "安提瓜和巴布达 +1"
-					},
-					{
-						"callingcode": "376",
-						"countrycode": "AD",
-						"value": "AD",
-						"content": "安道尔 +376"
-					},
-					{
-						"callingcode": "691",
-						"countrycode": "FM",
-						"value": "FM",
-						"content": "密克罗尼西亚 +691"
-					},
-					{
-						"callingcode": "505",
-						"countrycode": "NI",
-						"value": "NI",
-						"content": "尼加拉瓜 +505"
-					},
-					{
-						"callingcode": "234",
-						"countrycode": "NG",
-						"value": "NG",
-						"content": "尼日利亚 +234"
-					},
-					{
-						"callingcode": "227",
-						"countrycode": "NE",
-						"value": "NE",
-						"content": "尼日尔 +227"
-					},
-					{
-						"callingcode": "977",
-						"countrycode": "NP",
-						"value": "NP",
-						"content": "尼泊尔 +977"
-					},
-					{
-						"callingcode": "970",
-						"countrycode": "PS",
-						"value": "PS",
-						"content": "巴勒斯坦 +970"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "BS",
-						"value": "BS",
-						"content": "巴哈马 +1"
-					},
-					{
-						"callingcode": "92",
-						"countrycode": "PK",
-						"value": "PK",
-						"content": "巴基斯坦 +92"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "BB",
-						"value": "BB",
-						"content": "巴巴多斯 +1"
-					},
-					{
-						"callingcode": "675",
-						"countrycode": "PG",
-						"value": "PG",
-						"content": "巴布亚新几内亚 +675"
-					},
-					{
-						"callingcode": "595",
-						"countrycode": "PY",
-						"value": "PY",
-						"content": "巴拉圭 +595"
-					},
-					{
-						"callingcode": "507",
-						"countrycode": "PA",
-						"value": "PA",
-						"content": "巴拿马 +507"
-					},
-					{
-						"callingcode": "973",
-						"countrycode": "BH",
-						"value": "BH",
-						"content": "巴林 +973"
-					},
-					{
-						"callingcode": "55",
-						"countrycode": "BR",
-						"value": "BR",
-						"content": "巴西 +55"
-					},
-					{
-						"callingcode": "226",
-						"countrycode": "BF",
-						"value": "BF",
-						"content": "布基纳法索 +226"
-					},
-					{
-						"callingcode": "257",
-						"countrycode": "BI",
-						"value": "BI",
-						"content": "布隆迪 +257"
-					},
-					{
-						"callingcode": "30",
-						"countrycode": "GR",
-						"value": "GR",
-						"content": "希腊 +30"
-					},
-					{
-						"callingcode": "680",
-						"countrycode": "PW",
-						"value": "PW",
-						"content": "帕劳群岛 +680"
-					},
-					{
-						"callingcode": "682",
-						"countrycode": "CK",
-						"value": "CK",
-						"content": "库克群岛 +682"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "KY",
-						"value": "KY",
-						"content": "开曼群岛 +1"
-					},
-					{
-						"callingcode": "49",
-						"countrycode": "DE",
-						"value": "DE",
-						"content": "德国 +49"
-					},
-					{
-						"callingcode": "39",
-						"countrycode": "IT",
-						"value": "IT",
-						"content": "意大利 +39"
-					},
-					{
-						"callingcode": "677",
-						"countrycode": "SB",
-						"value": "SB",
-						"content": "所罗门群岛 +677"
-					},
-					{
-						"callingcode": "371",
-						"countrycode": "LV",
-						"value": "LV",
-						"content": "拉脱维亚 +371"
-					},
-					{
-						"callingcode": "47",
-						"countrycode": "NO",
-						"value": "NO",
-						"content": "挪威 +47"
-					},
-					{
-						"callingcode": "420",
-						"countrycode": "CZ",
-						"value": "CZ",
-						"content": "捷克共和国 +420"
-					},
-					{
-						"callingcode": "373",
-						"countrycode": "MD",
-						"value": "MD",
-						"content": "摩尔多瓦 +373"
-					},
-					{
-						"callingcode": "212",
-						"countrycode": "MA",
-						"value": "MA",
-						"content": "摩洛哥 +212"
-					},
-					{
-						"callingcode": "377",
-						"countrycode": "MC",
-						"value": "MC",
-						"content": "摩纳哥 +377"
-					},
-					{
-						"callingcode": "673",
-						"countrycode": "BN",
-						"value": "BN",
-						"content": "文莱 +673"
-					},
-					{
-						"callingcode": "679",
-						"countrycode": "FJ",
-						"value": "FJ",
-						"content": "斐济 +679"
-					},
-					{
-						"callingcode": "268",
-						"countrycode": "SZ",
-						"value": "SZ",
-						"content": "斯威士兰 +268"
-					},
-					{
-						"callingcode": "421",
-						"countrycode": "SK",
-						"value": "SK",
-						"content": "斯洛伐克 +421"
-					},
-					{
-						"callingcode": "386",
-						"countrycode": "SI",
-						"value": "SI",
-						"content": "斯洛文尼亚 +386"
-					},
-					{
-						"callingcode": "94",
-						"countrycode": "LK",
-						"value": "LK",
-						"content": "斯里兰卡 +94"
-					},
-					{
-						"callingcode": "65",
-						"countrycode": "SG",
-						"value": "SG",
-						"content": "新加坡 +65"
-					},
-					{
-						"callingcode": "687",
-						"countrycode": "NC",
-						"value": "NC",
-						"content": "新喀里多尼亚 +687"
-					},
-					{
-						"callingcode": "64",
-						"countrycode": "NZ",
-						"value": "NZ",
-						"content": "新西兰 +64"
-					},
-					{
-						"callingcode": "81",
-						"countrycode": "JP",
-						"value": "JP",
-						"content": "日本 +81"
-					},
-					{
-						"callingcode": "56",
-						"countrycode": "CL",
-						"value": "CL",
-						"content": "智利 +56"
-					},
-					{
-						"callingcode": "850",
-						"countrycode": "KP",
-						"value": "KP",
-						"content": "朝鲜 +850"
-					},
-					{
-						"callingcode": "855",
-						"countrycode": "KH",
-						"value": "KH",
-						"content": "柬埔寨 +855"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "GD",
-						"value": "GD",
-						"content": "格林纳达 +1"
-					},
-					{
-						"callingcode": "299",
-						"countrycode": "GL",
-						"value": "GL",
-						"content": "格陵兰岛 +299"
-					},
-					{
-						"callingcode": "995",
-						"countrycode": "GE",
-						"value": "GE",
-						"content": "格鲁吉亚 +995"
-					},
-					{
-						"callingcode": "32",
-						"countrycode": "BE",
-						"value": "BE",
-						"content": "比利时 +32"
-					},
-					{
-						"callingcode": "222",
-						"countrycode": "MR",
-						"value": "MR",
-						"content": "毛里塔尼亚 +222"
-					},
-					{
-						"callingcode": "230",
-						"countrycode": "MU",
-						"value": "MU",
-						"content": "毛里求斯 +230"
-					},
-					{
-						"callingcode": "676",
-						"countrycode": "TO",
-						"value": "TO",
-						"content": "汤加 +676"
-					},
-					{
-						"callingcode": "966",
-						"countrycode": "SA",
-						"value": "SA",
-						"content": "沙特阿拉伯 +966"
-					},
-					{
-						"callingcode": "33",
-						"countrycode": "FR",
-						"value": "FR",
-						"content": "法国 +33"
-					},
-					{
-						"callingcode": "594",
-						"countrycode": "GF",
-						"value": "GF",
-						"content": "法属圭亚那 +594"
-					},
-					{
-						"callingcode": "689",
-						"countrycode": "PF",
-						"value": "PF",
-						"content": "法属波利尼西亚 +689"
-					},
-					{
-						"callingcode": "298",
-						"countrycode": "FO",
-						"value": "FO",
-						"content": "法罗群岛 +298"
-					},
-					{
-						"callingcode": "48",
-						"countrycode": "PL",
-						"value": "PL",
-						"content": "波兰 +48"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "PR",
-						"value": "PR",
-						"content": "波多黎各 +1"
-					},
-					{
-						"callingcode": "387",
-						"countrycode": "BA",
-						"value": "BA",
-						"content": "波黑 +387"
-					},
-					{
-						"callingcode": "66",
-						"countrycode": "TH",
-						"value": "TH",
-						"content": "泰国 +66"
-					},
-					{
-						"callingcode": "263",
-						"countrycode": "ZW",
-						"value": "ZW",
-						"content": "津巴布韦 +263"
-					},
-					{
-						"callingcode": "504",
-						"countrycode": "HN",
-						"value": "HN",
-						"content": "洪都拉斯 +504"
-					},
-					{
-						"callingcode": "509",
-						"countrycode": "HT",
-						"value": "HT",
-						"content": "海地 +509"
-					},
-					{
-						"callingcode": "61",
-						"countrycode": "AU",
-						"value": "AU",
-						"content": "澳大利亚 +61"
-					},
-					{
-						"callingcode": "853",
-						"countrycode": "MO",
-						"value": "MO",
-						"content": "澳门 +853"
-					},
-					{
-						"callingcode": "353",
-						"countrycode": "IE",
-						"value": "IE",
-						"content": "爱尔兰 +353"
-					},
-					{
-						"callingcode": "372",
-						"countrycode": "EE",
-						"value": "EE",
-						"content": "爱沙尼亚 +372"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "JM",
-						"value": "JM",
-						"content": "牙买加 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "TC",
-						"value": "TC",
-						"content": "特克斯和凯科斯群岛 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "TT",
-						"value": "TT",
-						"content": "特立尼达和多巴哥 +1"
-					},
-					{
-						"callingcode": "591",
-						"countrycode": "BO",
-						"value": "BO",
-						"content": "玻利维亚 +591"
-					},
-					{
-						"callingcode": "674",
-						"countrycode": "NR",
-						"value": "NR",
-						"content": "瑙鲁 +674"
-					},
-					{
-						"callingcode": "46",
-						"countrycode": "SE",
-						"value": "SE",
-						"content": "瑞典 +46"
-					},
-					{
-						"callingcode": "41",
-						"countrycode": "CH",
-						"value": "CH",
-						"content": "瑞士 +41"
-					},
-					{
-						"callingcode": "590",
-						"countrycode": "GP",
-						"value": "GP",
-						"content": "瓜德罗普岛 +590"
-					},
-					{
-						"callingcode": "678",
-						"countrycode": "VU",
-						"value": "VU",
-						"content": "瓦努阿图 +678"
-					},
-					{
-						"callingcode": "262",
-						"countrycode": "RE",
-						"value": "RE",
-						"content": "留尼旺岛 +262"
-					},
-					{
-						"callingcode": "375",
-						"countrycode": "BY",
-						"value": "BY",
-						"content": "白俄罗斯 +375"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "BM",
-						"value": "BM",
-						"content": "百慕大 +1"
-					},
-					{
-						"callingcode": "350",
-						"countrycode": "GI",
-						"value": "GI",
-						"content": "直布罗陀 +350"
-					},
-					{
-						"callingcode": "500",
-						"countrycode": "FK",
-						"value": "FK",
-						"content": "福克兰群岛（马尔维纳斯） +500"
-					},
-					{
-						"callingcode": "965",
-						"countrycode": "KW",
-						"value": "KW",
-						"content": "科威特 +965"
-					},
-					{
-						"callingcode": "269",
-						"countrycode": "KM",
-						"value": "KM",
-						"content": "科摩罗 +269"
-					},
-					{
-						"callingcode": "225",
-						"countrycode": "CI",
-						"value": "CI",
-						"content": "科特迪瓦 +225"
-					},
-					{
-						"callingcode": "51",
-						"countrycode": "PE",
-						"value": "PE",
-						"content": "秘鲁 +51"
-					},
-					{
-						"callingcode": "216",
-						"countrycode": "TN",
-						"value": "TN",
-						"content": "突尼斯 +216"
-					},
-					{
-						"callingcode": "370",
-						"countrycode": "LT",
-						"value": "LT",
-						"content": "立陶宛 +370"
-					},
-					{
-						"callingcode": "252",
-						"countrycode": "SO",
-						"value": "SO",
-						"content": "索马里 +252"
-					},
-					{
-						"callingcode": "962",
-						"countrycode": "JO",
-						"value": "JO",
-						"content": "约旦 +962"
-					},
-					{
-						"callingcode": "264",
-						"countrycode": "NA",
-						"value": "NA",
-						"content": "纳米比亚 +264"
-					},
-					{
-						"callingcode": "683",
-						"countrycode": "NU",
-						"value": "NU",
-						"content": "纽埃岛 +683"
-					},
-					{
-						"callingcode": "95",
-						"countrycode": "MM",
-						"value": "MM",
-						"content": "缅甸 +95"
-					},
-					{
-						"callingcode": "40",
-						"countrycode": "RO",
-						"value": "RO",
-						"content": "罗马尼亚 +40"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "US",
-						"value": "US",
-						"content": "美国 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "VI",
-						"value": "VI",
-						"content": "美属维尔京群岛 +1"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "AS",
-						"value": "AS",
-						"content": "美属萨摩亚 +1"
-					},
-					{
-						"callingcode": "856",
-						"countrycode": "LA",
-						"value": "LA",
-						"content": "老挝 +856"
-					},
-					{
-						"callingcode": "254",
-						"countrycode": "KE",
-						"value": "KE",
-						"content": "肯尼亚 +254"
-					},
-					{
-						"callingcode": "358",
-						"countrycode": "FI",
-						"value": "FI",
-						"content": "芬兰 +358"
-					},
-					{
-						"callingcode": "249",
-						"countrycode": "SD",
-						"value": "SD",
-						"content": "苏丹 +249"
-					},
-					{
-						"callingcode": "597",
-						"countrycode": "SR",
-						"value": "SR",
-						"content": "苏里南 +597"
-					},
-					{
-						"callingcode": "44",
-						"countrycode": "GB",
-						"value": "GB",
-						"content": "英国 +44"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "VG",
-						"value": "VG",
-						"content": "英属维尔京群岛 +1"
-					},
-					{
-						"callingcode": "31",
-						"countrycode": "NL",
-						"value": "NL",
-						"content": "荷兰 +31"
-					},
-					{
-						"callingcode": "0",
-						"countrycode": "AN",
-						"value": "AN",
-						"content": "荷属安的列斯 +0"
-					},
-					{
-						"callingcode": "258",
-						"countrycode": "MZ",
-						"value": "MZ",
-						"content": "莫桑比克 +258"
-					},
-					{
-						"callingcode": "266",
-						"countrycode": "LS",
-						"value": "LS",
-						"content": "莱索托 +266"
-					},
-					{
-						"callingcode": "63",
-						"countrycode": "PH",
-						"value": "PH",
-						"content": "菲律宾 +63"
-					},
-					{
-						"callingcode": "503",
-						"countrycode": "SV",
-						"value": "SV",
-						"content": "萨尔瓦多 +503"
-					},
-					{
-						"callingcode": "685",
-						"countrycode": "WS",
-						"value": "WS",
-						"content": "萨摩亚群岛 +685"
-					},
-					{
-						"callingcode": "351",
-						"countrycode": "PT",
-						"value": "PT",
-						"content": "葡萄牙 +351"
-					},
-					{
-						"callingcode": "976",
-						"countrycode": "MN",
-						"value": "MN",
-						"content": "蒙古 +976"
-					},
-					{
-						"callingcode": "1",
-						"countrycode": "MS",
-						"value": "MS",
-						"content": "蒙特塞拉特岛 +1"
-					},
-					{
-						"callingcode": "34",
-						"countrycode": "ES",
-						"value": "ES",
-						"content": "西班牙 +34"
-					},
-					{
-						"callingcode": "672",
-						"countrycode": "NF",
-						"value": "NF",
-						"content": "诺福克岛 +672"
-					},
-					{
-						"callingcode": "229",
-						"countrycode": "BJ",
-						"value": "BJ",
-						"content": "贝宁 +229"
-					},
-					{
-						"callingcode": "260",
-						"countrycode": "ZM",
-						"value": "ZM",
-						"content": "赞比亚 +260"
-					},
-					{
-						"callingcode": "240",
-						"countrycode": "GQ",
-						"value": "GQ",
-						"content": "赤道几内亚 +240"
-					},
-					{
-						"callingcode": "84",
-						"countrycode": "VN",
-						"value": "VN",
-						"content": "越南 +84"
-					},
-					{
-						"callingcode": "994",
-						"countrycode": "AZ",
-						"value": "AZ",
-						"content": "阿塞拜疆 +994"
-					},
-					{
-						"callingcode": "93",
-						"countrycode": "AF",
-						"value": "AF",
-						"content": "阿富汗 +93"
-					},
-					{
-						"callingcode": "213",
-						"countrycode": "DZ",
-						"value": "DZ",
-						"content": "阿尔及利亚 +213"
-					},
-					{
-						"callingcode": "355",
-						"countrycode": "AL",
-						"value": "AL",
-						"content": "阿尔巴尼亚 +355"
-					},
-					{
-						"callingcode": "968",
-						"countrycode": "OM",
-						"value": "OM",
-						"content": "阿曼 +968"
-					},
-					{
-						"callingcode": "54",
-						"countrycode": "AR",
-						"value": "AR",
-						"content": "阿根廷 +54"
-					},
-					{
-						"callingcode": "971",
-						"countrycode": "AE",
-						"value": "AE",
-						"content": "阿联酋 +971"
-					},
-					{
-						"callingcode": "297",
-						"countrycode": "AW",
-						"value": "AW",
-						"content": "阿鲁巴岛 +297"
-					},
-					{
-						"callingcode": "82",
-						"countrycode": "KR",
-						"value": "KR",
-						"content": "韩国 +82"
-					},
-					{
-						"callingcode": "852",
-						"countrycode": "HK",
-						"value": "HK",
-						"content": "香港 +852"
-					},
-					{
-						"callingcode": "389",
-						"countrycode": "MK",
-						"value": "MK",
-						"content": "马其顿 +389"
-					},
-					{
-						"callingcode": "960",
-						"countrycode": "MV",
-						"value": "MV",
-						"content": "马尔代夫 +960"
-					},
-					{
-						"callingcode": "265",
-						"countrycode": "MW",
-						"value": "MW",
-						"content": "马拉维 +265"
-					},
-					{
-						"callingcode": "596",
-						"countrycode": "MQ",
-						"value": "MQ",
-						"content": "马提尼克岛 +596"
-					},
-					{
-						"callingcode": "60",
-						"countrycode": "MY",
-						"value": "MY",
-						"content": "马来西亚 +60"
-					},
-					{
-						"callingcode": "692",
-						"countrycode": "MH",
-						"value": "MH",
-						"content": "马绍尔群岛 +692"
-					},
-					{
-						"callingcode": "356",
-						"countrycode": "MT",
-						"value": "MT",
-						"content": "马耳他 +356"
-					},
-					{
-						"callingcode": "261",
-						"countrycode": "MG",
-						"value": "MG",
-						"content": "马达加斯加 +261"
-					},
-					{
-						"callingcode": "223",
-						"countrycode": "ML",
-						"value": "ML",
-						"content": "马里 +223"
-					},
-					{
-						"callingcode": "961",
-						"countrycode": "LB",
-						"value": "LB",
-						"content": "黎巴嫩 +961"
-					},
-					{
-						"callingcode": "382",
-						"countrycode": "ME",
-						"value": "ME",
-						"content": "黑山 +382"
+				});
+	
+				return angular.fromJson(result);
+			
+			 } else if(lanuage === 'zh-CN') {
+			 
+				$.ajax({
+					url: jsonhost + '/countryphone/zh-CN.json?bust' + bust,
+					cache: false,
+					async: false,
+					type: "get",
+					dataType: 'json',
+					success: function(data) {
+						result = data;
 					}
-				];
-
-			} else {
+				});
+	
+				return angular.fromJson(result);
+				
+			 } else {
 				return null;
 			}
 
@@ -4063,45 +1416,44 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function(viewprefix, defaultstate, defaultstateparams,
-		$http, $q, $cacheFactory, $window, mockidentify,
-		pages, views, webpagehost, currency,callingcode,
+	module.service('initctrlSvc', function(viewprefix, defaultstate, defaultstateparams, $http, $q, $cacheFactory, $window, mockidentify,
+		views, webpagehost, currency, callingcode,
 		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson,
 		advertJson, memberidentifyApi, memberbrowseApi, memberfollowApi, shoppingcartApi, member2addrApi, searchlogApi,
 		dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
-		this.cachePage = function(rootScope, name, value) {
+		this.cacheJson = function(rootScope, name, value) {
+			console.info(name);
+			console.info(value);
 
-			var isPageContent = _.startsWith(name, 'page_') && _.endsWith(name, '_content');
+			var jsonStr = JSON.stringify(value);
+			_.set(rootScope, name, JSON.parse(jsonStr));
+			sessionStorage.setItem(name, JSON.stringify(_.get(rootScope, name)));
+		};
 
-			var jsonStr = isPageContent ? value : JSON.stringify(value);
+		this.cachePageTemplate = function(rootScope, name, value) {
+			var jsonStr = value;
+			_.set(rootScope, name, jsonStr);
+			sessionStorage.setItem(name, _.get(rootScope, name));
+		};
 
-			if(isPageContent) {
-
-				_.set(rootScope, name, jsonStr);
-				sessionStorage.setItem(name, _.get(rootScope, name));
-			} else {
-
-				_.set(rootScope, name, JSON.parse(jsonStr));
-				sessionStorage.setItem(name, JSON.stringify(_.get(rootScope, name)));
-			}
+		this.initConfig = function(rootScope, bust) {
+			var jsonStr = configJson.get(bust);
+			this.cacheJson(rootScope, 'config', jsonStr);
 
 		};
 
-		this.initViews = function(rootScope, templateCache, pageid) {
+		this.initPageTemplate = function(rootScope, templateCache, pageid) {
 
 			var pageContent = sessionStorage.getItem('page_' + pageid + '_content');
 			if(pageContent === null) {
 				//没有预加载，同步加载
-
 				var pageValue = webpageJson.get(pageid, false, rootScope.bust);
-				this.cachePage(rootScope, 'page_' + pageid, pageValue);
+				this.cacheJson(rootScope, 'page_' + pageid, pageValue);
 
 				var pageContentValue = webpagecontentJson.get(pageid, false, rootScope.bust);
-				this.cachePage(rootScope, 'page_' + pageid + '_content', pageContentValue);
-
+				this.cachePageTemplate(rootScope, 'page_' + pageid + '_content', pageContentValue);
 				pageContent = sessionStorage.getItem('page_' + pageid + '_content');
-
 			}
 
 			var isSubPage = _.includes(pageid, '_');
@@ -4111,19 +1463,17 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				templateCache.put(pageid + '.html', pageContent);
 			}
 
-			//loadview
-			_(views).forEach(function(view) {
-				var viewContent = sessionStorage.getItem('page_' + view + '_content');
-				templateCache.put(view + '.html', viewContent);
-
-			});
-
 		};
 
 		this.initRootScope = function(rootScope, stateParams) {
-
-			var objectNames = ['config', 'webpc', 'menu', 'utility', 'advert'];
+			var objectNames;
+			if(viewprefix === 'm.') {
+				objectNames = ['config', 'webphone', 'menu', 'utility', 'advert'];
+			} else {
+				objectNames = ['config', 'webpc', 'menu', 'utility', 'advert'];
+			}
 			_(objectNames).forEach(function(name) {
+
 				_.set(rootScope, name, JSON.parse(sessionStorage.getItem(name)));
 			});
 
@@ -4154,9 +1504,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			var template = this.getTemplate(stateParams);
 
 			var pathString = "";
-			if(state.current.name === 'mkgpgm' || state.current.name === 'mkgdispgroup') {
+			if(state.current.name === 'mkgpgm' || state.current.name === 'mkgdispgroup' || state.current.name === 'article') {
 
-				pathString = stateParams.id;
+				return;
 			} else if(state.current.name === 'mainitem' || state.current.name === 'mkgpgmarticle') {
 
 				pathString = stateParams.path;
@@ -4165,6 +1515,12 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				pathString = template;
 			}
 
+			this.setPath2Rootscope(rootScope, pathString);
+
+		};
+
+		this.setPath2Rootscope = function(rootScope, pathString) {
+			console.info('pathString ' + pathString);
 			var paths = [];
 			var arr = _.words(pathString, /[^_ ]+/g);
 			var route = '';
@@ -4180,7 +1536,6 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			});
 
 			rootScope.paths = paths;
-
 		};
 
 		//设置自定义session变量
@@ -4534,13 +1889,13 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		this.initImageLazyLoad = function(rootScope) {
 
 			rootScope.loadImg = function() {
-
+				
 				setInterval(function() {
 					$("img.lazy").lazyload();
-				}, 1000);
+				}, 100);
 			};
 
-			rootScope.loadImg();
+			//rootScope.loadImg();
 		};
 
 		this.initSubmittime = function(rootScope) {
@@ -4709,9 +2064,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		 */
 		this.initRootVar = function(rootScope) {
 
-			rootScope.bust = sessionStorage.getItem("bust");
+			rootScope.bust = null;
 			rootScope.currency = currency;
-			rootScope.callingcode = callingcode;			
+			rootScope.callingcode = callingcode;
 			rootScope.fastshoppingcart = null;
 			rootScope.fastshoppingcartmainitems = [];
 			rootScope.addresslist = [];
@@ -4724,46 +2079,50 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			rootScope.title = null;
 			rootScope.submittime = null;
 			rootScope.localbrowses = null;
-			rootScope.pageroot = webpagehost + '/webpage/' + viewprefix; // + 'asidemenu.content.json?bust' + rootScope.bust
+			rootScope.pageroot = webpagehost + '/webpage/' + viewprefix;
 
 		};
 
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, loginConfig) {
 
-			if(sessionStorage.getItem('config') != null) {
+			this.initRootVar(rootScope);
+			this.initPageTemplate(rootScope, templateCache, pageid);
 
-				this.initRootVar(rootScope);
-				this.initViews(rootScope, templateCache, pageid);
-				this.initRootScope(rootScope, stateParams);
-				this.initTitle(pageid, rootScope);
-				this.initPath(rootScope, stateParams, state);
-				this.initAside(rootScope, viewprefix);
-				this.initIdentify(rootScope, state, loginConfig);
-				this.sessionVar(rootScope);
-
-				this.initMemberBrowse(rootScope, location);
-
-				this.initMemberAddress(rootScope);
-				this.initSearchlog(rootScope);
-				this.initImageLazyLoad(rootScope);
-				this.initSubmittime(rootScope);
-				this.localShoppingcart(rootScope);
-				this.initMainitems(rootScope);
-				this.initFastShoppingcart(rootScope);
-				this.initExt(rootScope, state);
-				this.initLogout(rootScope, state);
-
-				rootScope.localbrowses = rootScope.getLocalBrowses();
-
-				return true;
-			} else {
-
-				sessionStorage.setItem('redirect', location.absUrl());
-				state.go('load', {}, {
-					reload: true
-				});
-				return false;
+			for(var i = 0; i < views.length; ++i) {
+				this.initPageTemplate(rootScope, templateCache, views[i]);
 			}
+
+			if(sessionStorage.getItem("bust") === null) {
+				var bust = (new Date()).getTime();
+				sessionStorage.setItem("bust", bust);
+				this.initConfig(rootScope, bust);
+				this.resourcesInit(rootScope, bust);
+			}
+			rootScope.bust = sessionStorage.getItem("bust");
+
+			this.initRootScope(rootScope, stateParams);
+			this.initTitle(pageid, rootScope);
+			this.initPath(rootScope, stateParams, state);
+			this.initAside(rootScope, viewprefix);
+			this.initIdentify(rootScope, state, loginConfig);
+			this.sessionVar(rootScope);
+
+			this.initMemberBrowse(rootScope, location);
+
+			this.initMemberAddress(rootScope);
+			this.initSearchlog(rootScope);
+			this.initImageLazyLoad(rootScope);
+			this.initSubmittime(rootScope);
+			this.localShoppingcart(rootScope);
+			this.initMainitems(rootScope);
+			this.initFastShoppingcart(rootScope);
+			this.initExt(rootScope, state);
+			this.initLogout(rootScope, state);
+
+			rootScope.localbrowses = rootScope.getLocalBrowses();
+
+			return true;
+
 		};
 
 		this.getTemplate = function(stateParams) {
@@ -4773,57 +2132,27 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			return result;
 		};
 
-		this.resourcesInit = function(win, rootScope, state) {
-
-			var bust = (new Date()).getTime();
-			sessionStorage.setItem("bust", bust);
+		this.resourcesInit = function(rootScope, bust) {
 
 			var promises = [];
-			var objectNames = ['config', 'webpc', 'menu', 'utility', 'advert'];
+			var objectNames;
+			if(viewprefix === 'm.') {
+				objectNames = ['webphone', 'menu', 'utility', 'advert'];
+				promises.push(sitemapJson.get('webphone', bust));
+			} else {
+				objectNames = ['webpc', 'menu', 'utility', 'advert'];
+				promises.push(sitemapJson.get('webpc', bust));
+			}
 
-			promises.push(configJson.get(bust));
-			promises.push(sitemapJson.get('webpc', bust));
 			promises.push(sitemapJson.get('menu', bust));
 			promises.push(sitemapJson.get('utility', bust));
 			promises.push(advertJson.get(bust));
-			var forms = [];
-			$.merge(forms, pages);
-			$.merge(forms, views);
 
-			_(forms).forEach(function(page) {
-
-				promises.push(webpageJson.get(page, true, bust));
-				promises.push(webpagecontentJson.get(page, true, bust));
-
-				objectNames.push('page_' + page);
-				objectNames.push('page_' + page + "_content");
-
-			});
-
-			var cachePage = this.cachePage;
-
-			var _state = state;
+			var cacheJson = this.cacheJson;
 			$q.all(promises).then(function(values) {
-
 				for(var i = 0; i < values.length; ++i) {
-
-					var value = values[i];
-					var name = objectNames[i];
-
-					cachePage(rootScope, name, value);
+					cacheJson(rootScope, objectNames[i], values[i]);
 				}
-
-				var redirect = sessionStorage.getItem('redirect');
-				sessionStorage.removeItem('redirect');
-
-				if(_.isNull(redirect)) {
-					_state.go(defaultstate, defaultstateparams, {
-						reload: true
-					});
-				} else {
-					win.location = redirect;
-				}
-
 			});
 
 		};
@@ -5171,9 +2500,10 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 	var _ = require('lodash');
 
 	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-
+		
+ 
 		var template = initctrlSvc.getTemplate($stateParams);
-
+ 
 		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
 			auth: false,
 			isAsync: true
@@ -5241,9 +2571,10 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		$scope.load = function(page) {
 
 			mkgdispgroupJson.get($stateParams.id, $rootScope.bust).then(function(data) {
-
-					$scope.data = data;
-
+			 
+					
+					$scope.data = data;									
+					initctrlSvc.setPath2Rootscope($rootScope, data.paths[0].path);						
 					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
 					$scope.mkgdispgroup = {};
@@ -5280,9 +2611,10 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 					}
 
 					console.info($scope.mkgdispgroup);
-
+					$rootScope.loadImg();
+					
 					if(!_.isUndefined($window.afterLoad)) {
-
+						
 						$window.afterLoad();
 					}
 
@@ -5359,7 +2691,12 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 						$rootScope.title = title + ' -' + $rootScope.title;
 
 						console.info($scope.mkgpgmarticle.lines);
-
+						$rootScope.loadImg();					
+						if(!_.isUndefined($window.afterLoad)) {
+							
+							$window.afterLoad();
+						}
+						
 					});
 
 				})
@@ -5426,7 +2763,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 			mkgpgmJson.get($stateParams.id, $rootScope.bust).then(function(data) {
 
 					$scope.data = data;
-
+					initctrlSvc.setPath2Rootscope($rootScope, data.paths[0].path);
 					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
 					$scope.mkgpgm = {};
@@ -7992,10 +5329,13 @@ define('filters/sizeimage',['require', './module'], function(require, module) {
 	module.filter('sizeimage', function() {
 
 		return function(input, sizetype) {
+			if(_.isUndefined(input)){
+				return "";
+			}
+				
+				
+			var result = "";			
 			
-				 
-			var result = "";
-
 			var arr = input.split('.');
 			for(var i = 0; i < arr.length; i++) {
 
@@ -8009,10 +5349,10 @@ define('filters/sizeimage',['require', './module'], function(require, module) {
 				}
 
 			}
-			if(sizetype !== ""){
-				result += "_" + sizetype;	
+			if(sizetype !== "") {
+				result += "_" + sizetype;
 			}
-			
+
 			result += "." + arr[arr.length - 1];
 			return result;
 

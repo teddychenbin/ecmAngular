@@ -22,6 +22,12 @@ define(['require'], function(require) {
 					return '<div ng-include="' + "'info.html'" + '"></div>';
 				},
 				controller: 'infoCtrl'
+			}).state('custompage', {
+				url: '/custompage/:template',
+				template: function() {
+					return '<div ng-include="' + "'custompage.html'" + '"></div>';
+				},
+				controller: 'custompageCtrl'
 			}).state('home', {
 				url: '/home/:template',
 				template: function() {
