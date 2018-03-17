@@ -1,7 +1,7 @@
 {
   "name": "ecmAngular",
   "main": "module.js",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "license": "MIT",
   "homepage": "",
@@ -31,6 +31,7 @@
     "angular-animate": "^1.6.9",
     "bootstrap-additions": "^0.3.1",
     "bootstrap-hover-dropdown": "^2.2.1",
-    "angular": "^1.6.9"
+    "angular": "^1.6.9",
+    "popper.js": "^1.14.1"
   }
 }
