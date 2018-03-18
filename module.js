@@ -1416,7 +1416,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function(viewprefix, defaultstate, defaultstateparams, $http, $q, $cacheFactory, $window, mockidentify,
+	module.service('initctrlSvc', function(viewprefix, homedeftemplate, $http, $q, $cacheFactory, $window, mockidentify,
 		views, webpagehost, currency, callingcode,
 		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson,
 		advertJson, memberidentifyApi, memberbrowseApi, memberfollowApi, shoppingcartApi, member2addrApi, searchlogApi,
@@ -1889,7 +1889,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		this.initImageLazyLoad = function(rootScope) {
 
 			rootScope.loadImg = function() {
-				
+
 				setInterval(function() {
 					$("img.lazy").lazyload();
 				}, 100);
@@ -2031,7 +2031,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			};
 
 			rootScope.gohome = function() {
-				state.go(defaultstate, defaultstateparams, {
+				state.go('home', {
+					'template': homedeftemplate
+				}, {
 					reload: true
 				});
 			};
@@ -2499,11 +2501,22 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 
 	var _ = require('lodash');
 
-	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
-		
- 
+	module.controller('homeCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc, homedeftemplate) {
+
 		var template = initctrlSvc.getTemplate($stateParams);
- 
+
+		if(_.isNull(template) || template === '') {
+			if(homedeftemplate !== '') {
+
+				$state.go('home', {
+					'template': homedeftemplate
+				}, {
+					reload: true
+				});
+				return;
+			}
+		}
+
 		var isload = initctrlSvc.controlLoad('home' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
 			auth: false,
 			isAsync: true
@@ -2514,7 +2527,7 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 			$templateCache.put('home.html', '');
 			return;
 		}
-		 
+
 		$rootScope.loadFastShoppingcart();
 	});
 
