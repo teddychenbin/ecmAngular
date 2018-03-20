@@ -1459,25 +1459,26 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			} else {
 				templateCache.put(pageid + '.html', pageContent);
 			}
- 
+
 			//load ng-include template
 
-			var arr = pageContent.split('ng-include'); 
-			if(arr.length > 1)
-				for(var i = 0; i < arr.length; i++) {				
-					if(_.trim(arr[i]).startsWith('=')) {	 
-						
-						var includePageid = arr[i].split('</div>')[0];						
+			var arr = pageContent.split('ng-include');
+			if(arr.length > 1) {
+				for(var i = 0; i < arr.length; i++) {
+					if(_.trim(arr[i]).startsWith('=')) {
+
+						var includePageid = arr[i].split('</div>')[0];
 						includePageid = _.replace(includePageid, '.html', '');
 						includePageid = _.replace(includePageid, '=', '');
 						includePageid = _.replace(includePageid, '>', '');
 						includePageid = _.replace(includePageid, '"', '');
 						includePageid = _.replace(includePageid, '"', '');
 						includePageid = _.replace(includePageid, "'", '');
-						includePageid = _.replace(includePageid, "'", ''); 
+						includePageid = _.replace(includePageid, "'", '');
 						this.initPageTemplate(rootScope, templateCache, _.trim(includePageid));
 					}
 				}
+			}
 
 		};
 
@@ -2846,6 +2847,36 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 		};
 
 		$scope.load(_.parseInt($stateParams.page));
+		$rootScope.loadFastShoppingcart();
+
+	});
+
+});
+define('controllers/custompageCtrl',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+
+	module.controller('custompageCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window, initctrlSvc) {
+
+		var template = initctrlSvc.getTemplate($stateParams);
+		var isload = initctrlSvc.controlLoad('custompage' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
+			auth: false,
+			isAsync: true
+		});
+
+		if(!isload) {
+
+			$templateCache.put('custompage.html', '');
+			return;
+		}
+
+		$scope.load = function() {
+
+		 
+		};
+		
+		$scope.load();
 		$rootScope.loadFastShoppingcart();
 
 	});
@@ -5063,7 +5094,7 @@ define('controllers/wechatpayCtrl',['require', './module'], function(require, mo
 	});
 
 });
-define('controllers/main',['./articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl',
+define('controllers/main',['./articleCtrl', './errorCtrl', './homeCtrl', './mkgdispgroupCtrl', './mkgpgmarticleCtrl', './mkgpgmCtrl', './custompageCtrl',
 		'./mainitemCtrl', './itemsearchCtrl', './itemsearchlistCtrl', './loginCtrl', './memberCtrl',
 		'./salesorderCtrl', './shoppingcartadditemCtrl', './shoppingcartCtrl',
 		'./presalesorderCtrl', './preshoppingcartadditemCtrl', './preshoppingcartCtrl',
