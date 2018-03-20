@@ -1416,15 +1416,12 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var _ = require('lodash');
 	var angular = require('angular');
 
-	module.service('initctrlSvc', function(viewprefix, homedeftemplate, $http, $q, $cacheFactory, $window, mockidentify,
-		views, webpagehost, currency, callingcode,
+	module.service('initctrlSvc', function(viewprefix, homedeftemplate, $http, $q, $cacheFactory, $window, mockidentify, webpagehost, currency, callingcode,
 		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson,
 		advertJson, memberidentifyApi, memberbrowseApi, memberfollowApi, shoppingcartApi, member2addrApi, searchlogApi,
 		dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
 		this.cacheJson = function(rootScope, name, value) {
-			console.info(name);
-			console.info(value);
 
 			var jsonStr = JSON.stringify(value);
 			_.set(rootScope, name, JSON.parse(jsonStr));
@@ -1456,12 +1453,31 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				pageContent = sessionStorage.getItem('page_' + pageid + '_content');
 			}
 
-			var isSubPage = _.includes(pageid, '_');
-			if(isSubPage) {
+			var isTemplatePage = _.includes(pageid, '_');
+			if(isTemplatePage) {
 				templateCache.put(pageid.split('_')[0] + '.html', pageContent);
 			} else {
 				templateCache.put(pageid + '.html', pageContent);
 			}
+ 
+			//load ng-include template
+
+			var arr = pageContent.split('ng-include'); 
+			if(arr.length > 1)
+				for(var i = 0; i < arr.length; i++) {				
+					if(_.trim(arr[i]).startsWith('=')) {	 
+						
+						var includePageid = arr[i].split('</div>')[0];						
+						includePageid = _.replace(includePageid, '.html', '');
+						includePageid = _.replace(includePageid, '=', '');
+						includePageid = _.replace(includePageid, '>', '');
+						includePageid = _.replace(includePageid, '"', '');
+						includePageid = _.replace(includePageid, '"', '');
+						includePageid = _.replace(includePageid, "'", '');
+						includePageid = _.replace(includePageid, "'", ''); 
+						this.initPageTemplate(rootScope, templateCache, _.trim(includePageid));
+					}
+				}
 
 		};
 
@@ -2090,9 +2106,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			this.initRootVar(rootScope);
 			this.initPageTemplate(rootScope, templateCache, pageid);
 
-			for(var i = 0; i < views.length; ++i) {
-				this.initPageTemplate(rootScope, templateCache, views[i]);
-			}
+			//			for(var i = 0; i < views.length; ++i) {
+			//				this.initPageTemplate(rootScope, templateCache, views[i]);
+			//			}
 
 			if(sessionStorage.getItem("bust") === null) {
 				var bust = (new Date()).getTime();
@@ -2505,9 +2521,9 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
-		if(_.isNull(template) || template === '') {
+		if(_.isNull(template) || template === '') {			
 			if(homedeftemplate !== '') {
-
+				
 				$state.go('home', {
 					'template': homedeftemplate
 				}, {
