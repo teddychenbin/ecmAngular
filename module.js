@@ -9,10 +9,12 @@ define('jsons/advertJson',['require', './module'], function(require, module) {
 
 	module.service('advertJson', function($http, $q, jsonhost) {
 
-		this.get = function(bust) {
+		this.get = function(advertid, bust) {
+
+			console.info('advertJson');
 			var deferred = $q.defer();
 			$http({
-				url: jsonhost + '/adv/merge.json?bust' + bust,
+				url: jsonhost + '/adv/' + advertid + '.json?bust' + bust,
 				method: 'get'
 			}).then(function(result) {
 				deferred.resolve(result.data);
@@ -90,6 +92,7 @@ define('jsons/articleJson',['require', './module'], function(require, module) {
 				method: 'get'
 			}).then(function(result) {
 				deferred.resolve(result.data);
+				console.info(result.data);
 			}).catch(function(result) {
 				console.error(result);
 				deferred.reject(result);
@@ -138,6 +141,7 @@ define('jsons/countryJson',['require', './module'], function(require, module) {
 				method: 'get'
 			}).then(function(result) {
 				deferred.resolve(result.data);
+				console.info(result.data);
 			}).catch(function(result) {
 				console.error(result);
 				deferred.reject(result);
@@ -182,6 +186,7 @@ define('jsons/govadmdivJson',['require', './module'], function(require, module) 
 					url: jsonhost + '/govadmdiv/' + id + '.json?bust' + bust,
 					method: 'get'
 				}).then(function(result) {
+					console.info(result.data);
 					deferred.resolve(result.data);
 				}).catch(function(result) {
 					console.error(result);
@@ -208,6 +213,7 @@ define('jsons/mainitemJson',['require', './module'], function(require, module) {
 				url: jsonhost + '/mainitem/' + id + '.json?bust' + bust,
 				method: 'get'
 			}).then(function(result) {
+				console.info(result.data);
 				deferred.resolve(result.data);
 			}).catch(function(result) {
 				console.error(result);
@@ -226,11 +232,15 @@ define('jsons/mkgdispgroupJson',['require', './module'], function(require, modul
 	module.service('mkgdispgroupJson', function($http, $q, jsonhost) {
 
 		this.get = function(id, bust) {
+			
+			console.info('mkgdispgroupJson');
+			
 			var deferred = $q.defer();
 			$http({
 				url: jsonhost + '/mkgdispgroup/' + id + '.json?bust' + bust,
 				method: 'get'
 			}).then(function(result) {
+				console.info(result.data);
 				deferred.resolve(result.data);
 			}).catch(function(result) {
 				console.error(result);
@@ -249,11 +259,16 @@ define('jsons/mkgpgmarticleJson',['require', './module'], function(require, modu
 	module.service('mkgpgmarticleJson', function($http, $q, jsonhost) {
 
 		this.get = function(id, bust) {
+			
+			
+			console.info('mkgpgmarticleJson');
+			
 			var deferred = $q.defer();
 			$http({
 				url: jsonhost + '/mkgpgmarticle/' + id + '.json?bust' + bust,
 				method: 'get'
 			}).then(function(result) {
+				console.info(result.data);
 				deferred.resolve(result.data);
 			}).catch(function(result) {
 				console.error(result);
@@ -277,6 +292,7 @@ define('jsons/mkgpgmJson',['require', './module'], function(require, module) {
 				url: jsonhost + '/mkgpgm/' + id + '.json?bust' + bust,
 				method: 'get'
 			}).then(function(result) {
+				console.info(result.data);
 				deferred.resolve(result.data);
 			}).catch(function(result) {
 				console.error(result);
@@ -295,11 +311,14 @@ define('jsons/sitemapJson',['require', './module'], function(require, module) {
 	module.service('sitemapJson', function($http, $q, jsonhost) {
 
 		this.get = function(root, bust) {
+			
+			console.info('sitemapJson');
 			var deferred = $q.defer();
 			$http({
 				url: jsonhost + '/sitemap/sitemap.' + root + '.json?bust' + bust,
 				method: 'get'
 			}).then(function(result) {
+				console.info(result.data);
 				deferred.resolve(result.data);
 			}).catch(function(result) {
 				console.error(result);
@@ -394,6 +413,7 @@ define('jsons/webpageJson',['require', './module'], function(require, module) {
 					url: webpagehost + '/webpage/' + viewprefix + pageid + '.json?bust' + bust,
 					method: 'get'
 				}).then(function(result) {
+					console.info(result.data);
 					deferred.resolve(result.data);
 				}).catch(function(result) {
 					console.error(result);
@@ -454,6 +474,31 @@ define('jsons/countryphoneprefixJson',['require', './module'], function(require,
 	});
 
 });
+define('jsons/colorseriesJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('colorseriesJson', function($http, $q, jsonhost) {
+
+		this.get = function(bust) {
+
+			console.info('colorseriesJson');
+			var deferred = $q.defer();
+			$http({
+				url: jsonhost + '/colorseries/colorseries.json?bust' + bust,
+				method: 'get'
+			}).then(function(result) {
+				deferred.resolve(result.data);
+				console.info(result.data);
+			}).catch(function(result) {
+				console.error(result);
+				deferred.reject(result);
+			});
+			return deferred.promise;
+		};
+
+	});
+
+});
 /*
  * json层文件都是用get的方式去访问，有浏览器 缓存
  * 不能用factory 会直接执行
@@ -461,7 +506,7 @@ define('jsons/countryphoneprefixJson',['require', './module'], function(require,
 define('jsons/main',['./advertJson', './articlecontentJson', './articleJson',
 		'./configJson', './countryJson', './govadmdivJson',
 		'./mainitemJson', './mkgdispgroupJson', './mkgpgmarticleJson', './mkgpgmJson',
-		'./sitemapJson', './webpagecontentJson', './webpageJson', './countryphoneprefixJson'
+		'./sitemapJson', './webpagecontentJson', './webpageJson', './countryphoneprefixJson', './colorseriesJson'
 
 	],
 	function() {
@@ -1417,7 +1462,7 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var angular = require('angular');
 
 	module.service('initctrlSvc', function(viewprefix, homedeftemplate, $http, $q, $cacheFactory, $window, mockidentify, webpagehost, currency, callingcode,
-		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson,
+		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson, colorseriesJson,
 		advertJson, memberidentifyApi, memberbrowseApi, memberfollowApi, shoppingcartApi, member2addrApi, searchlogApi,
 		dialogSvc, dateformat, $modal, $aside, $alert, $select) {
 
@@ -1436,6 +1481,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		this.initConfig = function(rootScope, bust) {
 			var jsonStr = configJson.get(bust);
+			console.info('config');
+			console.info(jsonStr);
 			this.cacheJson(rootScope, 'config', jsonStr);
 
 		};
@@ -1460,6 +1507,8 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				templateCache.put(pageid + '.html', pageContent);
 			}
 
+			this.initAdv(rootScope, pageContent);
+			this.initColorseries(rootScope, pageContent);
 			//load ng-include template
 
 			var arr = pageContent.split('ng-include');
@@ -1479,23 +1528,67 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 					}
 				}
 			}
+		};
+
+		this.initAdv = function(rootScope, pageContent) {
+
+			if(_.isUndefined(rootScope.advert)) {
+				rootScope.advert = {};
+			}
+
+			var arr = pageContent.split('advert');
+			var hist = "";
+			if(arr.length > 1) {
+				for(var i = 0; i < arr.length; i++) {
+					if(_.trim(arr[i]).startsWith('.')) {
+						var advertid = arr[i].split('.')[1];
+						if(hist.indexOf(advertid + '.') >= 0) {
+							continue;
+						}
+						hist += advertid + ".";
+						this.setAdvert(advertid, rootScope);
+
+					}
+				}
+			}
+		};
+
+		this.setAdvert = function(advertid, rootScope) {
+			advertJson.get(advertid, rootScope.bust).then(function(data) {
+
+					_.set(rootScope.advert, data.id, data);
+				})
+				.catch(function(err) {
+
+				});
+
+		};
+
+		this.initColorseries = function(rootScope, pageContent) {
+
+			if(pageContent.indexOf('colorseries') >= 0) {
+				colorseriesJson.get(rootScope.bust).then(function(data) {
+						_.set(rootScope, 'colorseries', data);
+					})
+					.catch(function(err) {
+
+					});
+			}
 
 		};
 
 		this.initRootScope = function(rootScope, stateParams) {
 			var objectNames;
 			if(viewprefix === 'm.') {
-				objectNames = ['config', 'webphone', 'menu', 'utility', 'advert'];
+				objectNames = ['config', 'menu'];
 			} else {
-				objectNames = ['config', 'webpc', 'menu', 'utility', 'advert'];
+				objectNames = ['config', 'menu'];
 			}
 			_(objectNames).forEach(function(name) {
-
 				_.set(rootScope, name, JSON.parse(sessionStorage.getItem(name)));
 			});
 
 			_.set(rootScope, 'stateParams', JSON.parse(JSON.stringify(stateParams)));
-
 		};
 
 		this.initTitle = function(pageid, rootScope) {
@@ -2105,7 +2198,6 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		this.controlLoad = function(pageid, state, location, rootScope, stateParams, templateCache, loginConfig) {
 
 			this.initRootVar(rootScope);
-			this.initPageTemplate(rootScope, templateCache, pageid);
 
 			//			for(var i = 0; i < views.length; ++i) {
 			//				this.initPageTemplate(rootScope, templateCache, views[i]);
@@ -2115,9 +2207,12 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				var bust = (new Date()).getTime();
 				sessionStorage.setItem("bust", bust);
 				this.initConfig(rootScope, bust);
-				this.resourcesInit(rootScope, bust);
+
 			}
 			rootScope.bust = sessionStorage.getItem("bust");
+
+			this.initPageTemplate(rootScope, templateCache, pageid);
+			this.initMenu(rootScope);
 
 			this.initRootScope(rootScope, stateParams);
 			this.initTitle(pageid, rootScope);
@@ -2151,30 +2246,41 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			return result;
 		};
 
-		this.resourcesInit = function(rootScope, bust) {
+		this.initMenu = function(rootScope) {
 
-			var promises = [];
-			var objectNames;
-			if(viewprefix === 'm.') {
-				objectNames = ['webphone', 'menu', 'utility', 'advert'];
-				promises.push(sitemapJson.get('webphone', bust));
-			} else {
-				objectNames = ['webpc', 'menu', 'utility', 'advert'];
-				promises.push(sitemapJson.get('webpc', bust));
-			}
+			sitemapJson.get('menu', rootScope.bust).then(function(data) {
+					_.set(rootScope, 'menu', data);
+				})
+				.catch(function(err) {
 
-			promises.push(sitemapJson.get('menu', bust));
-			promises.push(sitemapJson.get('utility', bust));
-			promises.push(advertJson.get(bust));
-
-			var cacheJson = this.cacheJson;
-			$q.all(promises).then(function(values) {
-				for(var i = 0; i < values.length; ++i) {
-					cacheJson(rootScope, objectNames[i], values[i]);
-				}
-			});
+				});
 
 		};
+
+		//		this.resourcesInit = function(rootScope, bust) {
+		//
+		//			var promises = [];
+		//			var objectNames;
+		//			if(viewprefix === 'm.') {
+		//				objectNames = ['menu'];
+		//				//promises.push(sitemapJson.get('webphone', bust));
+		//			} else {
+		//				objectNames = ['menu'];
+		//				//promises.push(sitemapJson.get('webpc', bust));
+		//			}
+		//
+		//			promises.push(sitemapJson.get('menu', bust));
+		//			//promises.push(sitemapJson.get('utility', bust));
+		//			//promises.push(advertJson.get(bust));
+		//
+		//			var cacheJson = this.cacheJson;
+		//			$q.all(promises).then(function(values) {
+		//				for(var i = 0; i < values.length; ++i) {
+		//					cacheJson(rootScope, objectNames[i], values[i]);
+		//				}
+		//			});
+		//
+		//		};
 
 	});
 
@@ -5421,7 +5527,34 @@ define('filters/sizeimage',['require', './module'], function(require, module) {
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './hasnodes', './nothasnodes', './nodeattr', './nodeslength', './ifvalue', './range', './privatestring', './nvl', './cutindex', './sizeimage'],
+define('filters/catalogpath',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('catalogpath', function($rootScope) {
+
+		return function(input) {
+		 
+			if(input.indexOf('docfile_')>=0 && input.indexOf(':')>=0){
+				
+				var catalogid = input.replace('docfile_','').split(':')[0];
+			 	var filedoc = input.replace('docfile_','').split(':')[1];			 	
+				var result = _.get($rootScope.config, catalogid) +'/' + filedoc;			 	
+				return result;
+			
+			}else{
+				return input;
+			}
+			
+
+		};
+
+	});
+
+});
+define('filters/main',['./testFilter', './nodes', './hasnodes', './nothasnodes', './nodeattr', './nodeslength', './ifvalue', './range', './privatestring', './nvl', './cutindex', './sizeimage', './catalogpath'],
 	function() {
 
 		'use strict';
