@@ -2713,10 +2713,10 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 					initctrlSvc.setPath2Rootscope($rootScope, data.paths[0].path);						
 					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
-					$scope.mkgdispgroup = {};
-					_.set($scope.mkgdispgroup, "id", data.id);
-					_.set($scope.mkgdispgroup, "name", data.name);
-					_.set($scope.mkgdispgroup, "lines", []);
+					$scope.mkgdispgroup = data;
+//					_.set($scope.mkgdispgroup, "id", data.id);
+//					_.set($scope.mkgdispgroup, "name", data.name);
+//					_.set($scope.mkgdispgroup, "lines", []);
 
 					$scope.loadMainitem(data, page);
 				})
