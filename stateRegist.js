@@ -41,7 +41,7 @@ define(['require'], function(require) {
 				},
 				controller: 'articleCtrl'
 			}).state('mainitem', {
-				url: '/mainitem/:template/:path/:mainitemno/:prodspec1/:prodspec2',
+				url: '/mainitem/:template/:mainitemno/:prodspec1/:prodspec2',
 				template: function() {
 					return '<div ng-include="' + "'mainitem.html'" + '"></div>';
 				},

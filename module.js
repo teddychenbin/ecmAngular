@@ -2010,11 +2010,14 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 		this.initSubmittime = function(rootScope) {
 
-			rootScope.submittimeValid = function() {
+			rootScope.submittimeValid = function(sp) {
+
+				if(_.isUndefined(sp))
+					sp = 300;
 
 				if(rootScope.submittime != null) {
 					var sec = parseInt((new Date()) - rootScope.submittime);
-					if(sec < 300) {
+					if(sec < sp) {
 						return false;
 					}
 				}
@@ -2707,63 +2710,87 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		$scope.load = function(page) {
 
 			mkgdispgroupJson.get($stateParams.id, $rootScope.bust).then(function(data) {
-			 
-					
-					$scope.data = data;									
-					initctrlSvc.setPath2Rootscope($rootScope, data.paths[0].path);						
+
+					$scope.data = data;
+					initctrlSvc.setPath2Rootscope($rootScope, data.paths[0].path);
 					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
-					$scope.mkgdispgroup = data;
-//					_.set($scope.mkgdispgroup, "id", data.id);
-//					_.set($scope.mkgdispgroup, "name", data.name);
-//					_.set($scope.mkgdispgroup, "lines", []);
+					$scope.mkgdispgroup = {
+						mainitems: []
+					};
+					_.set($scope.mkgdispgroup, "id", data.id);
+					_.set($scope.mkgdispgroup, "name", data.name);
+					_.set($scope.mkgdispgroup, "sizes", data.sizes);
 
-					$scope.loadMainitem(data, page);
+					$scope.fetchData(data, page);
 				})
 				.catch(function(err) {
 
-					dialogSvc.error("net error");
 				});
 		};
 
-		$scope.loadMainitem = function(data, page) {
+		$scope.fetchData = function(data, page) {
 
-			var promises = [];
-
-			var fetch = pageSvc.fetch($scope, data.lines, page);
+			var fetch = pageSvc.fetch($scope, data.mainitems, page);
+			console.info('first ' + fetch.first + ' max' + fetch.max);
 
 			for(var i = fetch.first; i < fetch.max; i++) {
-				if(i < data.lines.length) {
-					var mainitemno = data.lines[i].mainitemno;
-					promises.push(mainitemJson.get(mainitemno, $rootScope.bust));
+				if(i < data.mainitems.length) {
+
+					$scope.mkgdispgroup.mainitems.push(data.mainitems[i]);
+					this.loadMainItem($scope.mkgdispgroup.mainitems[i], i)
 				}
 			}
 
-			$q.all(promises).then(function(values) {
+		};
 
-					for(var i = 0; i < values.length; i++) {
-						var mainitem = values[i];
-						$scope.mkgdispgroup.lines.push(mainitem);
+		$scope.loadMainItem = function(mainitem, index) {
+
+			mainitemJson.get(mainitem.mainitemno, $rootScope.bust).then(function(data) {
+
+					for(var i = 0; i < data.dispunits.length; i++) {
+
+						var exist = false;
+						for(var j = 0; j < mainitem.dispunits.length; j++) {
+							if(mainitem.dispunits[j].pk === data.dispunits[i].pk) {
+								
+								_.set(mainitem.dispunits[j],'promoprc',data.dispunits[i].promoprc);
+								exist = true;
+								break;
+							}
+						}
+
+						if(!exist) {
+							_.remove(data.dispunits, function(n) {
+								return data.dispunits[i].pk === n.pk;
+							});
+							i--;
+						}
 					}
-
-					console.info($scope.mkgdispgroup);
-					$rootScope.loadImg();
 					
+					
+					$scope.mkgdispgroup.mainitems.splice(index, 1, data);
+
 					if(!_.isUndefined($window.afterLoad)) {
-						
+					 
 						$window.afterLoad();
 					}
-
+					
 				})
 				.catch(function(err) {
-					console.log(err);
+
 				});
+
 		};
 
 		$scope.loadMore = function() {
 
+			if(!$rootScope.submittimeValid(1000)) {
+				return;
+			}
+
 			if($scope.page < $scope.pagecount) {
-				$scope.loadMainitem($scope.data, $scope.page + 1);
+				$scope.fetchData($scope.data, $scope.page + 1);
 			}
 		};
 
@@ -4640,7 +4667,7 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 					$scope.loadDetail(data);
 				})
 				.catch(function(err) {
-					dialogSvc.error("net error");
+
 				});
 		};
 
@@ -5495,13 +5522,12 @@ define('filters/sizeimage',['require', './module'], function(require, module) {
 	module.filter('sizeimage', function() {
 
 		return function(input, sizetype) {
-			if(_.isUndefined(input)){
+			if(_.isUndefined(input) || _.isNull(input)) {
 				return "";
 			}
-				
-				
-			var result = "";			
-			
+
+			var result = "";
+
 			var arr = input.split('.');
 			for(var i = 0; i < arr.length; i++) {
 
@@ -5536,25 +5562,60 @@ define('filters/catalogpath',['require', './module'], function(require, module) 
 	module.filter('catalogpath', function($rootScope) {
 
 		return function(input) {
-		 
-			if(input.indexOf('docfile_')>=0 && input.indexOf(':')>=0){
-				
-				var catalogid = input.replace('docfile_','').split(':')[0];
-			 	var filedoc = input.replace('docfile_','').split(':')[1];			 	
-				var result = _.get($rootScope.config, catalogid) +'/' + filedoc;			 	
+
+			if(_.isUndefined(input) || _.isNull(input)) {
+				return "";
+			}
+
+			if(input.indexOf('docfile_') >= 0 && input.indexOf(':') >= 0) {
+
+				var catalogid = input.replace('docfile_', '').split(':')[0];
+				var filedoc = input.replace('docfile_', '').split(':')[1];
+				var result = _.get($rootScope.config, catalogid) + '/' + filedoc;
 				return result;
-			
-			}else{
+
+			} else {
 				return input;
 			}
-			
 
 		};
 
 	});
 
 });
-define('filters/main',['./testFilter', './nodes', './hasnodes', './nothasnodes', './nodeattr', './nodeslength', './ifvalue', './range', './privatestring', './nvl', './cutindex', './sizeimage', './catalogpath'],
+define('filters/arraryeffitem',['require', './module'], function(require, module) {
+	'use strict';
+
+	var _ = require('lodash');
+	var angular = require('angular');
+
+	module.filter('arraryeffitem', function() {
+
+		return function(input, index) {
+
+			var j = 0;
+			var result = '';
+			for(var i = 0; i < input.length; i++) {
+				if(_.isUndefined(input[i])) {
+					continue;
+				}
+				
+				result = input[i];
+				
+				if(j === index) {
+					break;
+				}
+				
+				j++;
+			}
+			return result;
+
+		};
+
+	});
+
+});
+define('filters/main',['./testFilter', './nodes', './hasnodes', './nothasnodes', './nodeattr', './nodeslength', './ifvalue', './range', './privatestring', './nvl', './cutindex', './sizeimage', './catalogpath', './arraryeffitem'],
 	function() {
 
 		'use strict';
