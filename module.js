@@ -2012,8 +2012,10 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 			rootScope.submittimeValid = function(sp) {
 
-				if(_.isUndefined(sp))
+				if(_.isUndefined(sp)){
 					sp = 300;
+				}
+					
 
 				if(rootScope.submittime != null) {
 					var sec = parseInt((new Date()) - rootScope.submittime);
@@ -2721,6 +2723,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 					_.set($scope.mkgdispgroup, "id", data.id);
 					_.set($scope.mkgdispgroup, "name", data.name);
 					_.set($scope.mkgdispgroup, "sizes", data.sizes);
+					_.set($scope.mkgdispgroup, "mgtca2s", data.mgtca2s);
 
 					$scope.fetchData(data, page);
 				})
@@ -2738,7 +2741,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 				if(i < data.mainitems.length) {
 
 					$scope.mkgdispgroup.mainitems.push(data.mainitems[i]);
-					this.loadMainItem($scope.mkgdispgroup.mainitems[i], i)
+					this.loadMainItem($scope.mkgdispgroup.mainitems[i], i);
 				}
 			}
 
@@ -2761,9 +2764,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 						}
 
 						if(!exist) {
-							_.remove(data.dispunits, function(n) {
-								return data.dispunits[i].pk === n.pk;
-							});
+							data.dispunits.splice(i, 1);
 							i--;
 						}
 					}
