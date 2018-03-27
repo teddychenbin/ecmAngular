@@ -499,6 +499,36 @@ define('jsons/colorseriesJson',['require', './module'], function(require, module
 	});
 
 });
+define('jsons/mianitemhypertextJson',['require', './module'], function(require, module) {
+	'use strict';
+
+	module.service('mianitemhypertextJson', function($http, $q, jsonhost) {
+
+		this.get = function(id, bust) {
+
+			var result = "";
+
+			$.ajax({
+				url: jsonhost + '/mainitemhypertext/' + id + '.content.json?bust' + bust,
+				cache: false,
+				async: false,
+				type: "get",
+				dataType: 'html',
+				success: function(data) {
+					result = data;
+				},
+				error: function(XMLHTTPRequest, textStatus, errorThrown) {
+					console.info(XMLHTTPRequest.status);
+				}
+			});
+
+			return result;
+
+		};
+
+	});
+
+});
 /*
  * json层文件都是用get的方式去访问，有浏览器 缓存
  * 不能用factory 会直接执行
@@ -506,7 +536,7 @@ define('jsons/colorseriesJson',['require', './module'], function(require, module
 define('jsons/main',['./advertJson', './articlecontentJson', './articleJson',
 		'./configJson', './countryJson', './govadmdivJson',
 		'./mainitemJson', './mkgdispgroupJson', './mkgpgmarticleJson', './mkgpgmJson',
-		'./sitemapJson', './webpagecontentJson', './webpageJson', './countryphoneprefixJson', './colorseriesJson'
+		'./sitemapJson', './webpagecontentJson', './webpageJson', './countryphoneprefixJson', './colorseriesJson','./mianitemhypertextJson'
 
 	],
 	function() {
@@ -1462,9 +1492,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 	var angular = require('angular');
 
 	module.service('initctrlSvc', function(viewprefix, homedeftemplate, $http, $q, $cacheFactory, $window, mockidentify, webpagehost, currency, callingcode,
-		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson, colorseriesJson,
+		webpageJson, webpagecontentJson, sitemapJson, configJson, govadmdivJson, mainitemJson, colorseriesJson, mianitemhypertextJson,
 		advertJson, memberidentifyApi, memberbrowseApi, memberfollowApi, shoppingcartApi, member2addrApi, searchlogApi,
-		dialogSvc, dateformat, $modal, $aside, $alert, $select) {
+		dialogSvc, dateformat, $modal, $aside, $alert, $select, $stateParams) {
 
 		this.cacheJson = function(rootScope, name, value) {
 
@@ -1501,14 +1531,36 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 			}
 
 			var isTemplatePage = _.includes(pageid, '_');
+			var isMainItemHypertext = _.includes(pageContent, '[[mianitemhypertext');
+
 			if(isTemplatePage) {
+
 				templateCache.put(pageid.split('_')[0] + '.html', pageContent);
+
+			} else if(isMainItemHypertext) {
+			 
+				var arr = pageContent.split('[[mianitemhypertext');
+				if(arr.length > 1) {
+					for(var i = 0; i < arr.length; i++) {
+						if(_.trim(arr[i]).startsWith(':')) {							
+							var templateca = arr[i].split(']]')[0];						
+							templateca = _.replace(templateca, ':', '');
+							var hypertextid = $stateParams.mainitemno + '_' + templateca;
+								
+							var hypertext = mianitemhypertextJson.get(hypertextid, rootScope.bust);
+						 
+							pageContent = pageContent.replace('[[mianitemhypertext:'+templateca+"]]",hypertext);
+						}
+					}
+				}
+				
+				templateCache.put(pageid + '.html', pageContent);
 			} else {
 				templateCache.put(pageid + '.html', pageContent);
 			}
 
 			this.initAdv(rootScope, pageContent);
-			this.initColorseries(rootScope, pageContent);
+			this.initColorseries(rootScope, pageContent); 
 			//load ng-include template
 
 			var arr = pageContent.split('ng-include');
@@ -2012,10 +2064,9 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 
 			rootScope.submittimeValid = function(sp) {
 
-				if(_.isUndefined(sp)){
+				if(_.isUndefined(sp)) {
 					sp = 300;
 				}
-					
 
 				if(rootScope.submittime != null) {
 					var sec = parseInt((new Date()) - rootScope.submittime);
@@ -2467,94 +2518,7 @@ define('services/languageSvc',['require', './module'], function(require, module)
 	});
 
 });
-define('services/mainitemSvc',['require', './module'], function(require, module) {
-	'use strict';
-
-	var _ = require('lodash');
-	var angular = require('angular');
-
-	module.service('mainitemSvc', function($q, mainitemJson, memberfollowApi, dialogSvc) {
-
-		this.init = function(scope, rootScope, location, stateParams) {
-		
-			scope.mainitem = null;
-
-			scope.appendSuit = function(mainitem) {
-				var promises = [];
-				_(mainitem.suits).forEach(function(el) {
-
-					promises.push(mainitemJson.get(el.mainitemno, rootScope.bust));
-				});
-
-				$q.all(promises).then(function(suitmainitems) {
-
-					mainitem.suits = [];
-					mainitem.suits = suitmainitems;
-				});
-			};
- 
-
-			/*
-			 * loadSuccessHandle
-			 */
-			scope.loadMainitem = function() {
-
-				mainitemJson.get(stateParams.mainitemno, rootScope.bust).then(function(data) {
-
-						scope.mainitem = data;
-
-						scope.prodspec1 = scope.mainitem.dispunits[0].prodspec1;
-						_(scope.mainitem.dispunits).forEach(function(el) {
-							if(stateParams.prodspec1 === el.prodspec1.id) {
-								scope.prodspec1 = el.prodspec1;
-							}
-						});
-
-						_(scope.mainitem.dispunits).forEach(function(el) {
-
-							if(el.prodspec1.id === scope.prodspec1.id) {
-
-								scope.dispunit = el;
-								scope.prodspec2 = el.items[0].prodspec2;
-								scope.item = el.items[0];
-
-								_(el.items).forEach(function(item) {
-									if(stateParams.prodspec2 === item.prodspec2.id) {
-										scope.prodspec2 = item.prodspec2;
-										scope.item = item;
-									}
-								});
-
-							}
-
-						});
-
-						scope.appendSuit(scope.mainitem);
-
-						console.info('mainitem');
-						console.info(scope.mainitem);
-						console.info('dispunit');
-						console.info(scope.dispunit);
-						console.info('item');
-						console.info(scope.item);
-
-						if(!_.isUndefined(scope.loadMainitemSuccessHandle)) {
-							scope.loadMainitemSuccessHandle();
-						}
-
-					})
-					.catch(function(err) {
-						console.log(err);
-					});
-
-			};
-
-		};
-
-	});
-
-});
-define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './dialogSvc', './languageSvc', './mainitemSvc'],
+define('services/main',['./testSvc', './codeSvc', './initctrlSvc', './pageSvc', './dialogSvc', './languageSvc'],
 	function() {
 
 		'use strict';
@@ -2590,7 +2554,7 @@ define('controllers/articleCtrl',['require', './module'], function(require, modu
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 	});
 
 });
@@ -2619,7 +2583,7 @@ define('controllers/errorCtrl',['require', './module'], function(require, module
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -2656,7 +2620,7 @@ define('controllers/homeCtrl',['require', './module'], function(require, module)
 			return;
 		}
 
-		$rootScope.loadFastShoppingcart();
+		
 	});
 
 });
@@ -2796,7 +2760,7 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load(_.parseInt($stateParams.page));
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -2884,7 +2848,7 @@ define('controllers/mkgpgmarticleCtrl',['require', './module'], function(require
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -2981,7 +2945,7 @@ define('controllers/mkgpgmCtrl',['require', './module'], function(require, modul
 		};
 
 		$scope.load(_.parseInt($stateParams.page));
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3011,7 +2975,7 @@ define('controllers/custompageCtrl',['require', './module'], function(require, m
 		};
 		
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3022,11 +2986,11 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 	var _ = require('lodash');
 
 	/*
-	 * /mainitem/:template/:path/:mainitemno/:spec1/:spec2
+	 * /mainitem/:template/:mainitemno/:spec1/:spec2
 	 */
 
 	module.controller('mainitemCtrl', function($q, $scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		mainitemJson, memberfollowApi, shoppingcartApi, mainitemSvc, initctrlSvc, dialogSvc, $alert) {
+		mainitemJson, memberfollowApi, shoppingcartApi, initctrlSvc, dialogSvc, $alert) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 
@@ -3040,14 +3004,61 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			$templateCache.put('mainitem.html', '');
 			return;
 		}
+	
+  
+		var arr = template.split('[[hypertext');
+	 	
+		if(arr.length > 1) {
+			for(var i = 0; i < arr.length; i++) {
+				alert(arr[i])		
+				if(_.trim(arr[i]).startsWith(':')) {
+					
+					var templateca = arr[i].split(']]')[0];
+					console.info(templateca);
+					//this.setAdvert(advertid, rootScope);
+
+				}
+			}
+		}
 
 		$scope.load = function() {
 
 			$scope.follow = null;
 			$scope.itemqty = 1;
 
-			mainitemSvc.init($scope, $rootScope, $location, $stateParams);
-			$scope.loadMainitem();
+			mainitemJson.get($stateParams.mainitemno, $rootScope.bust).then(function(data) {
+
+					$scope.mainitem = data;
+					_($scope.mainitem.dispunits).forEach(function(el) {
+						if($stateParams.prodspec1 === el.prodspec1.id) {
+							$scope.dispunit = el;
+							console.info('dispunit');
+							console.info($scope.dispunit);
+						}
+					});
+					_($scope.dispunit.items).forEach(function(el) {
+						if($stateParams.prodspec2 === el.prodspec2.id) {
+							$scope.item = el;
+							console.info('item');
+							console.info($scope.item);
+						}
+					});
+
+					var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ' ' + $scope.item.prodspec2.name + ']';
+
+					if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
+						title += ' ' + $scope.mainitem.brand.name;
+					}
+					$rootScope.title = title + ' -' + $rootScope.title;
+
+					$scope.getfollow();
+					$scope.appendBrowse($scope.mainitem);
+
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+
 		};
 
 		$scope.plusItemQty = function() {
@@ -3067,6 +3078,10 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 		$scope.getfollow = function() {
 
 			$scope.follow = null;
+
+			if($rootScope.identify !== null) {
+				return;
+			}
 
 			memberfollowApi.get($rootScope.identify.pk + $scope.mainitem.pk + 'f').then(function(data) {
 					console.info(data);
@@ -3119,27 +3134,7 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 
 		};
 
-		$scope.loadMainitemSuccessHandle = function() {
-
-			var title = '[' + $scope.mainitem.name + ' ' + $scope.dispunit.id + ' ' + $scope.dispunit.prodspec1.name + ']';
-
-			if(!_.isUndefined($scope.mainitem.brand) && _.trim($scope.mainitem.brand.name) !== "") {
-				title += ' ' + $scope.mainitem.brand.name;
-			}
-			$rootScope.title = title + ' -' + $rootScope.title;
-
-			setTimeout(function() {
-				if($rootScope.identify !== null) {
-					$scope.getfollow();
-				}
-				$scope.appendBrowse($scope.mainitem);
-
-			}, 1000);
-
-		};
-
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
 
 	});
 
@@ -3170,7 +3165,7 @@ define('controllers/itemsearchCtrl',['require', './module'], function(require, m
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3288,7 +3283,7 @@ define('controllers/itemsearchlistCtrl',['require', './module'], function(requir
 		};
 
 		$scope.load(_.parseInt($stateParams.page));
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3357,7 +3352,7 @@ define('controllers/loginCtrl',['require', './module'], function(require, module
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3381,7 +3376,7 @@ define('controllers/memberCtrl',['require', './module'], function(require, modul
 			$templateCache.put('member.html', '');
 			return;
 		}
-		$rootScope.loadFastShoppingcart();
+		
 	 
 
 	});
@@ -3486,7 +3481,7 @@ define('controllers/salesorderCtrl',['require', './module'], function(require, m
 
 			$scope.load();
 		}
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3502,7 +3497,7 @@ define('controllers/shoppingcartadditemCtrl',['require', './module'], function(r
 	 * 
 	 */
 	module.controller('shoppingcartadditemCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		shoppingcartApi, mainitemJson, mainitemSvc, initctrlSvc, dialogSvc, languageSvc) {
+		shoppingcartApi, mainitemJson,  initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('shoppingcartadditem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
@@ -3519,7 +3514,7 @@ define('controllers/shoppingcartadditemCtrl',['require', './module'], function(r
 		$scope.load = function() {
 
 			$scope.state = 0;
-			mainitemSvc.init($scope, $rootScope, $location, $stateParams);
+			//mainitemSvc.init($scope, $rootScope, $location, $stateParams);
 			$scope.loadMainitem();
 		};
 
@@ -3605,7 +3600,6 @@ define('controllers/shoppingcartadditemCtrl',['require', './module'], function(r
 					}
 
 					$scope.state = 1;
-					$rootScope.loadFastShoppingcart();
 
 				}, function(err) {
 					$scope.state = 2;
@@ -3795,7 +3789,7 @@ define('controllers/presalesorderCtrl',['require', './module'], function(require
 		}
 	 
 
-		$rootScope.loadFastShoppingcart();
+		
 	});
 
 });
@@ -3810,7 +3804,7 @@ define('controllers/preshoppingcartadditemCtrl',['require', './module'], functio
 	 * 
 	 */
 	module.controller('preshoppingcartadditemCtrl', function($scope, $rootScope, $stateParams, $templateCache, $state, $location, $window,
-		shoppingcartApi, mainitemJson, mainitemSvc, initctrlSvc, dialogSvc, languageSvc) {
+		shoppingcartApi, mainitemJson, initctrlSvc, dialogSvc, languageSvc) {
 
 		var template = initctrlSvc.getTemplate($stateParams);
 		var isload = initctrlSvc.controlLoad('preshoppingcartadditem' + template, $state, $location, $rootScope, $stateParams, $templateCache, {
@@ -3873,7 +3867,7 @@ define('controllers/orderpayCtrl',['require', './module'], function(require, mod
 			$templateCache.put('orderpay.html', '');
 			return;
 		}
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3921,7 +3915,7 @@ define('controllers/orderconfirmsuccessCtrl',['require', './module'], function(r
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -3945,7 +3939,7 @@ define('controllers/orderpaysuccessCtrl',['require', './module'], function(requi
 			$templateCache.put('orderpaysuccess.html', '');
 			return;
 		}
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4011,7 +4005,7 @@ define('controllers/registCtrl',['require', './module'], function(require, modul
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4058,7 +4052,7 @@ define('controllers/infoCtrl',['require', './module'], function(require, module)
 		};
 		
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4128,7 +4122,7 @@ define('controllers/actionauthCtrl',['require', './module'], function(require, m
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4184,7 +4178,7 @@ define('controllers/changepasswordCtrl',['require', './module'], function(requir
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4241,7 +4235,7 @@ define('controllers/bindingemailCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4319,7 +4313,7 @@ define('controllers/bindingphoneCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4369,7 +4363,7 @@ define('controllers/memberaddresslistCtrl',['require', './module'], function(req
 		};
 
 		$rootScope.loadAddresslist();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4606,7 +4600,7 @@ define('controllers/memberaddressmodifyCtrl',['require', './module'], function(r
 
 		};
 
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4724,7 +4718,7 @@ define('controllers/memberbrowseCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4837,7 +4831,7 @@ define('controllers/memberfollowCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4899,7 +4893,7 @@ define('controllers/membermodifyCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4924,7 +4918,7 @@ define('controllers/membermessageCtrl',['require', './module'], function(require
 			return;
 		}
 
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -4974,7 +4968,7 @@ define('controllers/memberorderlistCtrl',['require', './module'], function(requi
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -5022,7 +5016,7 @@ define('controllers/memberorderCtrl',['require', './module'], function(require, 
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 		
 	});
 
@@ -5055,7 +5049,7 @@ define('controllers/memberrepairlistCtrl',['require', './module'], function(requ
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -5103,7 +5097,7 @@ define('controllers/memberrepairCtrl',['require', './module'], function(require,
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 		
 	});
 
@@ -5127,7 +5121,7 @@ define('controllers/memberbalancelistCtrl',['require', './module'], function(req
 			$templateCache.put('memberbalancelist.html', '');
 			return;
 		}
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -5151,7 +5145,7 @@ define('controllers/membercouponlistCtrl',['require', './module'], function(requ
 			$templateCache.put('membercouponlist.html', '');
 			return;
 		}
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -5175,7 +5169,7 @@ define('controllers/memberintegrallistCtrl',['require', './module'], function(re
 			$templateCache.put('memberintegrallist.html', '');
 			return;
 		}
-		$rootScope.loadFastShoppingcart();
+		
 
 	});
 
@@ -5223,7 +5217,7 @@ define('controllers/wechatpayCtrl',['require', './module'], function(require, mo
 		};
 
 		$scope.load();
-		$rootScope.loadFastShoppingcart();
+		
 		
 	});
 
