@@ -1538,29 +1538,15 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 				templateCache.put(pageid.split('_')[0] + '.html', pageContent);
 
 			} else if(isMainItemHypertext) {
-			 
-				var arr = pageContent.split('[[mianitemhypertext');
-				if(arr.length > 1) {
-					for(var i = 0; i < arr.length; i++) {
-						if(_.trim(arr[i]).startsWith(':')) {							
-							var templateca = arr[i].split(']]')[0];						
-							templateca = _.replace(templateca, ':', '');
-							var hypertextid = $stateParams.mainitemno + '_' + templateca;
-								
-							var hypertext = mianitemhypertextJson.get(hypertextid, rootScope.bust);
-						 
-							pageContent = pageContent.replace('[[mianitemhypertext:'+templateca+"]]",hypertext);
-						}
-					}
-				}
-				
+
+				pageContent = this.replaceMainitemHypertext(rootScope, pageContent);
 				templateCache.put(pageid + '.html', pageContent);
 			} else {
 				templateCache.put(pageid + '.html', pageContent);
 			}
 
 			this.initAdv(rootScope, pageContent);
-			this.initColorseries(rootScope, pageContent); 
+			this.initColorseries(rootScope, pageContent);
 			//load ng-include template
 
 			var arr = pageContent.split('ng-include');
@@ -1569,17 +1555,29 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 					if(_.trim(arr[i]).startsWith('=')) {
 
 						var includePageid = arr[i].split('</div>')[0];
-						includePageid = _.replace(includePageid, '.html', '');
-						includePageid = _.replace(includePageid, '=', '');
-						includePageid = _.replace(includePageid, '>', '');
-						includePageid = _.replace(includePageid, '"', '');
-						includePageid = _.replace(includePageid, '"', '');
-						includePageid = _.replace(includePageid, "'", '');
-						includePageid = _.replace(includePageid, "'", '');
+						includePageid = includePageid.replace('.html', '');
+						includePageid = includePageid.replace(/=|>|"|'/g, '');
+				
 						this.initPageTemplate(rootScope, templateCache, _.trim(includePageid));
 					}
 				}
 			}
+		};
+
+		this.replaceMainitemHypertext = function(rootScope, pageContent) {
+			var ar = pageContent.split('[[mianitemhypertext');
+			if(ar.length > 1) {
+				for(var i = 0; i < ar.length; i++) {
+					if(_.trim(ar[i]).startsWith(':')) {
+						var templateca = ar[i].split(']]')[0];
+						templateca = _.replace(templateca, ':', '');
+						var hypertextid = $stateParams.mainitemno + '_' + templateca;
+						var hypertext = mianitemhypertextJson.get(hypertextid, rootScope.bust);
+						pageContent = pageContent.replace('[[mianitemhypertext:' + templateca + "]]", hypertext);
+					}
+				}
+			}
+			return pageContent;
 		};
 
 		this.initAdv = function(rootScope, pageContent) {
@@ -1684,16 +1682,20 @@ define('services/initctrlSvc',['require', './module'], function(require, module)
 		this.setPath2Rootscope = function(rootScope, pathString) {
 			console.info('pathString ' + pathString);
 			var paths = [];
-			var arr = _.words(pathString, /[^_ ]+/g);
+			var arr = pathString.split(/_|-/);
 			var route = '';
 			_(arr).forEach(function(el) {
-				if(route !== '') {
-					route += '_';
-				}
 
-				route += el;
-				console.info('path ' + route);
-				paths.push(route);
+				if(_.trim(el) !== '') {
+					
+					if(route !== '') {
+						route += '_';
+					}
+
+					route += el;
+					paths.push(route);
+
+				}
 
 			});
 
@@ -2658,26 +2660,26 @@ define('controllers/mkgdispgroupCtrl',['require', './module'], function(require,
 			});
 		};
 
-		$scope.showMkgdispgroupasidefilter = function() {
-
-			$rootScope.aside = $aside({
-				scope: $scope,
-				animation: "am-slide-left",
-				placement: 'left',
-				templateUrl: webpagehost + '/webpage/' + viewprefix + 'mkgdispgroupasidefilter.content.json?bust' + $rootScope.bust
-			});
-
-			$rootScope.aside.$promise.then(function() {
-				$rootScope.aside.show();
-			});
-
-		};
+//		$scope.showMkgdispgroupasidefilter = function() {
+//
+//			$rootScope.aside = $aside({
+//				scope: $scope,
+//				animation: "am-slide-left",
+//				placement: 'left',
+//				templateUrl: webpagehost + '/webpage/' + viewprefix + 'mkgdispgroupasidefilter.content.json?bust' + $rootScope.bust
+//			});
+//
+//			$rootScope.aside.$promise.then(function() {
+//				$rootScope.aside.show();
+//			});
+//
+//		};
 
 		$scope.load = function(page) {
 
 			mkgdispgroupJson.get($stateParams.id, $rootScope.bust).then(function(data) {
 
-					$scope.data = data;
+					$scope.data = data;					
 					initctrlSvc.setPath2Rootscope($rootScope, data.paths[0].path);
 					$rootScope.title = '[' + data.name + '] -' + $rootScope.title;
 
@@ -3005,21 +3007,7 @@ define('controllers/mainitemCtrl',['require', './module'], function(require, mod
 			return;
 		}
 	
-  
-		var arr = template.split('[[hypertext');
-	 	
-		if(arr.length > 1) {
-			for(var i = 0; i < arr.length; i++) {
-				alert(arr[i])		
-				if(_.trim(arr[i]).startsWith(':')) {
-					
-					var templateca = arr[i].split(']]')[0];
-					console.info(templateca);
-					//this.setAdvert(advertid, rootScope);
-
-				}
-			}
-		}
+   
 
 		$scope.load = function() {
 
